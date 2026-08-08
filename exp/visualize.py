@@ -17,19 +17,23 @@ HOW TO USE
 ----------
 1. Put all 6 files for one clip in a single folder (any filenames are fine,
    as long as they *end with* the usual suffixes, e.g. "..._meta.json",
-   "..._hand_boxes.json", "..._video_left.mp4", etc. -- that's exactly how
-   Claude.ai names your uploads, so you can usually just point this at your
-   uploads folder).
-2. Edit the two lines below (CLIP_DIR / OUTPUT_DIR) or pass them as
-   command-line arguments:
+   "..._hand_boxes.json", "..._video_left.mp4", etc.).
+2. Run the script with either a single clip folder or a parent folder that
+   contains many clip folders.
 
-       python3 visualize_clip.py /path/to/clip_folder /path/to/output_folder
+       python3 visualize.py /path/to/clip_folder /path/to/output_folder
 
-3. Run it. Progress is printed to the terminal.
+   or for batch processing:
+
+       python3 visualize.py /path/to/parent_folder /path/to/output_folder
+
+   Each clip gets its own output subfolder under the output root.
+3. Optionally cap annotated frames with `--max-frames`.
 
 Requires: opencv-python, matplotlib, numpy  (all pip-installable)
 """
 
+import argparse
 import json
 import sys
 import time
@@ -229,25 +233,58 @@ def plot_trajectory(vio_pose: dict, meta: dict, out_path: Path):
 # ----------------------------------------------------------------------
 # 5. Main
 # ----------------------------------------------------------------------
-def main():
-    clip_dir = sys.argv[1] if len(sys.argv) > 1 else CLIP_DIR
-    output_dir = Path(sys.argv[2] if len(sys.argv) > 2 else OUTPUT_DIR)
+def process_clip(clip_dir: Path, output_root: Path):
+    meta, frame_ts, hand_boxes, vio_pose, video_left, video_right = load_clip(clip_dir)
+    clip_id = meta.get("cid") or clip_dir.name
+    output_dir = output_root / clip_id
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    meta, frame_ts, hand_boxes, vio_pose, video_left, video_right = load_clip(clip_dir)
-
-    print(f"\nClip: {meta.get('cid')}  |  Task: {meta.get('label')}  |  "
+    print(f"\nClip: {clip_id}  |  Task: {meta.get('label')}  |  "
           f"{meta.get('duration_s')}s @ {meta.get('fps')} fps")
 
-    annotated_video_path = output_dir / f"{meta.get('cid', 'clip')}_hands_overlay.mp4"
+    annotated_video_path = output_dir / f"{clip_id}_hands_overlay.mp4"
     overlay_hand_boxes(video_left, hand_boxes, annotated_video_path, max_frames=MAX_FRAMES)
 
-    trajectory_plot_path = output_dir / f"{meta.get('cid', 'clip')}_trajectory.png"
+    trajectory_plot_path = output_dir / f"{clip_id}_trajectory.png"
     plot_trajectory(vio_pose, meta, trajectory_plot_path)
 
-    print("\nAll done! Outputs:")
+    print("\nOutputs:")
     print(f"  - {annotated_video_path}")
     print(f"  - {trajectory_plot_path}")
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Visualize one clip or batch process a folder of clips."
+    )
+    parser.add_argument("input", help="Path to a clip folder or a parent folder containing many clip folders")
+    parser.add_argument("output", help="Path to an output folder where each clip gets its own subfolder")
+    parser.add_argument("--max-frames", type=int, default=None,
+                        help="Optional cap on how many frames to annotate per clip")
+    args = parser.parse_args()
+
+    global MAX_FRAMES
+    if args.max_frames is not None:
+        MAX_FRAMES = args.max_frames
+
+    input_path = Path(args.input)
+    output_root = Path(args.output)
+    output_root.mkdir(parents=True, exist_ok=True)
+
+    if input_path.is_dir():
+        clip_dirs = [p for p in sorted(input_path.iterdir()) if p.is_dir()]
+        if clip_dirs:
+            print(f"Found {len(clip_dirs)} clip folders in {input_path}")
+            for clip_dir in clip_dirs:
+                try:
+                    process_clip(clip_dir, output_root)
+                except Exception as exc:
+                    print(f"\nERROR processing {clip_dir}: {exc}")
+        else:
+            print(f"No clip subfolders found in {input_path}")
+            sys.exit(1)
+    else:
+        process_clip(input_path, output_root)
 
 
 if __name__ == "__main__":

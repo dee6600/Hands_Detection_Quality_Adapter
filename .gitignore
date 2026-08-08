@@ -1,2 +1,13 @@
+# Project outputs and datasets
 /data/
 /exp/output/
+
+# Python artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Editor and OS files
+.vscode/
+.DS_Store
