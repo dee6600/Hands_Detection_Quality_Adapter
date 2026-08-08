@@ -2,6 +2,7 @@
 /data/
 /exp/output/
 /exp/output_multi/
+/main/detection_quality_adapter/scripts/tmp
 
 # Python artifacts
 __pycache__/

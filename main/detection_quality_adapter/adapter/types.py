@@ -103,6 +103,7 @@ class Config:
 
     plausible_size: tuple[float, float] = (20.0, 800.0)  # box side length, px
     plausible_shape: tuple[float, float] = (0.3, 3.0)  # aspect ratio w/h bounds
+    duplicate_iou_threshold: float = 0.5  # IoU at/above this = same object
     candidate_pool_size: int = 5
     class_max_instances: int = 4
     max_speed_px_per_frame: float = 150.0
