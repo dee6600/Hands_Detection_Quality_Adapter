@@ -151,3 +151,91 @@ clip's own camera speed at each frame (via `ClipData.pose`, the same signal
 already driving the static rule), so `ae580129_t057`-like clips don't need a
 systematically higher false-rejection rate than calmer clips. This needs
 labeled data to validate the scaling factor rather than more eyeballing.
+
+## Visualizing stage 4 (interpolation + exit) and the full pipeline
+
+`tests/test_interpolation.py` covers gap-fill/exit on synthetic tracks
+(including the design notes below); `tests/test_interpolation_real_data.py`
+checks it against real clips; `tests/test_pipeline_synthetic.py` is the
+Milestone 5 exit-criteria integration test (`pipeline.run_pipeline` end to
+end on one synthetic multi-object clip). To see stage 4 by eye on a real
+clip, using the real, now fully-wired pipeline:
+
+```
+# batch by default: 5 random clips -> scripts/output/interpolation/
+python scripts/visualize_interpolation.py
+
+# pick how many random clips, and cap frames for a quick look
+python scripts/visualize_interpolation.py --num-clips 10 --max-frames 300
+
+# specific clips, or a reproducible random sample
+python scripts/visualize_interpolation.py --clips 0c54a47b_t010 407258cd_t036
+python scripts/visualize_interpolation.py --seed 42
+```
+
+Color legend: green = kept, cyan = interpolated (a gap stage 4 filled back
+in), red dashed = rejected (any stage 1/3 reason). A track confirmed as
+leaving the frame gets an "EXIT" label drawn at its last real frame. Each
+clip gets its own `{clip_id}_interp.mp4` under `--output-dir` (default
+`scripts/output/interpolation/`) plus a per-clip stats printout and a run
+summary; one clip failing doesn't stop the batch.
+
+`pipeline.py` is wired for real as of this milestone: `run_pipeline(clip.
+detections, clip.pose)` runs all four stages in order and returns tagged,
+gap-filled tracks — matching `ClipData`'s shape directly, so it can be
+called straight off `ingest.load_clip`'s output.
+
+### A real bug found by real-data testing: exit detection used box center, not edge
+
+The exit test's first version measured distance from a box's *center* to
+the nearest frame border. On synthetic fixtures (small, fixed-size boxes)
+this is indistinguishable from edge distance, so it passed every synthetic
+test — but on real clips it made **zero** tracks classify as `exiting`
+across all three clips checked, despite hands obviously leaving frame in
+every one of them (e.g. hairstyling, hands going below the chair). This
+dataset's boxes are often large/near-frame-filling: a real `t010` box with
+`y2=1200` — sitting exactly on the 1200px-tall frame's bottom edge — had a
+center only ~1093, **107px short** of the default 20px margin. Fixed by
+measuring from the box's own nearest edge instead of its center. After the
+fix: 8/6/10 tracks correctly classified as `exiting` on `t010`/`t036`/
+`ae580129_t057`. A regression test (`test_stage4_actually_classifies_some_
+real_exits`) locks this in, deliberately excluding `6cd0b236_t000` — a dense
+clip with only 2 tracks, both running to the clip's own last frame with no
+dropouts at all, so genuinely nothing to exit from there.
+
+### Design notes carried over from the spec cross-check
+
+Two things flagged in `planning.md` before this milestone was built, both
+implemented:
+
+- **`rejected` detections count as gap material.** A track's detections
+  tagged `rejected` by stage 3 (e.g. a motion-blur displacement flag) are
+  excluded from the "trustworthy anchor" sequence stage 4 reasons about —
+  their position isn't trusted, but the frame they're on is still eligible
+  to be filled in, exactly like a frame with no detection at all. Filling
+  overwrites the rejected box rather than leaving a stray untrustworthy one
+  next to a new one. This is what keeps the Milestone 4 speed-threshold
+  tightening from being a net loss: a wobble frame gets flagged untrustworthy
+  *and then* recovered, matching the spec's "motion blur ... interpolate
+  where the trajectory remains continuous" edge case instead of just losing
+  the frame.
+- **Per-border exit configurability.** `Config.exit_border_margin_overrides`
+  and `exit_requires_outward_motion` let a border have its own margin and
+  drop the outward-motion requirement — generic defaults require outward
+  motion everywhere with one shared margin, matching spec Part 1. Milestone
+  6 will set a larger, motion-optional bottom-border override for hands
+  (torso occlusion doesn't look like walking out of frame), without needing
+  any changes to `interpolation.py` itself.
+
+### A real bug found while writing the tests, not the code
+
+While hand-deriving the expected numbers for the "gap resumes far from
+prediction" test, the original gap-fill check turned out to be tautological:
+it computed the "predicted" position using the *same two points* (the gap's
+own before/after anchors) it was then checking that prediction against —
+so the distance was always zero and every gap would have passed the check
+regardless of how implausible the resumption was. Fixed by predicting from
+the anchor's own *incoming* velocity (from whatever came before it in the
+track), independent of where the gap actually resumes. Caught before it
+ever ran against real data, by tracing through the synthetic test math by
+hand rather than trusting the first green test run.

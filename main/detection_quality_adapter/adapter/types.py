@@ -134,3 +134,17 @@ class Config:
     camera_moving_speed_mps: float = 0.05  # VIO speed at/above this = camera is moving
     camera_moving_angular_deg_per_frame: float = 1.0  # roll/pitch/yaw delta at/above this = camera is moving
     min_static_run_frames: int = 15  # consecutive still-while-moving frames needed before tagging static
+
+    # Milestone 5 (interpolation.py): frame bounds for the border-exit test.
+    # Matches this dataset's fixed ZED resolution; generic Part 1 default, not a
+    # hand-specific one.
+    frame_size: tuple[float, float] = (1920.0, 1200.0)
+    # Per-border overrides of exit_border_margin_px / whether outward motion is
+    # required to count as an exit, keyed by "left"/"right"/"top"/"bottom". Missing
+    # borders fall back to exit_border_margin_px / True (motion required). Added for
+    # hand_config.py (Milestone 6) per the spec cross-check: a hand disappearing
+    # below the camera is occluded by the wearer's own torso, not walking out of
+    # frame like a side exit, so it may need a larger margin and no outward-motion
+    # requirement -- see planning.md's Milestone 5 design notes.
+    exit_border_margin_overrides: dict[str, float] = field(default_factory=dict)
+    exit_requires_outward_motion: dict[str, bool] = field(default_factory=dict)

@@ -346,19 +346,19 @@ detections tagged `rejected`, rest untouched.
 
 ---
 
-## Milestone 5 — Interpolation + exit detection (Stage 4)
+## Milestone 5 — Interpolation + exit detection (Stage 4) ✅ DONE
 
 **Goal:** fill genuine gaps, but never invent an object that left the frame
 (spec §4).
 
-- [ ] Exit test: near a frame border + motion directed outward → track ends,
+- [x] Exit test: near a frame border + motion directed outward → track ends,
   no interpolation.
-- [ ] Otherwise, if a track resumes near its predicted position after a gap
+- [x] Otherwise, if a track resumes near its predicted position after a gap
   within the max-dropout-length parameter → interpolate the missing frames,
   tag `interpolated`.
-- [ ] A break that doesn't resume, and isn't an exit either, is left untouched
+- [x] A break that doesn't resume, and isn't an exit either, is left untouched
   (no fabricated detections, no forced closure).
-- [ ] Unit tests: synthetic tracks —
+- [x] Unit tests: synthetic tracks —
   - object exits at border with outward motion → no interpolation
   - object occluded mid-frame, resumes near prediction → interpolated
   - object gap exceeds max dropout length → left untouched
@@ -405,6 +405,44 @@ proximity. Write the four synthetic test cases listed above."
 on a synthetic multi-frame sequence and produces correctly tagged output.
 This is a good checkpoint to wire `pipeline.py` together and add an
 integration test.
+
+**Done:** both design notes above got implemented, not just noted —
+`rejected` detections are excluded from a track's "trustworthy anchor"
+sequence (so a stage-3 wobble flag gets recovered by interpolation instead
+of just lost) and `Config.exit_border_margin_overrides`/
+`exit_requires_outward_motion` let a border skip the outward-motion
+requirement with its own margin (mechanism built now, generic defaults;
+Milestone 6 sets the actual hand-specific bottom-border override). `pipeline.py`
+is wired end to end (`run_pipeline(clip.detections, clip.pose)` running all
+four stages), with a new `tests/test_pipeline_synthetic.py` satisfying the
+exit criteria directly, and the two Milestone 0/1 placeholder pipeline tests
+(`test_smoke.py`, `test_types.py`) updated from asserting the old no-op
+passthrough to exercising the real pipeline.
+
+Real-data testing caught two bugs, both instructive:
+- **A test-writing bug, caught before ever running against real data**: the
+  original gap-fill "prediction" check computed the predicted position from
+  the gap's own two endpoints, then checked that prediction against one of
+  those same endpoints — tautologically always zero distance, so any
+  resumption would have passed regardless of plausibility. Found by
+  hand-deriving the expected numbers for the "resumes far from prediction"
+  test before running it, not by trusting a green test run. Fixed by
+  predicting from the anchor's own incoming velocity (from whatever came
+  before it), independent of where the gap resumes.
+- **A real bug, only visible on real data**: the exit test compared box
+  *center* distance to the frame border. Indistinguishable from edge
+  distance on the small, fixed-size synthetic test boxes — so every
+  synthetic test passed — but on real clips it produced **zero** confirmed
+  exits across all three clips checked, despite hands obviously leaving
+  frame in every one. This dataset's boxes are often large/near-frame-filling
+  (noted since the dataset first arrived): a real box with `y2=1200`, exactly
+  on the 1200px-tall frame's bottom edge, had its center 107px short of the
+  default 20px margin. Fixed by measuring from the box's nearest edge
+  instead. After the fix: 8/6/10 tracks correctly classified `exiting` on
+  `t010`/`t036`/`ae580129_t057` (0 on `6cd0b236_t000`, correctly — a dense
+  clip with only 2 tracks, both running to the clip's own last frame with no
+  dropouts to explain). See `detection_quality_adapter/README.md` for full
+  numbers and a locked-in regression test.
 
 ---
 
@@ -568,7 +606,12 @@ Wire real camera-motion and stereo-depth signals in place of the Milestone
    gate/plausibility split above and the "Working strategy" section up top.
    Worth repeating this kind of pause every few milestones rather than only
    at the end.
-7. Session 7: Milestone 5 (interpolation/exit) + wire `pipeline.py` end to end
+7. ~~Session 7: Milestone 5 (interpolation/exit) + wire `pipeline.py` end to
+   end~~ ✅ done, informed by a full spec re-read in between (see the
+   Milestone 5/6 design notes and Open Questions added then) — real-data
+   testing caught a real bug (exit test used box center, not edge) and a
+   test-writing bug (a tautological prediction check), both documented in
+   Milestone 5's "Done" notes above and the README.
 8. Session 8: Milestone 6 (hand specialization + edge-case tests) — stereo
    depth rule is DONE against nominal calibration (see above); remaining
    Milestone 6 work is `hand_config.py`, `selection.py`, and the edge-case
@@ -651,16 +694,13 @@ each):
   data look different enough — nested/offset with a confidence gap — that
   plain IoU hasn't visibly misfired), but the failure mode is real and
   spec-named, not hypothetical. See Milestone 6's new bullet on this.
-- **Interpolation (Milestone 5) needs to treat a track's `rejected`
-  detections as gap-equivalent, not just literally-missing frames**, or the
-  Milestone 4 speed-threshold tightening becomes a net loss on exactly the
-  case the spec wants recovered ("motion blur ... interpolate where the
-  trajectory remains continuous"). Not yet built, so not yet a live bug —
-  flagged so Milestone 5 gets built with this from the start. See
-  Milestone 5's design notes above.
-- **The bottom-border exit test probably needs its own trigger condition**,
-  not just a heavier weight on the bottom border as currently planned — see
-  Milestone 5's design notes above.
+- ~~Interpolation (Milestone 5) needs to treat a track's `rejected`
+  detections as gap-equivalent~~ → done: built into Milestone 5 from the
+  start (see its "Done" notes above), not retrofitted after the fact.
+- ~~The bottom-border exit test probably needs its own trigger condition~~ →
+  done: `Config.exit_border_margin_overrides`/`exit_requires_outward_motion`
+  give Milestone 6 that hook without touching `interpolation.py`; Milestone 6
+  still needs to actually set the hand-specific override.
 - **Milestone 6's stereo-depth "done" status was overstated**: the
   implementation is a validated prototype in `exp/scafholds/`, not yet
   migrated into `main/detection_quality_adapter/adapter/`. Fixed in this

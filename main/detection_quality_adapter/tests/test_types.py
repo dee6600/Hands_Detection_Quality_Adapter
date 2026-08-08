@@ -46,13 +46,26 @@ def test_config_defaults_are_generic_placeholders():
     assert c.class_max_instances > 0
 
 
-def test_hand_built_detection_list_through_noop_pipeline():
+def test_hand_built_detection_list_through_real_pipeline():
+    """Milestone 5 wired `pipeline.py` for real; this fixture (real box
+    values from t010 frame 0) now exercises the actual pipeline instead of
+    a no-op. Appearing on a single frame with nothing before or after, both
+    detections are correctly flagged `rejected` as unsupported/flicker by
+    stage 3 -- there's no track to support them, which is the right answer,
+    not the old placeholder's blanket `reported`.
+    """
     from adapter.pipeline import run_pipeline
 
     detections = [
-        Detection(frame=0, xyxy=(912.3, 912.16, 1245.5, 1200.0), confidence=0.78, class_label=0),
-        Detection(frame=0, xyxy=(1150.79, 1048.0, 1481.36, 1199.51), confidence=0.25, class_label=1),
+        [
+            Detection(frame=0, xyxy=(912.3, 912.16, 1245.5, 1200.0), confidence=0.78, class_label=0),
+            Detection(frame=0, xyxy=(1150.79, 1048.0, 1481.36, 1199.51), confidence=0.25, class_label=1),
+        ]
     ]
-    out = run_pipeline(detections)
-    assert out is detections
-    assert all(d.tag == Tag.REPORTED for d in out)
+    pose = [PoseSample(t=0.0, x=0.0, y=0.0, z=0.0, roll=0.0, pitch=0.0, yaw=0.0, speed=0.0)]
+
+    tracks = run_pipeline(detections, pose)
+
+    all_dets = [d for t in tracks for d in t.detections]
+    assert len(all_dets) == 2
+    assert all(d.tag == Tag.REJECTED for d in all_dets)
