@@ -1,6 +1,7 @@
 # Project outputs and datasets
 /data/
 /exp/output/
+/exp/output_multi/
 
 # Python artifacts
 __pycache__/
