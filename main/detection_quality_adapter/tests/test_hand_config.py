@@ -25,6 +25,25 @@ def _still_pose(n):
     return [PoseSample(t=i / 30.0, x=0.0, y=0.0, z=0.0, roll=0.0, pitch=0.0, yaw=0.0, speed=0.0) for i in range(n)]
 
 
+def test_plausible_size_admits_a_real_near_frame_filling_hand():
+    """Milestone 7 sweep: raw box side lengths across all 39 clips run up to
+    1110px, and this dataset's own README/stereo-depth calibration establish
+    near-frame-filling hands as a genuine, expected pattern (hands very
+    close to a head-mounted camera), not noise. The generic Config's 800px
+    upper bound would incorrectly reject a box this large; hand_config()'s
+    1150px bound (set from that real distribution) keeps it.
+    """
+    from adapter.types import Config as GenericConfig
+
+    big_hand = _det(0, (500.0, 500.0), w=1000.0, h=900.0)  # side=1000, within (50, 1150)
+
+    hand_survivors = apply_stage1([big_hand], hand_config())
+    assert len(hand_survivors) == 1
+
+    generic_survivors = apply_stage1([_det(0, (500.0, 500.0), w=1000.0, h=900.0)], GenericConfig())
+    assert len(generic_survivors) == 0  # confirms the generic 800px cap really would reject it
+
+
 def test_duplicate_boxes_on_one_hand_merge_in_the_candidate_pool():
     config = hand_config()
     strong = _det(0, (500.0, 500.0), confidence=0.9)

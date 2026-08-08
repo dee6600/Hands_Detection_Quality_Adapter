@@ -567,29 +567,104 @@ the right thing. 143 tests pass, 1 `xfail`ed as designed.
 
 ---
 
-## Milestone 7 — Calibration & validation (needs the dataset)
+## Milestone 7 — Calibration & validation (needs the dataset) ⚠️ PARTIALLY DONE
 
 **Goal:** replace every guessed threshold with one derived from a labeled
 reference set (spec §7–8). Do this only once the dataset is downloaded.
 
-- [ ] Build the reference set per spec's guidance: weighted toward hard cases
-  — both hands, one hand, no hands, hands at border, borderline detections —
-  not "representative" footage. Confirm it includes a meaningful fraction of
-  zero-hand frames.
-- [ ] `metrics.py`: precision/recall computed **per stage**, not aggregate —
-  false-positive rejection should raise precision, trajectory recovery should
-  raise recall, duplicate merging should raise both. Flag any stage moving the
-  wrong direction.
-- [ ] `sweep_thresholds.py`: derive from the reference set —
-  - frequency of each false-positive class → prioritize calibration effort
-  - distribution of dropout lengths → sets max interpolation gap
-  - rate at which a true hand is outranked by a spurious box → sets
-    candidate pool width
-- [ ] Standing check: track proportion of `interpolated` detections over time
-  as an early-warning signal (no labels needed) that the adapter has started
-  fabricating rather than recovering.
-- [ ] Replace stubbed camera-motion and stereo-depth signals with real ones
-  once the corresponding data streams are available.
+**Honest status, stated up front: there is still no labelled reference set
+for this dataset.** The dataset arrived (Milestone 1.5), but it's exactly
+`hand_boxes.json` — the raw, noisy detector output this whole adapter exists
+to correct — plus `meta.json`'s task-level metadata (label, job, scene,
+provenance). Neither is ground truth for which boxes are correct on which
+frames. Spec S7 is explicit that "no value here should be set by
+inspection," so the precision/recall-optimal half of this milestone is
+still genuinely blocked, not skipped by choice. What follows is what's
+honestly achievable without labels, done properly rather than faked:
+
+- [ ] Build the reference set per spec's guidance — **still blocked**, no
+  labels exist. Not attempted; would need real human annotation.
+- [x] `metrics.py`: precision/recall computed **per stage**, not aggregate —
+  the machinery is built and correct (`StageMetrics`, greedy IoU matching,
+  `flag_wrong_direction_stages` catching a stage that moves the wrong way),
+  verified against hand-built synthetic ground truth in `tests/test_metrics.py`.
+  **Not run against real ground truth for this project — there isn't any.**
+  Every number this module could report about the real 39 clips today would
+  not be a real precision/recall figure; the module's own docstring says so
+  up front so this can't get misquoted later.
+- [x] `sweep_thresholds.py`: derived what's honestly derivable **without**
+  labels, across all 39 real clips:
+  - frequency of each **rejection reason** (not confirmed false-positive
+    class — that needs labels — but a real, unsupervised proxy for where
+    each rule fires): kept 85.3%, rejected_temporal 5.1%, dropped_duplicate
+    3.1%, rejected_size_shape 2.6%, interpolated 2.5%, rejected_selection
+    1.3%, across all 153,876 raw detections (+ 2,964 stage-4 fabrications).
+  - distribution of dropout lengths → directly used to retune
+    `max_dropout_frames` (see `hand_config.py`'s notes below) — this is the
+    one spec S7 explicitly says a real (non-labelled) distribution can set.
+  - candidate-pool-width tuning ("rate at which a true hand is outranked by
+    a spurious box") — **not attempted**, genuinely needs labels: there's no
+    way to know which candidate was "true" without them.
+- [x] Standing check: `interpolated_proportion` (spec S8: "needs no
+  labelled data") — implemented in `metrics.py`, run for real across all 39
+  clips in `sweep_thresholds.py`'s report: mean 3.5%, max 17.2%
+  (`beb348be_t000`, checked by hand — longest interpolated runs there are
+  6-12 frames, consistent with genuine brief-occlusion recovery, not
+  fabrication).
+- [x] Stubbed camera-motion and stereo-depth signals — **already resolved in
+  earlier milestones**, not deferred to here: camera motion was real VIO
+  pose from Milestone 4 onward (never actually stubbed, since the dataset
+  had it from the start), and stereo depth was migrated into the real
+  package in Milestone 6.
+
+**Two real accounting bugs found and fixed while building
+`sweep_thresholds.py` itself** (both in the diagnostic tool, not the
+pipeline): `rejection_reason_frequency` first only walked `tracks`, silently
+dropping every stage-1 casualty (dedup losers, size/shape rejects never
+reach `track_detections`) — undercounted the real dataset by 4.1% with no
+error. The fix then walked raw per-frame lists instead, which silently
+dropped stage-4's brand-new fabricated `interpolated` detections in the
+other direction (they never existed as raw input). Caught by an independent
+total-count assertion in `tests/test_sweep_thresholds.py`
+(`test_rejection_reason_frequency_total_matches_raw_plus_fabricated`) before
+either version shipped. See `calibration/sweep_thresholds.py`'s docstring
+for the full account — a good example of why "the numbers added up" isn't
+sufficient proof of correctness on its own; the first buggy version's total
+also looked internally consistent.
+
+**Tuning applied to `hand_config()` from this real-data analysis** (see its
+own inline comments for the numbers): `plausible_size` (20,800) → (50,1150)
+— the old lower bound was a complete no-op (0% of 153,876 raw detections
+anywhere near 20px) and the old upper bound incorrectly rejected ~0.16% of
+raw detections that are far more likely genuine close-up hands than noise,
+given this dataset's own documented near-frame-filling characteristic.
+`max_dropout_frames` 10 → 15 — the old value sat just under the real
+gap-length distribution's p75 (13 frames), so over a quarter of genuine
+short recoverable gaps were already too long to interpolate; the long tail
+beyond that (p90=54, worst case 2529 frames) isn't trustworthy as "the same
+object" since the position gate has grown too wide by then to mean anything,
+so 15 stays well clear of it. Both are still informal, distribution-based
+calibration, not precision/recall-optimal — flagged as such, not oversold.
+
+**Final run**: the tuned hand pipeline (stages 1-5) ran against all 39
+clips (`scripts/visualize_hand_pipeline.py --all`), 996.8s, one annotated
+video per clip saved to `detection_quality_adapter/scripts/output/
+final_all_clips/` (gitignored, ~8.3GB, local only). Aggregate: 148,714 final
+detections across 787 tracks, 90.5% kept, 5.5% rejected at stage 3, 2.6%
+interpolated, 1.4% rejected at stage 5, 36.1% of tracks confirmed exiting —
+matches `sweep_thresholds.py`'s independently-computed numbers exactly.
+Stage 6 (stereo depth) omitted from this run: at the per-clip rate observed
+in Milestone 6, the full dataset would take several hours rather than
+~15-20 minutes; available via `--stereo-depth` on a smaller selection. One
+limitation found reviewing the run: this script's stats/video never show a
+`rejected_geometric` case (same root cause as the `sweep_thresholds.py`
+accounting bug above — stage-1 casualties never reach `track_detections`,
+so a track-only walk never sees them) — doesn't affect the pipeline's actual
+output, only this one script's ability to show *why* a stage-1 rejection
+happened; `visualize_stage1.py` already covers that view correctly. Not
+fixed-and-re-rendered for this pass (would cost another ~17 min + 8GB for a
+visualization completeness gap, not a behavior change) — flagged here
+instead so it's a tracked, known thing rather than a silent gap.
 
 **Prompt to give Claude:** "Implement `metrics.py` for per-stage
 precision/recall and `sweep_thresholds.py` once the dataset is in `data/`.
@@ -633,13 +708,17 @@ Wire real camera-motion and stereo-depth signals in place of the Milestone
    test per spec §6 row (gloved-hand deliberately `xfail`ed).
    `scripts/visualize_hand_pipeline.py` added, same batch-by-default
    interface as `visualize_interpolation.py`.
-9. Once labels exist for a reference set: Milestone 7 (calibration/validation)
-   — though see "Working strategy" above: don't wait until this session to
-   sanity-check every placeholder against real data, only the parts that
-   truly need labels (precision/recall). `plausible_size`, `plausible_shape`,
-   and `max_dropout_frames` haven't had the same real-data pass that speed
-   and static-motion got yet — good candidates for the next checkpoint,
-   before Milestone 6, not necessarily after.
+9. ~~Session 9: Milestone 7 (calibration/validation)~~ ⚠️ partially done —
+   `metrics.py` and `sweep_thresholds.py` built, and everything honestly
+   achievable without labels was: rejection-reason frequency, dropout-length
+   distribution, the interpolated-proportion standing check, all across all
+   39 real clips, plus retuning `plausible_size` and `max_dropout_frames`
+   from that data. The precision/recall-optimal half (a labelled reference
+   set, candidate-pool-width tuning) is still genuinely blocked — see
+   Milestone 7's "Honest status" note above. `plausible_size`/
+   `plausible_shape`/`max_dropout_frames` (flagged as unexamined after
+   Milestone 4's checkpoint) are now all done; `plausible_shape` had already
+   been covered incidentally during Milestone 6's hand_config tuning.
 
 Each session should end with passing tests before moving on. Synthetic tests
 remain the primary correctness check through Milestone 6; real-clip checks
@@ -691,11 +770,12 @@ notes above for full detail):
   difference (this clip is a maintenance job, not hairstyling/carpentry),
   not noise, so Milestone 7's reference set should probably report metrics
   per job/task type rather than only in aggregate.
-- **`plausible_size`, `plausible_shape`, and `max_dropout_frames` haven't had
-  a real-data sanity pass yet**, unlike speed and static motion. Given how
-  much the speed threshold moved once actually checked (150 → 110, plus
-  splitting it in two), these are worth the same treatment before assuming
-  they're in a reasonable range — see "Working strategy" above.
+- ~~`plausible_size`, `plausible_shape`, and `max_dropout_frames` haven't had
+  a real-data sanity pass yet~~ → done at Milestone 7: `plausible_size`
+  (20,800)→(50,1150) and `max_dropout_frames` 10→15 in `hand_config()`, both
+  from real distributional data across all 39 clips; `plausible_shape` had
+  already been covered during Milestone 6. See Milestone 7's notes above
+  for the numbers.
 
 Found during a full spec re-read at this checkpoint (spec text supplied in
 full for the first time — prior sessions worked from summaries in this

@@ -23,6 +23,15 @@ types.py for the real-data numbers behind the 0.7 chosen here).
 Handedness independence (tracker never uses the left/right label) needed no
 config at all -- it was already true of `association.py` and tested ahead of
 schedule in Milestone 3.
+
+Milestone 7 (`calibration/sweep_thresholds.py`) added two more overrides,
+`plausible_size` and `max_dropout_frames`, both re-derived from real
+distributional data across all 39 clips rather than the Milestone 1
+placeholders they replace -- see each field's inline comment below for the
+numbers. Neither needed labels: they're unsupervised checks against what the
+detector actually emits and how tracks actually behave, not precision/recall
+against ground truth (which this dataset doesn't have -- see
+`calibration/metrics.py`'s module docstring).
 """
 
 from __future__ import annotations
@@ -37,6 +46,17 @@ def hand_config(**overrides) -> Config:
     defaults = dict(
         class_max_instances=2,
         candidate_pool_size=4,
+        # Milestone 7 sweep (calibration/sweep_thresholds.py) against all
+        # 153,876 raw detections in the real dataset: side length p1=94px,
+        # max=1110px. The generic (20, 800) lower bound is a complete no-op
+        # here (0% of raw detections come anywhere near 20px) and the upper
+        # bound incorrectly rejects ~0.16% of raw detections (253 boxes)
+        # that are far more likely genuine close-up hands than noise, given
+        # this dataset's own documented near-frame-filling characteristic
+        # and the stereo-depth calibration's independent finding of hands
+        # as close as 0.33m. (50, 1150) keeps a wide safety margin below
+        # the smallest real box and just above the largest.
+        plausible_size=(50.0, 1150.0),
         # roughly equant: real hand box aspect ratios across all 39 clips'
         # stage-1 survivors have p1=0.54, median=0.92, p99=2.10 -- (0.5, 2.0)
         # covers essentially all real hands while excluding markedly
@@ -58,6 +78,20 @@ def hand_config(**overrides) -> Config:
         # stereo_depth.py's module docstring for the calibration and why
         # 1.8m, not the more intuitive ~0.8m.
         max_reach_m=1.8,
+        # Milestone 7 sweep: real internal-gap lengths within tracks (using
+        # a deliberately loosened cap so the CURRENT threshold doesn't
+        # pre-clip what's being measured) have p50=3, p75=13, p90=54,
+        # p99=470 frames. The generic default of 10 sits just under p75 --
+        # over a quarter of genuine short recoverable gaps were already too
+        # long to interpolate. The long tail (p90 and up, worst case 2529
+        # frames = 84s) is not trustworthy as "the same object": at that
+        # timescale the tracker's speed-based gate has grown so wide
+        # (radius = track_gate_speed_px_per_frame * dt) it stops meaningfully
+        # constraining anything, so those almost certainly reflect
+        # coincidental position matches between two different objects, not
+        # real dropouts. 15 frames (0.5s) comfortably covers the reliable
+        # p75 mass without reaching into that contaminated tail.
+        max_dropout_frames=15,
     )
     defaults.update(overrides)
     return Config(**defaults)

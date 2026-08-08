@@ -33,6 +33,12 @@ Usage (run from `main/detection_quality_adapter/`):
     # specific clips, reproducible sample
     python scripts/visualize_hand_pipeline.py --clips 0c54a47b_t010 407258cd_t036
     python scripts/visualize_hand_pipeline.py --seed 42
+
+    # every clip in the dataset, sorted (not a random sample) -- this is the
+    # slow one: ~20 min for all 39 clips without --stereo-depth, several
+    # hours with it (a real video seek + template match per surviving
+    # detection, across the whole dataset)
+    python scripts/visualize_hand_pipeline.py --all
 """
 
 from __future__ import annotations
@@ -253,6 +259,7 @@ def main():
                      help="how many random clips to process (ignored if --clips is given)")
     ap.add_argument("--clips", nargs="+", default=None, metavar="CLIP_ID",
                      help="explicit clip ids to process instead of a random sample")
+    ap.add_argument("--all", action="store_true", help="process every clip found under --data-dir, sorted, not a random sample")
     ap.add_argument("--seed", type=int, default=None, help="random seed, for a reproducible sample")
     ap.add_argument("--max-frames", type=int, default=None, help="cap rendered frames per clip")
     ap.add_argument("--stereo-depth", action="store_true",
@@ -264,7 +271,9 @@ def main():
         print(f"no clip bundles found under {args.data_dir}")
         sys.exit(1)
 
-    if args.clips:
+    if args.all:
+        selected = available
+    elif args.clips:
         missing = [c for c in args.clips if c not in available]
         if missing:
             print(f"unknown clip id(s): {missing}\navailable: {available}")

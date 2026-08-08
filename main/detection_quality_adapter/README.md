@@ -378,3 +378,118 @@ detection out near the seated client — clearly beyond arm's reach — gets
 flagged yellow ("rejected_stereo_depth"), confirming the depth check is
 discriminating on the right thing rather than misfiring on the wearer's
 own hands.
+
+## Milestone 7: calibration, honestly
+
+**There is no labelled reference set for this dataset.** Spec S7: "No value
+here should be set by inspection. A labelled reference set is required."
+`hand_boxes.json` is the raw, noisy input this whole adapter corrects, not
+ground truth — there's no file anywhere in `data/` recording which boxes are
+actually right. So the precision/recall-optimal half of Milestone 7 is
+genuinely blocked, not skipped. `calibration/metrics.py` builds that
+machinery anyway (per-stage `StageMetrics`, greedy IoU matching against
+ground truth, `flag_wrong_direction_stages`) and verifies it against
+hand-built synthetic ground truth — ready to run the moment real labels
+exist, but **no number it could report about this project's real clips
+today would be a real precision/recall figure**, and the module's docstring
+says so before anyone can misquote it.
+
+What spec S7-S8 explicitly allow (and `calibration/sweep_thresholds.py`
+implements) without labels, run for real across all 39 clips:
+
+```
+python calibration/sweep_thresholds.py
+```
+
+- **Rejection-reason frequency** (a real proxy for spec S7's "frequency of
+  each false-positive class," not a confirmed false-positive rate — that
+  still needs labels): of 156,840 total detections (153,876 raw + 2,964
+  stage-4 fabrications), 85.3% kept, 5.1% temporal, 3.1% dropped as
+  duplicates, 2.6% size/shape, 2.5% interpolated, 1.3% selection.
+- **Dropout-length distribution** — spec S7 names this one directly as
+  needing no labels ("sets the largest break that may safely be
+  interpolated"). Directly retuned `max_dropout_frames`.
+- **Interpolated-detection proportion** — spec S8's standing check, which it
+  explicitly says needs no labelled data: mean 3.5%, max 17.2%
+  (`beb348be_t000` — checked by hand, longest interpolated runs there are
+  6-12 frames, consistent with genuine brief-occlusion recovery, not
+  fabrication creeping in).
+- **Not attempted**: candidate-pool-width tuning ("rate at which a true
+  hand is outranked by a spurious box"). No way to know which candidate was
+  "true" without labels.
+
+### Two accounting bugs found building the calibration tool itself
+
+`rejection_reason_frequency`'s first version only walked `tracks`, which
+silently dropped every stage-1 casualty from the count: `reject_duplicates`
+drops a duplicate's loser without tagging it (only the winner gets `merged`),
+and `reject_implausible_size`/`_shape` do the same after tagging `rejected`
+— either way, the detection never reaches `track_detections` and so never
+appears in any `Track`. Undercounted the real dataset by 4.1% (147,590 vs.
+153,876) with no error raised. The fix — walk the original per-frame lists
+to catch stage-1 casualties — then silently dropped stage 4's brand-new
+*fabricated* `interpolated` detections in the other direction, since those
+never existed as raw input either. An independent total-count assertion in
+`tests/test_sweep_thresholds.py` (built by re-running the pipeline by hand,
+not by calling the function under test) caught this before either version
+shipped. Worth remembering: a total that "adds up" isn't proof of
+correctness on its own — the first buggy version's total looked internally
+consistent too, right up until it was checked against an independently
+computed number.
+
+### Parameters retuned from this data
+
+Both in `hand_config()`, both still informal/distribution-based (not
+precision/recall-optimal, since that needs labels):
+
+- **`plausible_size`**: (20, 800) → **(50, 1150)**. Real side-length
+  percentiles across all 153,876 raw detections: p1=94px, p99=586px,
+  max=1110px. The old lower bound was a complete no-op — 0% of real
+  detections come anywhere near 20px — and the old upper bound incorrectly
+  rejected ~0.16% (253) of raw detections that are far more likely genuine
+  close-up hands than noise, given this dataset's own near-frame-filling
+  characteristic (see the stereo-depth section above) and no evidence
+  they're spurious.
+- **`max_dropout_frames`**: 10 → **15**. Real internal-gap lengths within
+  tracks (measured with the cap loosened to 10,000 so the current threshold
+  didn't pre-clip the measurement): p50=3, p75=13, p90=54, p99=470, worst
+  case 2529 frames. The old value of 10 sat just under p75 — over a quarter
+  of genuine short recoverable gaps were already too long to interpolate.
+  The tail beyond p90 isn't trustworthy as "the same object": by then the
+  position gate (`track_gate_speed_px_per_frame * dt`) has grown so wide it
+  no longer meaningfully constrains anything, so those almost certainly
+  reflect coincidental position matches between different objects, not real
+  dropouts. 15 covers the reliable p75 mass without reaching into that
+  contaminated tail.
+
+## Running the final pipeline on the whole dataset
+
+```
+python scripts/visualize_hand_pipeline.py --all --output-dir scripts/output/final_all_clips
+```
+
+Runs the tuned hand-specialized pipeline (stages 1-5; stage 6/stereo depth
+omitted by default — see the note above about `--stereo-depth`'s cost, which
+would run to several hours across the full dataset rather than the ~15-20
+minutes stages 1-5 take) across every clip and writes one annotated
+`{clip_id}_hand.mp4` per clip.
+
+Run against all 39 clips: 996.8s (~16.6 min), 148,714 final detections
+across 787 tracks. 90.5% kept, 5.5% rejected at stage 3 (temporal), 2.6%
+interpolated, 1.4% rejected at stage 5 (selection), 36.1% of tracks
+confirmed exiting — matches `sweep_thresholds.py`'s numbers exactly, a good
+cross-check between the two tools.
+
+**One honest limitation, found while reviewing this run**: `rejected_geometric`
+reads 0 across every single clip in this script's stats and is never drawn
+in the videos. Not a pipeline bug — it's the same root cause documented in
+`sweep_thresholds.py`'s docstring: a detection dropped at stage 1 (a
+duplicate's loser, or a size/shape reject) never reaches `track_detections`,
+so it never appears in any `Track`, and this script only walks `tracks` for
+both its stats and its rendering. The pipeline's actual output is unaffected
+(those detections are correctly absent from the final result either way) —
+this only means this particular video can't show *why* a stage-1 rejection
+happened. `scripts/visualize_stage1.py` already covers that view correctly
+frame-by-frame. Left as-is for this run rather than fixing and re-rendering
+all 39 clips (another ~17 min + 8GB) for a stats/visualization completeness
+gap that doesn't change any actual pipeline behavior.
