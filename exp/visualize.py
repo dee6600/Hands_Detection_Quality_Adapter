@@ -32,11 +32,34 @@ Requires: opencv-python, matplotlib, numpy  (all pip-installable)
 
 import json
 import sys
+import time
 from pathlib import Path
 
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
+
+
+def print_progress(current: int, total: int, start_time: float, bar_len: int = 30):
+    """
+    Prints a single-line, self-overwriting progress bar to the terminal, e.g.:
+      [######............] 1200/2700 (44.4%)  180.3 fps  ETA 8s
+    Call this once per iteration; it rewrites the same terminal line using \r.
+    """
+    frac = current / total if total else 1.0
+    filled = int(bar_len * frac)
+    bar = "#" * filled + "." * (bar_len - filled)
+
+    elapsed = max(time.time() - start_time, 1e-6)
+    rate = current / elapsed  # items per second
+    remaining = (total - current) / rate if rate > 0 else 0
+
+    line = (f"\r  [{bar}] {current}/{total} ({frac*100:5.1f}%)  "
+            f"{rate:5.1f} fps  ETA {remaining:4.0f}s")
+    sys.stdout.write(line)
+    sys.stdout.flush()
+    if current >= total:
+        sys.stdout.write("\n")
 
 # ----------------------------------------------------------------------
 # 1. EDIT THESE if you're not passing them as command-line arguments
@@ -121,6 +144,7 @@ def overlay_hand_boxes(video_path: Path, hand_boxes: dict, out_path: Path, max_f
 
     print(f"\nAnnotating {n_frames} frames -> {out_path.name}")
     frame_idx = 0
+    start_time = time.time()
     while frame_idx < n_frames:
         ok, frame = cap.read()
         if not ok:
@@ -146,8 +170,7 @@ def overlay_hand_boxes(video_path: Path, hand_boxes: dict, out_path: Path, max_f
 
         writer.write(frame)
         frame_idx += 1
-        if frame_idx % 300 == 0:
-            print(f"  ...{frame_idx}/{n_frames} frames done")
+        print_progress(frame_idx, n_frames, start_time)
 
     cap.release()
     writer.release()
