@@ -109,3 +109,8 @@ class Config:
     max_speed_px_per_frame: float = 150.0
     exit_border_margin_px: float = 20.0
     max_dropout_frames: int = 10
+    min_supported_track_length: int = 3  # tracks shorter than this = flicker
+    static_px_threshold: float = 4.0  # box movement below this, per frame, = "not moving"
+    camera_moving_speed_mps: float = 0.05  # VIO speed at/above this = camera is moving
+    camera_moving_angular_deg_per_frame: float = 1.0  # roll/pitch/yaw delta at/above this = camera is moving
+    min_static_run_frames: int = 15  # consecutive still-while-moving frames needed before tagging static
