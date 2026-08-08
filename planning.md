@@ -364,6 +364,39 @@ detections tagged `rejected`, rest untouched.
   - object gap exceeds max dropout length → left untouched
   - object gap resumes far from prediction → new track, not bridged
 
+**Design notes from the spec cross-check (added at the checkpoint, read
+before implementing):**
+
+- **A "gap" for interpolation purposes must include `rejected` frames, not
+  just literally-missing ones.** The spec's edge case table treats "motion
+  blur during rapid movement — confidence falls across several consecutive
+  frames" as an *interpolate* case, not a *reject* case. But Milestone 4's
+  displacement rule (tightened at the checkpoint specifically to catch
+  motion-blur "wobble" — see its notes above) now tags some of those exact
+  frames `rejected`, since the box position momentarily looks implausible
+  even though the underlying trajectory is real. These aren't in conflict
+  *if* Milestone 5 treats a track's `rejected`-tagged detections the same as
+  an absent frame when looking for gaps to fill — i.e. don't trust a
+  rejected detection's position, but do let the surrounding trajectory
+  predict through it. If Milestone 5 only fills gaps where a frame is
+  missing entirely, the Milestone 4 tightening becomes a net loss: it
+  correctly flags the bad frame but nothing then recovers it, which is
+  exactly the false-negative the spec's edge case wants recovered.
+- **The bottom-border exit test likely needs a different trigger condition
+  than the side-border one, not just a different weight.** The spec gives
+  "hand exits at a side border" and "hand passes below the camera" the same
+  required handling (terminate, don't interpolate) but different
+  observations: the side case is "motion directed outward," the bottom case
+  is "occluded by the torso." A hand disappearing behind the wearer's own
+  body isn't guaranteed to show a clean outward velocity right before it
+  vanishes — it can be moving sideways, or even slightly upward, as an arm
+  bends and drops out of the lower frame. Milestone 6's plan already says
+  the bottom border should be *weighted* more heavily, but weighting alone
+  won't help if the exit test's core logic still hard-requires outward
+  motion. Consider a separate, more permissive trigger for the bottom
+  border specifically (e.g. "last detection near the bottom edge" may be
+  sufficient on its own, without also requiring outward velocity).
+
 **Prompt to give Claude:** "Implement `interpolation.py`: exit-border test
 first, then gap-fill logic gated by max dropout length and predicted-position
 proximity. Write the four synthetic test cases listed above."
@@ -382,19 +415,59 @@ adapter — mostly config, four behavioral changes.
 
 - [ ] `hand_config.py`: class max = 2, candidate pool = 3–4, shape rule tuned
   for roughly-equant boxes, exit-border weighting favors the bottom border.
+  **Also needs a hand-specific duplicate-merge override** — see the new
+  bullet below on hands crossing/overlapping; the generic IoU-only dedup
+  from Milestone 2 is a real risk here, not just a theoretical one.
 - [ ] **Selection after association** (`selection.py`): with a low,
   constantly-reached cap, implement "rank remaining candidates by track
   quality, select top 2" rather than per-frame confidence.
-- [ ] **Static-detection rule** is unusually strong here (head-mounted camera
-  is always moving) — no code change, just confirm the stub camera-motion
-  signal from Milestone 4 gets replaced with a real one before this matters.
-- [ ] **Handedness**: tracker must never use the left/right label to decide
-  association — confirm Milestone 3's tracker only uses position/motion
-  (it should already, but add an explicit test with hands crossing and
-  swapped labels).
-- [x] **Stereo depth check** — DONE (nominal calibration tier). Implemented
-  in `adapter/nominal_calibration.py` + `adapter/stereo_depth.py`, tested
-  against synthetic cases and validated on the real `t010` clip:
+- [x] **Static-detection rule is unusually strong here, and needed real code
+  changes, not just confirmation.** The spec's assumption — "a hand is never
+  stationary in the image for a sustained period" because the camera is
+  always moving — turned out not to hold universally: `407258cd_t036` (a
+  carpentry clip) shows a hand braced motionless for several *seconds* while
+  steadying a workpiece (frame 220), which is exactly a sustained stationary
+  period despite continuous camera motion. Milestone 4's sustained-run fix
+  (`min_static_run_frames`) handles brief pauses but not this multi-second
+  brace — see Milestone 4's "Done" notes and the open question below. Worth
+  remembering this is a place where the spec's own stated assumption doesn't
+  universally hold, not just an implementation gap.
+- [x] **Handedness**: tracker must never use the left/right label to decide
+  association — done ahead of schedule during Milestone 3
+  (`test_handedness_label_never_influences_association` in
+  `tests/test_association.py`), since it was cheap to add right after the
+  crossing-paths test and didn't need Milestone 6's other pieces first.
+- [ ] **NEW (found at the spec cross-check): hands crossing/overlapping vs.
+  true duplicates need a hand-specific dedup rule, not just the generic
+  IoU threshold.** The spec's edge case table is explicit: "Hands cross or
+  overlap ... Retain both. Must not be treated as a duplicate" — but
+  Milestone 2's `reject_duplicates` runs per-frame, before any tracking
+  exists, so it has no way to know whether two overlapping boxes are one
+  object detected twice or two real hands that happen to overlap; it merges
+  on IoU alone. Checked real data for this: scanning all 39 clips for
+  2-detection frames with IoU in the current merge range (≥0.5) didn't turn
+  up a clear "two real distinct hands wrongly merged" example — the
+  moderate-IoU real cases found all looked like genuine duplicate echoes
+  (one strong box, one weaker, nested/offset, same class label), not two
+  independent hands. So this isn't visibly biting yet in the tested clips,
+  but the risk is real and spec-named, and absence of an observed case
+  isn't the same as absence of the failure mode (hands actually crossing is
+  probably just rarer than generic 2-box frames in this data). Two possibly
+  useful, evidence-backed refinements for hand_config.py: (a) a tighter
+  hand-specific `duplicate_iou_threshold` than the generic default, and/or
+  (b) a containment-ratio check (intersection / smaller-box-area) in
+  addition to IoU, since the real duplicate pattern observed was one box
+  mostly *inside* the other with a confidence gap — genuinely distinct
+  crossing hands are more likely to be similar-sized and laterally offset,
+  which plain IoU doesn't distinguish but containment ratio might. Needs an
+  explicit synthetic test per the spec's edge case (two similar-sized,
+  offset, non-nested boxes → both retained) before trusting either fix.
+- [x] **Stereo depth check** — prototype DONE at the nominal-calibration
+  tier, but **NOT YET migrated into the real `adapter/` package** — this
+  milestone can't be marked fully done until that happens. Currently lives
+  in `exp/scafholds/nominal_calibration.py` + `exp/scafholds/stereo_depth.py`
+  (a standalone prototype, not part of `main/detection_quality_adapter/`),
+  tested against synthetic cases and validated on the real `t010` clip:
   - Calibration: ZED X, 2.2mm lens (0.3m min depth), 12cm baseline — chosen
     because 4mm (1.5m min depth) can't explain the near-frame-filling hand
     boxes actually seen in the data. Cross-checked: a real high-confidence
@@ -415,8 +488,15 @@ adapter — mostly config, four behavioral changes.
     a placeholder pending Milestone 7 calibration, and probably needs to vary
     by job/task type.
   - 13/13 tests pass (synthetic + one real-clip integration check). See
-    `detection_quality_adapter/tests/` and run the demo with
-    `python scripts/demo_stereo_depth.py --hand-boxes ... --left ... --right ...`.
+    `exp/scafholds/test_stereo_depth*.py`, and run the demo with
+    `python exp/scafholds/demo_stereo_depth.py --hand-boxes ... --left ... --right ...`.
+  - **Migration TODO**: port `nominal_calibration.py`/`stereo_depth.py` (and
+    the "beyond arm's reach" rejection rule) into
+    `main/detection_quality_adapter/adapter/`, wired into `hand_config.py`/
+    `pipeline.py` like the other stages, with tests moved into
+    `detection_quality_adapter/tests/`. Until this happens, the real
+    pipeline can't actually run the stereo-depth rule end to end — it only
+    exists as a validated standalone prototype.
 - [ ] Implement the edge-case table from spec §6 as explicit test cases:
   duplicate on one hand, side exit, bottom exit (occluded by torso), brief
   occlusion, hands crossing, long-absence re-entry, motion-blur confidence
@@ -527,12 +607,21 @@ Resolved by the dataset arrival:
 Found during Milestones 2-4 and the Milestone 4 checkpoint (see their "Done"
 notes above for full detail):
 - **Static-rejection rule can't yet tell "background" from "hand held still
-  on purpose" over multi-second timescales.** The sustained-run fix
-  (Milestone 4) solved brief real pauses but not a hand deliberately braced
-  for seconds (`t036` frame 220). Properly separating rotation-induced
-  apparent motion from real parallax — judging staticness against the
-  *expected* motion at a box's position rather than a flat pixel threshold —
-  needs labeled data to validate; a Milestone 7 candidate.
+  on purpose" over multi-second timescales — and this is a place the spec's
+  own stated assumption doesn't universally hold, not just an implementation
+  gap.** The spec says (§5): "Head-mounted camera: the camera moves
+  constantly, so the static-detection rule is unusually discriminating. A
+  hand is never stationary in the image for a sustained period." `t036`
+  frame 220 is a direct counter-example: a hand braced motionless for
+  several *seconds* while steadying a workpiece, well past "not sustained."
+  The Milestone 4 sustained-run fix solved brief real pauses but not this.
+  Properly separating rotation-induced apparent motion from real parallax —
+  judging staticness against the *expected* motion at a box's position
+  rather than a flat pixel threshold — needs labeled data to validate; a
+  Milestone 7 candidate. Worth building the labeled reference set (§7) with
+  this specific failure mode in mind — deliberately include some
+  bracing/steadying frames, not just the border/borderline cases the spec
+  already calls out.
 - **A single flat speed threshold can't distinguish "fast hand" from "normal
   hand, fast camera."** `ae580129_t057`'s camera moves 2-4x faster on
   average than other clips (VIO speed), which shows up as systematically
@@ -548,6 +637,34 @@ notes above for full detail):
   much the speed threshold moved once actually checked (150 → 110, plus
   splitting it in two), these are worth the same treatment before assuming
   they're in a reasonable range — see "Working strategy" above.
+
+Found during a full spec re-read at this checkpoint (spec text supplied in
+full for the first time — prior sessions worked from summaries in this
+document; see the Milestone 5/6 sections above for the full detail behind
+each):
+- **Milestone 2's duplicate-merge rule risks wrongly merging two real,
+  overlapping hands** — the spec explicitly requires "hands cross or
+  overlap ... retain both, must not be treated as a duplicate," but
+  `reject_duplicates` runs pre-tracking and can't distinguish that from a
+  true duplicate echo using IoU alone. Checked all 39 clips for a live
+  example; didn't find a clear one yet (real duplicate-echo patterns in this
+  data look different enough — nested/offset with a confidence gap — that
+  plain IoU hasn't visibly misfired), but the failure mode is real and
+  spec-named, not hypothetical. See Milestone 6's new bullet on this.
+- **Interpolation (Milestone 5) needs to treat a track's `rejected`
+  detections as gap-equivalent, not just literally-missing frames**, or the
+  Milestone 4 speed-threshold tightening becomes a net loss on exactly the
+  case the spec wants recovered ("motion blur ... interpolate where the
+  trajectory remains continuous"). Not yet built, so not yet a live bug —
+  flagged so Milestone 5 gets built with this from the start. See
+  Milestone 5's design notes above.
+- **The bottom-border exit test probably needs its own trigger condition**,
+  not just a heavier weight on the bottom border as currently planned — see
+  Milestone 5's design notes above.
+- **Milestone 6's stereo-depth "done" status was overstated**: the
+  implementation is a validated prototype in `exp/scafholds/`, not yet
+  migrated into `main/detection_quality_adapter/adapter/`. Fixed in this
+  document; the actual migration is still outstanding.
 
 Still open:
 - **Stereo calibration is nominal, not exact — resolved enough to build on,
