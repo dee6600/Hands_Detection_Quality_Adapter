@@ -1,8 +1,15 @@
-import sys, os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'adapter'))
+"""Milestone 6: nominal ZED stereo calibration constants.
 
-from exp.scafholds.nominal_calibration import (
-    ZED_X_2_2MM, ZED_X_4MM, ZED_X_MINI_2_2MM, depth_from_disparity,
+Migrated from `exp/scafholds/test_nominal_calibration.py` (the module's own
+docstring has the full derivation) -- import paths updated for the real
+package, behavior unchanged.
+"""
+
+from adapter.nominal_calibration import (
+    ZED_X_2_2MM,
+    ZED_X_4MM,
+    ZED_X_MINI_2_2MM,
+    depth_from_disparity,
 )
 
 

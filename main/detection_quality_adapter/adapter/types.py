@@ -104,6 +104,12 @@ class Config:
     plausible_size: tuple[float, float] = (20.0, 800.0)  # box side length, px
     plausible_shape: tuple[float, float] = (0.3, 3.0)  # aspect ratio w/h bounds
     duplicate_iou_threshold: float = 0.5  # IoU at/above this = same object
+    # Extra dedup gate, off by default (0.0 = always passes, no behavior change
+    # for the generic pipeline). hand_config.py sets this to 0.7: real duplicate
+    # echoes in this dataset are nested (containment >= ~0.73 in every real
+    # moderate-IoU pair checked), while a same-size 50%-overlap crossing (two
+    # genuinely distinct hands) sits at ~0.5 -- see geometric.py's `_containment`.
+    duplicate_containment_threshold: float = 0.0
     candidate_pool_size: int = 5
     class_max_instances: int = 4
     # Plausibility check (stage 3, temporal.py): is this specific jump too fast to
@@ -148,3 +154,10 @@ class Config:
     # requirement -- see planning.md's Milestone 5 design notes.
     exit_border_margin_overrides: dict[str, float] = field(default_factory=dict)
     exit_requires_outward_motion: dict[str, bool] = field(default_factory=dict)
+
+    # Milestone 6 (stereo_depth.py): stereo-depth "beyond arm's reach" rejection.
+    # None = rule not applicable (the generic Part 1 pipeline has no second eye and
+    # never runs this rule at all). hand_config() sets 1.8 -- see stereo_depth.py's
+    # module docstring for the real-data derivation (a hairstyling clip's own-hand
+    # detections regularly exceed 1m with arms extended toward a seated client).
+    max_reach_m: float | None = None

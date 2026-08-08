@@ -1,32 +1,41 @@
-import sys, os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'adapter'))
+"""Milestone 6: per-box stereo depth and the "beyond arm's reach" rule.
+
+Migrated from `exp/scafholds/test_stereo_depth.py`, adapted to this
+package's real `Detection`/`Config`/`Tag` types instead of the prototype's
+ad-hoc dicts. Synthetic stereo pairs (a distinctive random patch pasted into
+noise, shifted between the two "eyes" to fake a known disparity) -- no real
+video needed here; see `test_stereo_depth_real_data.py` for that.
+"""
 
 import numpy as np
-import cv2
-from exp.scafholds.stereo_depth import estimate_box_depth, reject_beyond_reach
-from exp.scafholds.nominal_calibration import ZED_X_2_2MM
+
+from adapter.nominal_calibration import ZED_X_2_2MM
+from adapter.stereo_depth import estimate_box_depth, reject_beyond_reach
+from adapter.types import Config, Detection, Tag
+
+
+def _det(xyxy, confidence=0.8):
+    return Detection(frame=0, xyxy=xyxy, confidence=confidence)
 
 
 def _make_stereo_pair(shape=(400, 600), patch_size=40, true_disparity=50, vertical_offset=0):
-    """
-    Build a synthetic stereo pair: a distinctive random patch pasted into a
-    plain-noise left image, and pasted into the right image shifted left by
-    true_disparity px (simulating a near object) plus an optional vertical
-    offset (simulating this dataset's imperfect vertical alignment).
+    """Build a synthetic stereo pair: a distinctive random patch pasted into
+    a plain-noise left image, and pasted into the right image shifted left
+    by true_disparity px (simulating a near object) plus an optional
+    vertical offset (simulating this dataset's imperfect vertical alignment).
     """
     rng = np.random.default_rng(0)
     left = rng.integers(0, 255, size=shape, dtype=np.uint8)
     right = left.copy()
 
     patch = rng.integers(0, 255, size=(patch_size, patch_size), dtype=np.uint8)
-    cy, cx = shape[0] // 2, shape[0]  # placeholder, set below
     cy, cx = shape[0] // 2, shape[1] // 2
 
-    left[cy - patch_size // 2: cy + patch_size // 2, cx - patch_size // 2: cx + patch_size // 2] = patch
+    left[cy - patch_size // 2 : cy + patch_size // 2, cx - patch_size // 2 : cx + patch_size // 2] = patch
 
     rcx = cx - true_disparity
     rcy = cy + vertical_offset
-    right[rcy - patch_size // 2: rcy + patch_size // 2, rcx - patch_size // 2: rcx + patch_size // 2] = patch
+    right[rcy - patch_size // 2 : rcy + patch_size // 2, rcx - patch_size // 2 : rcx + patch_size // 2] = patch
 
     box = (cx - patch_size // 2, cy - patch_size // 2, cx + patch_size // 2, cy + patch_size // 2)
     return left, right, box
@@ -76,7 +85,7 @@ def _make_two_object_stereo_pair(shape=(400, 800), patch_size=40,
 
     def paste(img, patch, cy, cx):
         h2 = patch_size // 2
-        img[cy - h2:cy + h2, cx - h2:cx + h2] = patch
+        img[cy - h2 : cy + h2, cx - h2 : cx + h2] = patch
 
     near_patch = rng.integers(0, 255, size=(patch_size, patch_size), dtype=np.uint8)
     far_patch = rng.integers(0, 255, size=(patch_size, patch_size), dtype=np.uint8)
@@ -96,13 +105,13 @@ def test_reject_beyond_reach_flags_far_detection_only():
     # near: disparity 120px -> ~0.73m at default calib, well under 1.8m
     # far: disparity 8px -> ~11m, well beyond 1.8m
     left, right, box_near, box_far = _make_two_object_stereo_pair()
-    dets = [{"xyxy": box_near}, {"xyxy": box_far}]
+    config = Config(max_reach_m=1.8)
+    det_near, det_far = _det(box_near), _det(box_far)
 
-    reject_beyond_reach(dets, left, right, max_reach_m=1.8, calib=ZED_X_2_2MM, patch_half_size=20)
+    reject_beyond_reach([det_near, det_far], left, right, config, calib=ZED_X_2_2MM, patch_half_size=20)
 
-    assert dets[0].get("status") != "rejected"
-    assert dets[1].get("status") == "rejected"
-    assert dets[1].get("reject_reason") == "beyond_arm_reach"
+    assert det_near.tag != Tag.REJECTED
+    assert det_far.tag == Tag.REJECTED
 
 
 def test_low_confidence_match_defaults_to_keep_not_reject():
@@ -110,7 +119,37 @@ def test_low_confidence_match_defaults_to_keep_not_reject():
     rng = np.random.default_rng(1)
     left = rng.integers(0, 255, size=(200, 300), dtype=np.uint8)
     right = rng.integers(0, 255, size=(200, 300), dtype=np.uint8)
-    dets = [{"xyxy": (100, 80, 160, 140)}]
-    reject_beyond_reach(dets, left, right)
-    assert dets[0].get("status") != "rejected"
-    assert dets[0]["depth_m"] is None
+    config = Config(max_reach_m=1.8)
+    det = _det((100, 80, 160, 140))
+
+    estimates = reject_beyond_reach([det], left, right, config)
+
+    assert det.tag != Tag.REJECTED
+    assert estimates[id(det)].depth_m is None
+
+
+def test_low_confidence_match_can_be_configured_to_reject():
+    rng = np.random.default_rng(1)
+    left = rng.integers(0, 255, size=(200, 300), dtype=np.uint8)
+    right = rng.integers(0, 255, size=(200, 300), dtype=np.uint8)
+    config = Config(max_reach_m=1.8)
+    det = _det((100, 80, 160, 140))
+
+    reject_beyond_reach([det], left, right, config, on_low_confidence_match="reject")
+
+    assert det.tag == Tag.REJECTED
+
+
+def test_rule_is_a_noop_when_max_reach_m_is_not_configured():
+    """The generic (non-hand) pipeline never sets max_reach_m -- confirm the
+    rule does nothing at all rather than rejecting on an arbitrary default.
+    """
+    left, right, box_near, box_far = _make_two_object_stereo_pair()
+    config = Config()  # max_reach_m defaults to None
+    det_near, det_far = _det(box_near), _det(box_far)
+
+    estimates = reject_beyond_reach([det_near, det_far], left, right, config)
+
+    assert estimates == {}
+    assert det_near.tag != Tag.REJECTED
+    assert det_far.tag != Tag.REJECTED

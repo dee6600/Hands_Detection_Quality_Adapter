@@ -31,19 +31,50 @@ def _iou(a: Detection, b: Detection) -> float:
     return inter / union if union > 0.0 else 0.0
 
 
+def _containment(a: Detection, b: Detection) -> float:
+    """Intersection / smaller-box-area -- 1.0 when one box sits entirely
+    inside the other. Real duplicate echoes in this dataset are nested
+    (one strong box, one weaker, mostly inside it) rather than laterally
+    offset, which plain IoU can't tell apart from two similarly-sized,
+    genuinely distinct objects that happen to overlap (e.g. two crossing
+    hands). See `Config.duplicate_containment_threshold`.
+    """
+    ax1, ay1, ax2, ay2 = a.xyxy
+    bx1, by1, bx2, by2 = b.xyxy
+    ix1, iy1 = max(ax1, bx1), max(ay1, by1)
+    ix2, iy2 = min(ax2, bx2), min(ay2, by2)
+    inter = max(0.0, ix2 - ix1) * max(0.0, iy2 - iy1)
+    if inter <= 0.0:
+        return 0.0
+    area_a = (ax2 - ax1) * (ay2 - ay1)
+    area_b = (bx2 - bx1) * (by2 - by1)
+    smaller = min(area_a, area_b)
+    return inter / smaller if smaller > 0.0 else 0.0
+
+
 def reject_duplicates(detections: list[Detection], config: Config) -> list[Detection]:
     """Greedy NMS: process boxes highest-confidence first; any lower-confidence
-    box overlapping an already-kept box above `duplicate_iou_threshold` is
-    treated as a duplicate of it and dropped. The surviving box is tagged
-    `merged` so the output makes clear a duplicate was absorbed into it.
-    Boxes with no duplicate keep their incoming tag untouched.
+    box overlapping an already-kept box above `duplicate_iou_threshold` (AND,
+    if `duplicate_containment_threshold` is set above its 0.0 default, nested
+    inside it above that ratio too -- see hand_config.py) is treated as a
+    duplicate of it and dropped. The surviving box is tagged `merged` so the
+    output makes clear a duplicate was absorbed into it. Boxes with no
+    duplicate keep their incoming tag untouched.
 
     Returns survivors in their original input order.
     """
     ordered = sorted(detections, key=lambda d: d.confidence, reverse=True)
     kept: list[Detection] = []
     for det in ordered:
-        winner = next((k for k in kept if _iou(det, k) >= config.duplicate_iou_threshold), None)
+        winner = next(
+            (
+                k
+                for k in kept
+                if _iou(det, k) >= config.duplicate_iou_threshold
+                and _containment(det, k) >= config.duplicate_containment_threshold
+            ),
+            None,
+        )
         if winner is None:
             kept.append(det)
         else:

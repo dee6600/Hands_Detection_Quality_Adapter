@@ -239,3 +239,142 @@ the anchor's own *incoming* velocity (from whatever came before it in the
 track), independent of where the gap actually resumes. Caught before it
 ever ran against real data, by tracing through the synthetic test math by
 hand rather than trusting the first green test run.
+
+## Milestone 6: the hand-specialized pipeline
+
+`pipeline.run_hand_pipeline(clip.detections, clip.pose)` runs stages 1-4
+exactly as the generic pipeline, using `hand_config()` (tuned defaults, see
+below) instead of `Config()`, plus two more stages: 5 (`selection.py`,
+enforcing the 2-hand cap by track quality) and, if video paths are passed,
+6 (`stereo_depth.py`, rejecting detections beyond arm's reach).
+
+```python
+from adapter.ingest import load_clip
+from adapter.pipeline import run_hand_pipeline
+
+clip = load_clip("../../data/0c54a47b_t010")
+tracks = run_hand_pipeline(
+    clip.detections, clip.pose,
+    video_left_path="../../data/0c54a47b_t010/video_left.mp4",
+    video_right_path="../../data/0c54a47b_t010/video_right.mp4",
+)  # video paths optional -- omit them to skip stage 6
+```
+
+**`hand_config()`** (`adapter/hand_config.py`) overrides, each backed by a
+real-data check rather than guessed, same as every other threshold in this
+project:
+
+- `class_max_instances=2`, `candidate_pool_size=4` — per spec.
+- `plausible_shape=(0.5, 2.0)` — real hand aspect ratios across all 39
+  clips' stage-1 survivors: p1=0.54, median=0.92, p99=2.10.
+- `duplicate_containment_threshold=0.7` — see below.
+- `exit_border_margin_overrides={"bottom": 150.0}`,
+  `exit_requires_outward_motion={"bottom": False}` — see Milestone 5's notes
+  above; the numbers come from checking how far real ambiguous-dropout
+  tracks' last box sits from the bottom edge across `t010`/`t036`/
+  `ae580129_t057`.
+- `max_reach_m=1.8` — carried over from the `exp/scafholds/` prototype's own
+  validation (see `stereo_depth.py`'s docstring): a hairstyling task's
+  own-hand detections regularly exceed 1m with arms extended toward a
+  seated client, so a tighter, more "arm's-length"-sounding threshold would
+  reject the wearer's own hands during completely normal reaching.
+
+### Hands crossing/overlapping vs. true duplicates: the containment-ratio fix
+
+The spec's edge case table is explicit: two hands crossing must be retained
+as two detections, never merged as a duplicate. But Milestone 2's
+`reject_duplicates` runs pre-tracking, on IoU alone, with no way to tell "one
+object detected twice" from "two real objects that happen to overlap."
+Checked real data for a discriminator: scanning all 39 clips' moderate-IoU
+2-detection frames, every one that looked like a genuine duplicate echo had
+a *containment ratio* (intersection / smaller-box-area) of at least 0.73 —
+they're nested, one strong box mostly inside a weaker one — while a
+synthetic same-size 50%-overlap crossing (representative of two similarly-
+sized real hands) sits at 0.5. `hand_config()` sets
+`duplicate_containment_threshold=0.7`, comfortably between the two, gated
+behind a new `Config` field that defaults to 0.0 (always passes, no behavior
+change) so the generic pipeline and all of Milestone 2's existing tests are
+untouched. `tests/test_hand_config.py` includes a test pair proving the
+fix's precision: a crossing-hands pair right in the gap between the two
+gates (IoU 0.52, containment 0.68) survives under `hand_config()` but
+would have merged under the generic `Config()` — and a true duplicate
+(containment 0.95) still correctly merges either way.
+
+### Stereo depth: migrated from `exp/scafholds/`, not a new build
+
+The "beyond arm's reach" rule (`stereo_depth.py`) was already built and
+validated against real `t010` data in an earlier exploratory session, but
+lived in `exp/scafholds/` as a standalone prototype using ad-hoc dicts, with
+one test hardcoded to an old sandbox upload path (`/mnt/user-data/uploads`)
+that doesn't exist in this repo. Migrated into the real package: adapted to
+`Detection`/`Config`/`Tag` instead of dicts, the broken test path fixed to
+point at `data/`, and a new `apply_stereo_depth_stage` added to run it
+across a whole clip's tracks (grouped by frame, so each frame's video pair
+is decoded once regardless of how many detections land on it). The old
+`exp/scafholds/` files were deleted once the migration was verified —
+nothing outside that directory imported from them. See
+`nominal_calibration.py`'s module docstring for the full calibration
+derivation (nominal ZED X, 2.2mm lens, 12cm baseline — not exact, good
+enough for a coarse arm's-reach threshold, not precision depth).
+
+Only runs when both video paths are given to `run_hand_pipeline` (or
+`config.max_reach_m` is set at all) — it needs actual pixel data, which nothing
+else in this pipeline touches, so it's opt-in rather than baked into the
+default 5-stage flow.
+
+### Gloved/partially-occluded hands: deliberately not implemented
+
+Per the spec's own instruction ("behaviour unmeasured, needs labelled
+examples — don't guess at logic here"), this edge case has a dedicated
+`xfail(strict=True)` test in `test_hand_config.py` instead of a guessed
+implementation. It should keep failing until Milestone 7 provides real
+examples to design against; `strict=True` means it'll loudly break the
+suite (an "XPASS" failure) if something accidentally makes it pass first,
+which would mean untested behavior slipped in silently.
+
+## Visualizing the hand-specialized pipeline
+
+`tests/test_hand_config.py` covers one synthetic case per row of the spec's
+edge-case table (S6); `tests/test_selection.py` covers stage 5;
+`tests/test_stereo_depth.py`/`test_nominal_calibration.py` cover stage 6 on
+synthetic stereo pairs; `test_stereo_depth_real_data.py` checks it against
+real video. To see the whole hand pipeline by eye, batch by default like
+`visualize_interpolation.py`:
+
+```
+# 5 random clips (default) -> scripts/output/hand_pipeline/
+python scripts/visualize_hand_pipeline.py
+
+# more clips, capped frames
+python scripts/visualize_hand_pipeline.py --num-clips 10 --max-frames 300
+
+# specific clips, reproducible sample
+python scripts/visualize_hand_pipeline.py --clips 0c54a47b_t010 407258cd_t036
+python scripts/visualize_hand_pipeline.py --seed 42
+
+# also run stage 6 (stereo depth) -- slower, needs per-detection video seeks
+python scripts/visualize_hand_pipeline.py --clips 0c54a47b_t010 --max-frames 300 --stereo-depth
+```
+
+Color legend (finer-grained than `visualize_interpolation.py`'s flat
+"rejected", specifically so Milestone 6's two *new* rejection reasons are
+checkable by eye): green = kept, cyan = interpolated, red = rejected at
+stage 1 (geometric), orange = stage 3 (temporal), purple = stage 5
+(selection — outranked for the 2-hand cap), yellow = stage 6 (stereo depth
+— beyond arm's reach). This needed extending the same before/after
+tag-diffing approach `visualize_temporal.py` uses (diagnostic-only, kept out
+of the core modules), across all five/six stages instead of just three.
+
+**Note:** unlike `visualize_interpolation.py`, `--max-frames` here caps what's
+actually fed into the pipeline, not just the rendered video length. Stage 6
+does a real video seek + template match per surviving detection — running it
+over a full ~2700-frame clip for what was meant to be a quick preview took
+over 15 minutes before this was fixed; capping the input, not just the
+render, brought a 150-frame `--stereo-depth` preview down to ~20s.
+
+Checked visually on `t010` with `--stereo-depth`: the wearer's own
+hand (holding a device close to the camera) stays green ("kept"), while a
+detection out near the seated client — clearly beyond arm's reach — gets
+flagged yellow ("rejected_stereo_depth"), confirming the depth check is
+discriminating on the right thing rather than misfiring on the wearer's
+own hands.

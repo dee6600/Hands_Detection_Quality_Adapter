@@ -446,17 +446,17 @@ Real-data testing caught two bugs, both instructive:
 
 ---
 
-## Milestone 6 — Hand specialization (Part 2)
+## Milestone 6 — Hand specialization (Part 2) ✅ DONE
 
 **Goal:** layer hand-specific parameters and rules on top of the generic
 adapter — mostly config, four behavioral changes.
 
-- [ ] `hand_config.py`: class max = 2, candidate pool = 3–4, shape rule tuned
+- [x] `hand_config.py`: class max = 2, candidate pool = 3–4, shape rule tuned
   for roughly-equant boxes, exit-border weighting favors the bottom border.
-  **Also needs a hand-specific duplicate-merge override** — see the new
-  bullet below on hands crossing/overlapping; the generic IoU-only dedup
-  from Milestone 2 is a real risk here, not just a theoretical one.
-- [ ] **Selection after association** (`selection.py`): with a low,
+  **Also needed a hand-specific duplicate-merge override** — see the bullet
+  below on hands crossing/overlapping; the generic IoU-only dedup from
+  Milestone 2 was a real risk here, not just a theoretical one.
+- [x] **Selection after association** (`selection.py`): with a low,
   constantly-reached cap, implement "rank remaining candidates by track
   quality, select top 2" rather than per-frame confidence.
 - [x] **Static-detection rule is unusually strong here, and needed real code
@@ -475,71 +475,74 @@ adapter — mostly config, four behavioral changes.
   (`test_handedness_label_never_influences_association` in
   `tests/test_association.py`), since it was cheap to add right after the
   crossing-paths test and didn't need Milestone 6's other pieces first.
-- [ ] **NEW (found at the spec cross-check): hands crossing/overlapping vs.
-  true duplicates need a hand-specific dedup rule, not just the generic
-  IoU threshold.** The spec's edge case table is explicit: "Hands cross or
-  overlap ... Retain both. Must not be treated as a duplicate" — but
-  Milestone 2's `reject_duplicates` runs per-frame, before any tracking
-  exists, so it has no way to know whether two overlapping boxes are one
-  object detected twice or two real hands that happen to overlap; it merges
-  on IoU alone. Checked real data for this: scanning all 39 clips for
-  2-detection frames with IoU in the current merge range (≥0.5) didn't turn
-  up a clear "two real distinct hands wrongly merged" example — the
-  moderate-IoU real cases found all looked like genuine duplicate echoes
-  (one strong box, one weaker, nested/offset, same class label), not two
-  independent hands. So this isn't visibly biting yet in the tested clips,
-  but the risk is real and spec-named, and absence of an observed case
-  isn't the same as absence of the failure mode (hands actually crossing is
-  probably just rarer than generic 2-box frames in this data). Two possibly
-  useful, evidence-backed refinements for hand_config.py: (a) a tighter
-  hand-specific `duplicate_iou_threshold` than the generic default, and/or
-  (b) a containment-ratio check (intersection / smaller-box-area) in
-  addition to IoU, since the real duplicate pattern observed was one box
-  mostly *inside* the other with a confidence gap — genuinely distinct
-  crossing hands are more likely to be similar-sized and laterally offset,
-  which plain IoU doesn't distinguish but containment ratio might. Needs an
-  explicit synthetic test per the spec's edge case (two similar-sized,
-  offset, non-nested boxes → both retained) before trusting either fix.
-- [x] **Stereo depth check** — prototype DONE at the nominal-calibration
-  tier, but **NOT YET migrated into the real `adapter/` package** — this
-  milestone can't be marked fully done until that happens. Currently lives
-  in `exp/scafholds/nominal_calibration.py` + `exp/scafholds/stereo_depth.py`
-  (a standalone prototype, not part of `main/detection_quality_adapter/`),
-  tested against synthetic cases and validated on the real `t010` clip:
+- [x] **Hands crossing/overlapping vs. true duplicates needed a hand-specific
+  dedup rule, not just the generic IoU threshold.** The spec's edge case
+  table is explicit: "Hands cross or overlap ... Retain both. Must not be
+  treated as a duplicate" — but Milestone 2's `reject_duplicates` runs
+  per-frame, before any tracking exists, so it has no way to know whether
+  two overlapping boxes are one object detected twice or two real hands
+  that happen to overlap; it merges on IoU alone. Real-data check across
+  all 39 clips found the discriminator: every real moderate-IoU duplicate
+  pair had a **containment ratio** (intersection / smaller-box-area) of at
+  least 0.73 — nested, one strong box mostly inside a weaker one — while a
+  synthetic same-size 50%-overlap crossing (two similarly-sized real hands)
+  sits at 0.5. Added `Config.duplicate_containment_threshold` (default 0.0
+  = always passes, no behavior change for the generic pipeline);
+  `hand_config()` sets it to 0.7. `tests/test_hand_config.py` includes a
+  pair chosen right in the gap between the two gates (IoU 0.52, containment
+  0.68) to prove the fix's precision, not just that low IoU alone saves it.
+- [x] **Stereo depth check** — migrated out of `exp/scafholds/` into the
+  real package (it was previously a validated prototype, not wired into
+  anything real — see the now-resolved open question below). Adapted to
+  `Detection`/`Config`/`Tag` instead of ad-hoc dicts:
   - Calibration: ZED X, 2.2mm lens (0.3m min depth), 12cm baseline — chosen
     because 4mm (1.5m min depth) can't explain the near-frame-filling hand
     boxes actually seen in the data. Cross-checked: a real high-confidence
     box (frame 230) gave disparity ~267px → ~0.33m depth, right at the 2.2mm
     lens's minimum focus distance — exactly what you'd expect for a box that
-    large. See the module docstring for the full derivation.
+    large. See `nominal_calibration.py`'s module docstring for the full
+    derivation.
   - Discovered the two eyes are **not perfectly vertically aligned** (~2.4px
     mean offset, up to ~9px, from ORB+RANSAC feature matching) — likely
     unrectified output and/or slight temporal skew between eyes on this
     moving rig. The depth-per-box matcher uses a vertical search tolerance
     rather than assuming a strict horizontal epipolar line.
-  - Per-box depth via template matching (patch around box center in the left
-    frame, searched in a vertical band of the right frame) — median match
-    score 0.95 across ~150 real high-confidence hand detections in `t010`.
   - `max_reach_m` default set to **1.8m**, not the more intuitive ~0.8m —
-    empirically, 72% of this clip's own-hand detections exceed 1.0m because
+    empirically, 72% of `t010`'s own-hand detections exceed 1.0m because
     it's a hairstyling task with arms extended toward a seated client. Still
-    a placeholder pending Milestone 7 calibration, and probably needs to vary
-    by job/task type.
-  - 13/13 tests pass (synthetic + one real-clip integration check). See
-    `exp/scafholds/test_stereo_depth*.py`, and run the demo with
-    `python exp/scafholds/demo_stereo_depth.py --hand-boxes ... --left ... --right ...`.
-  - **Migration TODO**: port `nominal_calibration.py`/`stereo_depth.py` (and
-    the "beyond arm's reach" rejection rule) into
-    `main/detection_quality_adapter/adapter/`, wired into `hand_config.py`/
-    `pipeline.py` like the other stages, with tests moved into
-    `detection_quality_adapter/tests/`. Until this happens, the real
-    pipeline can't actually run the stereo-depth rule end to end — it only
-    exists as a validated standalone prototype.
-- [ ] Implement the edge-case table from spec §6 as explicit test cases:
-  duplicate on one hand, side exit, bottom exit (occluded by torso), brief
-  occlusion, hands crossing, long-absence re-entry, motion-blur confidence
-  dip, other person's hands, gloved hand (explicitly marked "behavior
-  unmeasured — needs labelled examples", don't guess at logic here).
+    a placeholder pending Milestone 7 calibration, and probably needs to
+    vary by job/task type.
+  - New `apply_stereo_depth_stage(tracks, video_left_path, video_right_path,
+    config)` runs it across a whole clip, grouped by frame so each frame's
+    video pair decodes once. `pipeline.run_hand_pipeline` calls it as an
+    optional stage 6 when both video paths are given (a no-op otherwise, or
+    if `config.max_reach_m` is `None`).
+  - The old sandbox-path-dependent real-clip test
+    (`/mnt/user-data/uploads`, which doesn't exist in this repo) is fixed to
+    use the real `data/` directory, same pattern as every other real-data
+    test here. `exp/scafholds/`'s now-redundant files were deleted after
+    confirming nothing outside that directory imported from them.
+  - **Real bug found while testing this milestone (not stereo depth
+    itself)**: the batch visualization script's `--max-frames` only capped
+    the rendered video, not what was fed into the pipeline -- so turning on
+    stage 6 for a "quick preview" still ran video-seek + template-match
+    stereo depth across the *entire* ~2700-frame clip. Took over 15 minutes
+    before this was caught and fixed (cap the actual pipeline input, not
+    just the render) — see `detection_quality_adapter/README.md`.
+- [x] Implement the edge-case table from spec §6 as explicit test cases —
+  `tests/test_hand_config.py`, one test per row: duplicate on one hand
+  (merges), side exit (terminates, no interpolation), bottom exit (torso
+  occlusion, terminates via the outward-motion override), brief occlusion
+  (interpolated), hands crossing (retained as two, with the sanity-check
+  pair proving the fix isn't just "low IoU"), long-absence re-entry (new
+  track, not bridged), motion-blur confidence dip (interpolated, not lost —
+  see Milestone 5's `rejected`-as-gap-material design). Two rows live
+  elsewhere: "another person's hands" is `tests/test_stereo_depth*.py`
+  (needs real video, not just detections); "gloved/partially-occluded hand"
+  is an explicit `xfail(strict=True)` — per the spec's own instruction not
+  to guess at logic there, with `strict=True` so it loudly breaks the suite
+  if something accidentally starts passing before real labeled examples
+  justify it.
 
 **Prompt to give Claude:** "Implement `hand_config.py` and `selection.py` per
 the notes above. Add the stereo-depth rejection rule with a stubbed depth
@@ -549,6 +552,18 @@ says it needs real data."
 
 **Exit criteria:** full hand-configured pipeline passes all edge-case tests
 on synthetic data. This is the last milestone before real data is required.
+
+**Done:** `pipeline.run_hand_pipeline(clip.detections, clip.pose,
+video_left_path=..., video_right_path=...)` runs the full 5-6-stage
+hand-specialized pipeline. `scripts/visualize_hand_pipeline.py` (batch by
+default, same interface as `visualize_interpolation.py`) renders real clips
+with a finer color breakdown than the generic visualization — specifically
+so Milestone 6's two *new* rejection reasons (selection, stereo depth) are
+checkable by eye, not just folded into a flat "rejected" bucket. Checked
+visually on `t010` with `--stereo-depth`: the wearer's own hand stays
+"kept," a detection out near the seated client (clearly beyond arm's reach)
+gets flagged "rejected_stereo_depth" — the depth check is discriminating on
+the right thing. 143 tests pass, 1 `xfail`ed as designed.
 
 ---
 
@@ -612,11 +627,12 @@ Wire real camera-motion and stereo-depth signals in place of the Milestone
    testing caught a real bug (exit test used box center, not edge) and a
    test-writing bug (a tautological prediction check), both documented in
    Milestone 5's "Done" notes above and the README.
-8. Session 8: Milestone 6 (hand specialization + edge-case tests) — stereo
-   depth rule is DONE against nominal calibration (see above); remaining
-   Milestone 6 work is `hand_config.py`, `selection.py`, and the edge-case
-   table tests, which still need Milestones 0-5's types/pipeline in place
-   first (selection needs association output, etc.)
+8. ~~Session 8: Milestone 6 (hand specialization + edge-case tests)~~ ✅
+   done — `hand_config.py`, `selection.py`, the containment-ratio dedup fix,
+   and the stereo-depth migration out of `exp/scafholds/`, plus one edge-case
+   test per spec §6 row (gloved-hand deliberately `xfail`ed).
+   `scripts/visualize_hand_pipeline.py` added, same batch-by-default
+   interface as `visualize_interpolation.py`.
 9. Once labels exist for a reference set: Milestone 7 (calibration/validation)
    — though see "Working strategy" above: don't wait until this session to
    sanity-check every placeholder against real data, only the parts that
@@ -685,26 +701,20 @@ Found during a full spec re-read at this checkpoint (spec text supplied in
 full for the first time — prior sessions worked from summaries in this
 document; see the Milestone 5/6 sections above for the full detail behind
 each):
-- **Milestone 2's duplicate-merge rule risks wrongly merging two real,
-  overlapping hands** — the spec explicitly requires "hands cross or
-  overlap ... retain both, must not be treated as a duplicate," but
-  `reject_duplicates` runs pre-tracking and can't distinguish that from a
-  true duplicate echo using IoU alone. Checked all 39 clips for a live
-  example; didn't find a clear one yet (real duplicate-echo patterns in this
-  data look different enough — nested/offset with a confidence gap — that
-  plain IoU hasn't visibly misfired), but the failure mode is real and
-  spec-named, not hypothetical. See Milestone 6's new bullet on this.
+- ~~Milestone 2's duplicate-merge rule risks wrongly merging two real,
+  overlapping hands~~ → done: `Config.duplicate_containment_threshold`
+  (0.7 for hands) gates dedup on containment ratio in addition to IoU — see
+  Milestone 6's notes above for the real-data numbers behind 0.7.
 - ~~Interpolation (Milestone 5) needs to treat a track's `rejected`
   detections as gap-equivalent~~ → done: built into Milestone 5 from the
   start (see its "Done" notes above), not retrofitted after the fact.
 - ~~The bottom-border exit test probably needs its own trigger condition~~ →
-  done: `Config.exit_border_margin_overrides`/`exit_requires_outward_motion`
-  give Milestone 6 that hook without touching `interpolation.py`; Milestone 6
-  still needs to actually set the hand-specific override.
-- **Milestone 6's stereo-depth "done" status was overstated**: the
-  implementation is a validated prototype in `exp/scafholds/`, not yet
-  migrated into `main/detection_quality_adapter/adapter/`. Fixed in this
-  document; the actual migration is still outstanding.
+  done: `Config.exit_border_margin_overrides`/`exit_requires_outward_motion`,
+  set by `hand_config()` for the bottom border specifically.
+- ~~Milestone 6's stereo-depth "done" status was overstated~~ → done: fully
+  migrated into `main/detection_quality_adapter/adapter/`, wired into
+  `pipeline.run_hand_pipeline` as an optional stage 6, old `exp/scafholds/`
+  files deleted.
 
 Still open:
 - **Stereo calibration is nominal, not exact — resolved enough to build on,
