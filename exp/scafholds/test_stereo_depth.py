@@ -3,8 +3,8 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'adapter'))
 
 import numpy as np
 import cv2
-from stereo_depth import estimate_box_depth, reject_beyond_reach
-from nominal_calibration import ZED_X_2_2MM
+from exp.scafholds.stereo_depth import estimate_box_depth, reject_beyond_reach
+from exp.scafholds.nominal_calibration import ZED_X_2_2MM
 
 
 def _make_stereo_pair(shape=(400, 600), patch_size=40, true_disparity=50, vertical_offset=0):

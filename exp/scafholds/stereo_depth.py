@@ -15,7 +15,7 @@ from dataclasses import dataclass
 import cv2
 import numpy as np
 
-from nominal_calibration import NominalCalibration, DEFAULT_CALIBRATION, depth_from_disparity
+from exp.scafholds.nominal_calibration import NominalCalibration, DEFAULT_CALIBRATION, depth_from_disparity
 
 
 @dataclass

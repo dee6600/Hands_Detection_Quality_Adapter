@@ -17,8 +17,8 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "adapter"))
 
 import cv2
 
-from stereo_depth import reject_beyond_reach
-from nominal_calibration import DEFAULT_CALIBRATION
+from exp.scafholds.stereo_depth import reject_beyond_reach
+from exp.scafholds.nominal_calibration import DEFAULT_CALIBRATION
 
 
 def find_by_suffix(directory, suffix):

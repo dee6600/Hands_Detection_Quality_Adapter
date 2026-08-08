@@ -43,7 +43,7 @@ def test_real_clip_depth_distribution_is_plausible():
 
     import cv2
     import numpy as np
-    from stereo_depth import estimate_box_depth
+    from exp.scafholds.stereo_depth import estimate_box_depth
 
     hb_path, left_path, right_path = found
     with open(hb_path) as f:

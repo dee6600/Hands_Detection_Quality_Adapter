@@ -1,7 +1,7 @@
 import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'adapter'))
 
-from nominal_calibration import (
+from exp.scafholds.nominal_calibration import (
     ZED_X_2_2MM, ZED_X_4MM, ZED_X_MINI_2_2MM, depth_from_disparity,
 )
 
