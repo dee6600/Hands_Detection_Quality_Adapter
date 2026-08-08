@@ -106,7 +106,27 @@ class Config:
     duplicate_iou_threshold: float = 0.5  # IoU at/above this = same object
     candidate_pool_size: int = 5
     class_max_instances: int = 4
-    max_speed_px_per_frame: float = 150.0
+    # Plausibility check (stage 3, temporal.py): is this specific jump too fast to
+    # trust, given an already-established track? Calibrated from real adjacent-frame
+    # (dt=1) hand speeds across 38 of the 39 delivered clips: p99=82.6, p99.5=97.7,
+    # p99.9=132.0 px/frame -- 110 sits just above the p99.5 mark. One clip
+    # (ae580129_t057, a maintenance task) was excluded from that calibration: its
+    # camera moves ~2-4x faster on average (VIO speed) than the other 38 clips, which
+    # inflates apparent hand speed in image space with no change in real hand
+    # behavior -- a flat px/frame threshold can't distinguish "fast hand" from "normal
+    # hand, fast camera." Scaling this threshold by the clip's own VIO camera speed at
+    # each frame would fix that properly; deferred to Milestone 7, where labeled data
+    # can validate the scaling factor instead of more manual eyeballing.
+    max_speed_px_per_frame: float = 110.0
+    # Match gate (stage 2, association.py): is this detection even a plausible
+    # candidate to extend an existing track? Deliberately generous -- comfortably
+    # above the single fastest adjacent-frame jump observed in any of the 39 clips
+    # (305.8 px/frame) -- because over-tightening the gate FRAGMENTS a genuine track
+    # right at the moment it's moving fastest (see README: real motion-blur/low-
+    # confidence "wobble" moments observed within otherwise long, clearly-continuous
+    # tracks). The plausibility check above is what should flag those moments as
+    # untrustworthy; the gate's only job is to not sever the track over it.
+    track_gate_speed_px_per_frame: float = 350.0
     exit_border_margin_px: float = 20.0
     max_dropout_frames: int = 10
     min_supported_track_length: int = 3  # tracks shorter than this = flicker

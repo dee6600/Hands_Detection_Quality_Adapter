@@ -11,7 +11,10 @@ prompt. Work top to bottom — later stages depend on data structures and output
 earlier ones. Milestones 1–5 need NO dataset; they can be fully built and unit-tested
 on synthetic data. Milestone 6 is hand-specific. Milestone 7 needs real labeled data.
 
-## Dataset (arrived — 39 clips, one bundle inspected: `0c54a47b_t010`)
+## Dataset (arrived — 39 clips; `load_clip` verified against all 39)
+
+Inspected in depth so far: `0c54a47b_t010`, `407258cd_t036`, `ae580129_t057`,
+`6cd0b236_t000`, `130d64c7_t054`, `7fe10737_t009`.
 
 Each clip bundle: `video_left.mp4`, `video_right.mp4` (ZED stereo, 1920x1200 @30fps
 CFR), `frame_ts.json` (frame index → unix ns), `hand_boxes.json` (raw WiLoR detector
@@ -38,11 +41,45 @@ Confirmed from the actual `t010` clip (2700 frames / 90s):
 
 ---
 
-## Milestone 0 — Project scaffolding
+## Working strategy (added at the Milestone 4 checkpoint, applies going forward)
+
+Confirmed by three real fixes so far (Milestone 6's `max_reach_m`, Milestone 4's
+static-rule rewrite, and the Milestone 3/4 speed-gate split below): **don't wait for
+Milestone 7 to sanity-check a placeholder threshold against real data.** Most of
+Milestone 7 is genuinely blocked on labeled ground truth (precision/recall need
+labels) — but a threshold that's just wrong on its face can usually be caught earlier,
+without labels, using the real clips already in hand:
+
+1. **Check every placeholder against ALL 39 clips, not one or two**, before trusting
+   it. A single clip can be a different population, not an outlier — see the
+   `ae580129_t057` speed finding below, where one clip's camera moves 2-4x faster
+   than the rest for task reasons (a maintenance job vs. hairstyling/carpentry), and
+   averaging over it or ignoring it would both have been wrong.
+2. **When a threshold looks off, get the distribution, not just a fix.** Percentiles
+   across the real dataset (no labels needed) usually reveal whether the current
+   default is in the right neighborhood, and whether the problem is "wrong number"
+   or "wrong shape of rule" (the static-rule fix needed a sustained-run requirement,
+   not just a smaller pixel threshold — a shape problem a single number couldn't fix).
+3. **Pull the actual outlier frames/boxes before trusting a statistic.** Aggregate
+   percentiles told us *that* something was off; looking at specific frames (e.g.
+   t010 frame 16, t036 frame 220, the `ae580129_t057` track-41 sequence) told us
+   *why*, and changed the fix each time.
+4. **Document the mechanism and the residual limitation, not just the new default.**
+   Every fix so far solves the common case and leaves a harder edge case open
+   (bracing hands for the static rule, camera-motion-relative speed for the
+   displacement rule) — write both down (see `detection_quality_adapter/README.md`)
+   so the gap is a tracked open question, not a silent gap.
+5. **Still defer to Milestone 7** anything that genuinely needs labels to validate —
+   precision/recall tradeoffs, or a fix whose correctness depends on comparing
+   against ground truth rather than just "is this number in a sane range."
+
+---
+
+## Milestone 0 — Project scaffolding ✅ DONE
 
 **Goal:** repo structure, environment, no logic yet.
 
-- [ ] Create project structure:
+- [x] Create project structure:
   ```
   detection_quality_adapter/
     adapter/
@@ -69,9 +106,9 @@ Confirmed from the actual `t010` clip (2700 frames / 90s):
     requirements.txt
     README.md
   ```
-- [ ] Set up virtual env, `numpy`, `pytest`, optionally `scipy` (Hungarian matching) and
+- [x] Set up virtual env, `numpy`, `pytest`, optionally `scipy` (Hungarian matching) and
   `filterpy` (Kalman filter) as candidates for Milestone 3.
-- [ ] Decide language/runtime version and commit an empty pipeline that just passes
+- [x] Decide language/runtime version and commit an empty pipeline that just passes
   detections through untouched, with a passing smoke test.
 
 **Prompt to give Claude:** "Scaffold the repo structure above, empty modules, one
@@ -79,19 +116,19 @@ smoke test that imports everything and runs a no-op pipeline call."
 
 ---
 
-## Milestone 1 — Data model & contracts
+## Milestone 1 — Data model & contracts ✅ DONE
 
 **Goal:** lock down the shapes everything else builds on.
 
-- [ ] `Detection`: box (x, y, w, h or corners), confidence, frame_id/timestamp,
+- [x] `Detection`: box (x, y, w, h or corners), confidence, frame_id/timestamp,
   class label, source flag (`reported` at input).
-- [ ] `Track`: id, ordered list of Detections, state (active / ended / exiting),
+- [x] `Track`: id, ordered list of Detections, state (active / ended / exiting),
   predicted next position (for association + exit test).
-- [ ] Output tag enum: `reported | merged | rejected | interpolated`.
-- [ ] `Config`: per-class expectations — plausible size range, plausible shape
+- [x] Output tag enum: `reported | merged | rejected | interpolated`.
+- [x] `Config`: per-class expectations — plausible size range, plausible shape
   (aspect ratio range), candidate pool size, class max instances, max speed
   (px/frame or px/sec), exit-border weighting.
-- [ ] Write this as plain dataclasses/structs first — no behavior, just shape —
+- [x] Write this as plain dataclasses/structs first — no behavior, just shape —
   so every later stage can be unit tested against hand-built fixtures.
 
 **Prompt to give Claude:** "Implement `types.py` with these dataclasses. Add a
@@ -101,16 +138,25 @@ smoke test that imports everything and runs a no-op pipeline call."
 and pass them through a no-op pipeline that returns them unchanged but tagged
 `reported`.
 
+**Note (added at the Milestone 4 checkpoint):** `Config` has grown well past
+the fields listed above as later milestones needed more granular thresholds
+(`duplicate_iou_threshold`, `min_supported_track_length`, `static_px_threshold`,
+`camera_moving_speed_mps`, `camera_moving_angular_deg_per_frame`,
+`min_static_run_frames`, and a split `max_speed_px_per_frame` /
+`track_gate_speed_px_per_frame` — see Milestone 4's notes). Check
+`adapter/types.py` directly for the current field list rather than trusting this
+document's Milestone 1 description, which only reflects the original placeholder set.
+
 ---
 
-## Milestone 1.5 — Data ingestion (real bundle → internal types)
+## Milestone 1.5 — Data ingestion (real bundle → internal types) ✅ DONE
 
 **Goal:** one loader that turns a clip folder into the objects Milestones 2–6
 operate on. This is new now that the dataset has actually arrived — do it
 right after Milestone 1, in parallel with (not instead of) the synthetic-data
 work in Milestones 2–5.
 
-- [ ] `load_clip(clip_dir) -> ClipData`, where `ClipData` bundles:
+- [x] `load_clip(clip_dir) -> ClipData`, where `ClipData` bundles:
   - `detections: list[list[Detection]]` — one list per frame index, built from
     `hand_boxes.json` (note: frames with zero detections are **omitted** from
     the file, not present as empty lists — the loader must reconstruct the
@@ -123,11 +169,11 @@ work in Milestones 2–5.
     2700 frames, `vio_pose` has 2701 samples; reconcile the indexing before
     building anything downstream on top of it).
   - `meta: dict` — pass through `meta.json` as-is (task label, provenance).
-- [ ] Map `hand_boxes.json`'s `class 0/1` field into `Detection`'s handedness
+- [x] Map `hand_boxes.json`'s `class 0/1` field into `Detection`'s handedness
   field but **do not** treat it as a stable identity — every downstream stage
   must already ignore it per the spec, this is just carrying it through for
   debugging/visualization.
-- [ ] Write one integration test that loads the real `t010` bundle end-to-end
+- [x] Write one integration test that loads the real `t010` bundle end-to-end
   and asserts basic sanity: frame count matches `meta.json`, no crashes on the
   handful of zero-detection frames, pose array aligns with frame timestamps.
 
@@ -141,9 +187,15 @@ uploaded `t010` bundle."
 that Milestone 2's geometric-rejection stage can already run against, frame by
 frame, without modification.
 
+**Done:** the `frame_ts`/`vio_pose` off-by-one turned out to be consistent
+(`n == frame_count + 1`) across every clip checked, not `t010`-specific — see
+`adapter/ingest.py`'s `_load_pose` docstring. Tests in `tests/test_ingest.py`
+now run against 4 clips (not just `t010`), chosen to also cover a dense
+zero-gap clip and two clips with real dropout gaps.
+
 ---
 
-## Milestone 2 — Geometric rejection (Stage 1, per-frame only)
+## Milestone 2 — Geometric rejection (Stage 1, per-frame only) ✅ DONE
 
 **Goal:** the three per-frame rules, in fixed order, no tracking required yet.
 
@@ -155,11 +207,11 @@ Order matters (spec §3):
 3. **Implausible shape** — reject boxes markedly more elongated than the
    object should be.
 
-- [ ] IoU-based duplicate merge function, testable with two overlapping synthetic
+- [x] IoU-based duplicate merge function, testable with two overlapping synthetic
   boxes → confirm one `merged` output survives.
-- [ ] Size filter against `Config.plausible_size`.
-- [ ] Shape filter against `Config.plausible_shape` (aspect ratio bounds).
-- [ ] Unit tests: one synthetic frame per rule, plus one frame that passes clean.
+- [x] Size filter against `Config.plausible_size`.
+- [x] Shape filter against `Config.plausible_shape` (aspect ratio bounds).
+- [x] Unit tests: one synthetic frame per rule, plus one frame that passes clean.
 
 **Prompt to give Claude:** "Implement `geometric.py` with `reject_duplicates`,
 `reject_implausible_size`, `reject_implausible_shape`, applied in that order.
@@ -168,22 +220,31 @@ Write pytest cases for each using hand-built boxes — no dataset needed."
 **Exit criteria:** stage 1 runs standalone on a list of per-frame candidate
 boxes and returns a filtered/merged/tagged list. Fully testable now.
 
+**Done:** implemented as greedy NMS (confidence-sorted, IoU-gated) for
+duplicates, then size/shape filters. Real-data test suite
+(`tests/test_geometric_real_data.py`) checks structural invariants (no
+crashes, no residual duplicates, count never increases) across 3 real clips,
+plus a test locking in a confirmed real duplicate pair (`t010` frame 5, two
+overlapping right-hand boxes). `scripts/visualize_stage1.py` renders a real
+clip color-coded by what stage 1 did to each box — see
+`detection_quality_adapter/README.md` for the color legend and example.
+
 ---
 
-## Milestone 3 — Association (Stage 2, the tracker)
+## Milestone 3 — Association (Stage 2, the tracker) ✅ DONE
 
 **Goal:** turn per-frame detections into per-object tracks. This is the piece
 everything downstream depends on — worth the most care.
 
-- [ ] Decide matching strategy: start simple — greedy nearest-neighbor using
+- [x] Decide matching strategy: start simple — greedy nearest-neighbor using
   predicted position (linear extrapolation from last known velocity) — before
   reaching for a Kalman filter or Hungarian algorithm. Upgrade only if the
   simple version isn't good enough on synthetic sequences.
-- [ ] A detection close to a predicted position extends that track.
-- [ ] A detection far from any active track starts a new track.
-- [ ] Track object needs: history, current predicted position/velocity,
+- [x] A detection close to a predicted position extends that track.
+- [x] A detection far from any active track starts a new track.
+- [x] Track object needs: history, current predicted position/velocity,
   "active" vs "no detection this frame but still within patience window" state.
-- [ ] Unit tests: synthetic multi-frame sequences —
+- [x] Unit tests: synthetic multi-frame sequences —
   - one object moving smoothly → one continuous track
   - one object with a 2-frame gap → track continues, not two tracks
   - two objects crossing paths → tracks don't swap identities
@@ -198,24 +259,37 @@ improve robustness, but don't build them yet."
 **Exit criteria:** a list of per-frame detection lists in → a list of Tracks
 out, correctly separating and continuing objects across synthetic sequences.
 
+**Done:** greedy NN + linear velocity extrapolation, gated by
+`Config.track_gate_speed_px_per_frame` scaled by frames-since-last-seen (a
+coasting track gets a wider gate the longer it's been coasting). Real-data
+tests (`tests/test_association_real_data.py`) caught a real ordering bug: a
+stale track's patience was originally checked *after* matching instead of
+before, so an ever-widening gate could resurrect a track that should have
+already ended — fixed by expiring stale tracks at the top of each frame's
+processing. `scripts/visualize_tracks.py` renders a real clip with a
+persistent color per track plus a fading trail, for eyeballing identity
+continuity/fragmentation directly. See the Milestone 4 entry below for the
+gate-vs-plausibility speed split this milestone's `max_speed`-based gate
+eventually needed.
+
 ---
 
-## Milestone 4 — Temporal rejection (Stage 3, needs tracks)
+## Milestone 4 — Temporal rejection (Stage 3, needs tracks) ✅ DONE
 
 **Goal:** the three rules that only make sense once tracks exist (spec §3,
 rules 4–6).
 
-- [ ] **Implausible displacement** — box jumps further between consecutive
+- [x] **Implausible displacement** — box jumps further between consecutive
   frames than `Config.max_speed` allows → reject.
-- [ ] **Unsupported detection** — appears for 1–2 frames with no track before
+- [x] **Unsupported detection** — appears for 1–2 frames with no track before
   or after → reject as flicker.
-- [ ] **Static detection** — doesn't move while the camera does → reject as
+- [x] **Static detection** — doesn't move while the camera does → reject as
   background structure. Camera motion is now a real signal, not a stub: use
   `vio_pose.json` (via `ingest.py`'s `ClipData.pose`) — frame-to-frame delta in
   position and/or yaw/pitch/roll gives "is the camera moving" directly, no
   optical flow needed. Define a motion threshold (e.g. speed or angular rate
   above some epsilon) rather than a boolean stub.
-- [ ] Unit tests: synthetic tracks — one flicker-only track, one track
+- [x] Unit tests: synthetic tracks — one flicker-only track, one track
   exceeding max speed, one static track against a "moving camera" stub, one
   clean track that should survive all three.
 
@@ -226,6 +300,49 @@ one clean pass-through case."
 
 **Exit criteria:** tracks in → tracks with implausible/unsupported/static
 detections tagged `rejected`, rest untouched.
+
+**Done, in three passes** (full mechanism, numbers, and screenshots in
+`detection_quality_adapter/README.md` — summarized here):
+
+1. **Initial implementation.** All three rules against real VIO pose data
+   (no stub). Real-data tests confirmed it runs cleanly and rejects a
+   non-trivial, non-total fraction of survivors.
+2. **Static rule rewrite** (user caught this by eyeballing
+   `407258cd_t036`): the original per-frame threshold flagged real hands for
+   pausing even one frame, because a head-mounted camera is "moving" by a
+   low-bar definition almost continuously, and rotation-dominated camera
+   motion means the hand the wearer is *looking at* is often the thing in
+   frame with the *least* apparent motion — nearly backwards from what the
+   rule wants. Fixed by requiring `min_static_run_frames` (15) *consecutive*
+   still-while-moving frames, not one. Cut `t010`'s static false-rejections
+   from 261 to ~0. **Still open**: a hand braced motionless for several
+   *seconds* (e.g. `t036` frame 220, steadying a workpiece) still gets
+   flagged — no sustained-run window is both long enough to admit that and
+   short enough to catch real background. Real fix needs to separate
+   rotation-induced apparent motion from translation-induced parallax
+   instead of using a flat pixel threshold — deferred to Milestone 7.
+3. **Speed gate/plausibility split** (this checkpoint, prompted by the user
+   noticing detections still jumping too far): per-clip speed percentiles
+   across all 39 clips showed the shared `max_speed_px_per_frame=150` sat at
+   ~p99.9 of 38 clips' real adjacent-frame hand speed (p99=82.6, p99.9=132)
+   — so loose that stage 3's displacement rule almost never fired, even
+   though real "motion-blur wobble" moments inside long, clearly-continuous
+   tracks should have been caught. One clip (`ae580129_t057`, a maintenance
+   task) turned out to be a genuinely different population (camera moves
+   2-4x faster on average) rather than an outlier to average away. Split
+   into two config fields: `max_speed_px_per_frame` (110, tightened, used
+   only by the displacement-plausibility check) and
+   `track_gate_speed_px_per_frame` (350, generous, used only by the
+   Milestone 3 tracker's match gate) — conflating them meant tightening one
+   to catch real wobble moments was simultaneously loosening or fragmenting
+   the tracker's own identity continuity. Effect on `t010`: track count
+   dropped 65→44 (less gate-driven fragmentation) while stage 3's rejection
+   rate rose 0.6%→1.5% (catching more real wobble without breaking tracks
+   to do it). **Still open**: making `max_speed_px_per_frame` scale with the
+   clip's own VIO camera speed at each frame, so a naturally-faster task
+   like `ae580129_t057` doesn't inherit a systematically higher
+   false-rejection rate — needs labeled data to validate the scaling factor,
+   deferred to Milestone 7.
 
 ---
 
@@ -350,28 +467,46 @@ Wire real camera-motion and stereo-depth signals in place of the Milestone
 
 ## Suggested working order / session plan
 
-1. Session 1: Milestones 0–1 (scaffold + types)
-2. Session 2: Milestone 1.5 (real data ingestion against `t010`) — do this
-   early now that data is in hand, so every later milestone can be sanity
-   checked against a real clip alongside its synthetic tests
-3. Session 3: Milestone 2 (geometric rejection) — synthetic tests first, then
-   a quick manual look at stage-1 output on `t010`'s 3+ box frames
-4. Session 4: Milestone 3 (association/tracker) — the hardest, give it room;
-   `t010`'s handedness-swap-on-crossing risk is a good real test case once
-   synthetic cases pass
-5. Session 5: Milestone 4 (temporal rejection) — wire real VIO-based camera
-   motion in immediately, no stub needed
-6. Session 6: Milestone 5 (interpolation/exit) + wire `pipeline.py` end to end
-7. Session 7: Milestone 6 (hand specialization + edge-case tests) — stereo
+1. ~~Session 1: Milestones 0–1 (scaffold + types)~~ ✅ done
+2. ~~Session 2: Milestone 1.5 (real data ingestion against `t010`)~~ ✅ done —
+   `load_clip` has since been run against all 39 clips without incident
+   (during the Milestone 4 checkpoint's speed analysis), not just the 4
+   clips pytest covers
+3. ~~Session 3: Milestone 2 (geometric rejection)~~ ✅ done — synthetic tests
+   plus real-data checks and a visualization script
+4. ~~Session 4: Milestone 3 (association/tracker)~~ ✅ done — greedy NN +
+   linear prediction; real-data testing caught a real patience-ordering bug
+5. ~~Session 5: Milestone 4 (temporal rejection)~~ ✅ done, wired to real VIO
+   pose from the start, plus a mid-course checkpoint session (below)
+6. **Checkpoint session (this one): refine planning/memory + recalibrate
+   against real data now that ~half the milestones are built.** Not a new
+   milestone — a deliberate pause to (a) keep this document and the
+   assistant's memory in sync with what's actually built, since both had
+   drifted behind the real state of the repo, and (b) chase down a
+   correctness concern (detections jumping further than they should) with
+   real multi-clip data instead of guessing. Produced the Milestone 4 speed
+   gate/plausibility split above and the "Working strategy" section up top.
+   Worth repeating this kind of pause every few milestones rather than only
+   at the end.
+7. Session 7: Milestone 5 (interpolation/exit) + wire `pipeline.py` end to end
+8. Session 8: Milestone 6 (hand specialization + edge-case tests) — stereo
    depth rule is DONE against nominal calibration (see above); remaining
    Milestone 6 work is `hand_config.py`, `selection.py`, and the edge-case
    table tests, which still need Milestones 0-5's types/pipeline in place
    first (selection needs association output, etc.)
-8. Once labels exist for a reference set: Milestone 7 (calibration/validation)
+9. Once labels exist for a reference set: Milestone 7 (calibration/validation)
+   — though see "Working strategy" above: don't wait until this session to
+   sanity-check every placeholder against real data, only the parts that
+   truly need labels (precision/recall). `plausible_size`, `plausible_shape`,
+   and `max_dropout_frames` haven't had the same real-data pass that speed
+   and static-motion got yet — good candidates for the next checkpoint,
+   before Milestone 6, not necessarily after.
 
 Each session should end with passing tests before moving on. Synthetic tests
-remain the primary correctness check through Milestone 6; the real `t010`
-clip is a secondary sanity pass, not a substitute, until labels exist.
+remain the primary correctness check through Milestone 6; real-clip checks
+are a secondary pass, not a substitute, until labels exist — but per the
+Working strategy section, that secondary pass should happen continuously
+across all 39 clips, not just once at the end.
 
 ## Open questions
 
@@ -383,6 +518,36 @@ Resolved by the dataset arrival:
   not IMU, not optical flow. No per-clip IMU exists in this bundle set at all.
 - ~~Batch vs streaming~~ → offline, per-clip, non-causal. Full clip files are
   delivered up front.
+- ~~`frame_ts`/`vio_pose` off-by-one, `t010`-specific or universal?~~ →
+  universal: `load_clip` has now run cleanly against all 39 clips with the
+  `n == frame_count + 1` assumption enforced (fails loudly otherwise, per
+  `ingest.py`), not just the 4 clips pytest exercises. Confirmed during the
+  Milestone 4 checkpoint's all-clips speed analysis.
+
+Found during Milestones 2-4 and the Milestone 4 checkpoint (see their "Done"
+notes above for full detail):
+- **Static-rejection rule can't yet tell "background" from "hand held still
+  on purpose" over multi-second timescales.** The sustained-run fix
+  (Milestone 4) solved brief real pauses but not a hand deliberately braced
+  for seconds (`t036` frame 220). Properly separating rotation-induced
+  apparent motion from real parallax — judging staticness against the
+  *expected* motion at a box's position rather than a flat pixel threshold —
+  needs labeled data to validate; a Milestone 7 candidate.
+- **A single flat speed threshold can't distinguish "fast hand" from "normal
+  hand, fast camera."** `ae580129_t057`'s camera moves 2-4x faster on
+  average than other clips (VIO speed), which shows up as systematically
+  faster apparent hand motion with no change in real hand behavior. Scaling
+  `max_speed_px_per_frame` by the clip's own VIO camera speed at each frame
+  is the likely right fix; needs labeled data to validate the scaling
+  factor, so deferred to Milestone 7 — but worth remembering it's a *task*
+  difference (this clip is a maintenance job, not hairstyling/carpentry),
+  not noise, so Milestone 7's reference set should probably report metrics
+  per job/task type rather than only in aggregate.
+- **`plausible_size`, `plausible_shape`, and `max_dropout_frames` haven't had
+  a real-data sanity pass yet**, unlike speed and static motion. Given how
+  much the speed threshold moved once actually checked (150 → 110, plus
+  splitting it in two), these are worth the same treatment before assuming
+  they're in a reasonable range — see "Working strategy" above.
 
 Still open:
 - **Stereo calibration is nominal, not exact — resolved enough to build on,
@@ -403,15 +568,11 @@ Still open:
   search tolerance in `stereo_depth.py` handles it either way — but worth a
   follow-up if depth precision needs to improve beyond the current coarse
   threshold.
-- `frame_ts.json` (`frame_count`) and `vio_pose.json` (`n`) differ by one
-  sample in the inspected clip (2700 vs 2701) — is this a consistent off-by-one
-  across all 39 clips (e.g. pose sampled at both endpoints of the window) or
-  clip-specific? Worth checking a second bundle once available, so
-  `ingest.py` handles it generally rather than special-casing `t010`.
-- Max-speed, plausible-size/shape, and dropout-length thresholds (Milestone 7)
-  still need the labeled reference set — raw detections alone don't have
-  ground truth, so calibration can't start until labels exist, even though
-  the raw clips themselves are now in hand.
+- Formal, labeled precision/recall calibration (Milestone 7) is still fully
+  blocked on the reference set for every threshold — informal real-data
+  passes (speed, static motion) can catch "this number is obviously wrong"
+  and "this rule has the wrong shape," but not "this is the precision/recall-
+  optimal value," which genuinely needs ground truth.
 - Should the adapter run per-clip independently (39 separate runs) or is there
   ever continuity across clips within a session worth preserving? Currently
   assuming per-clip independence, matching how the bundles are delivered.

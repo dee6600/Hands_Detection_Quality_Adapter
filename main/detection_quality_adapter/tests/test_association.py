@@ -8,7 +8,7 @@ an explicit check that swapped handedness labels never affect association
 """
 
 from adapter.association import track_detections
-from adapter.types import Config, Detection, TrackState
+from adapter.types import Config, Detection, Tag, TrackState
 
 
 def _det(frame, xy, confidence=0.8, class_label=None, w=40.0, h=40.0):
@@ -133,3 +133,34 @@ def test_handedness_label_never_influences_association():
         xs = [d.center[0] for d in track.detections]
         assert xs == sorted(xs) or xs == sorted(xs, reverse=True)
         assert len(track.detections) == 4
+
+
+def test_gate_uses_its_own_speed_not_the_displacement_plausibility_threshold():
+    """The tracker's match gate (`track_gate_speed_px_per_frame`) is
+    deliberately more generous than stage 3's displacement-plausibility
+    threshold (`max_speed_px_per_frame`) -- a fast-but-real jump should still
+    bridge into one track here, even though the same jump would later get
+    tagged `rejected` by temporal.py's rule. See Config's docstring in
+    types.py for why these need to be two different numbers (calibrated
+    against real per-clip speed distributions -- see planning.md).
+    """
+    config = Config(max_speed_px_per_frame=50.0, track_gate_speed_px_per_frame=500.0)
+    # a 200px jump in one frame: far past the plausibility threshold (50),
+    # comfortably inside the gate (500)
+    frames = [
+        [_det(0, (0.0, 100.0))],
+        [_det(1, (20.0, 100.0))],
+        [_det(2, (220.0, 100.0))],
+        [_det(3, (240.0, 100.0))],
+    ]
+
+    tracks = track_detections(frames, config)
+
+    assert len(tracks) == 1
+    assert [d.frame for d in tracks[0].detections] == [0, 1, 2, 3]
+
+    from adapter.temporal import reject_implausible_displacement
+
+    reject_implausible_displacement(tracks, config)
+    tags = [d.tag for d in tracks[0].detections]
+    assert tags == [Tag.REPORTED, Tag.REPORTED, Tag.REJECTED, Tag.REPORTED]

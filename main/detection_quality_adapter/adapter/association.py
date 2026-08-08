@@ -41,8 +41,13 @@ def _predict_position(track: Track, frame: int) -> tuple[float, float]:
 def _gate_radius(config: Config, dt: int) -> float:
     """Max allowed distance between a track's prediction and a candidate
     detection, scaled by frames elapsed since the track was last seen.
+
+    Deliberately uses `track_gate_speed_px_per_frame`, not the tighter
+    `max_speed_px_per_frame` plausibility threshold from temporal.py's
+    displacement rule -- see Config's docstring for why those two need to be
+    different numbers.
     """
-    return config.max_speed_px_per_frame * max(dt, 1)
+    return config.track_gate_speed_px_per_frame * max(dt, 1)
 
 
 def _extend_track(track: Track, det: Detection) -> None:
