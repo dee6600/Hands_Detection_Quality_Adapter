@@ -11,6 +11,7 @@ from adapter import (
     temporal,
     types,
 )
+from adapter.types import Detection, Tag
 
 
 def test_modules_import():
@@ -29,7 +30,10 @@ def test_modules_import():
 
 
 def test_noop_pipeline_passthrough():
-    detections = [{"frame": 0, "box": [0, 0, 10, 10]}, {"frame": 1, "box": [1, 1, 11, 11]}]
+    detections = [
+        Detection(frame=0, xyxy=(0, 0, 10, 10), confidence=0.9),
+        Detection(frame=1, xyxy=(1, 1, 11, 11), confidence=0.8),
+    ]
     out = pipeline.run_pipeline(detections)
     assert len(out) == len(detections)
-    assert all(d["tag"] == "reported" for d in out)
+    assert all(d.tag == Tag.REPORTED for d in out)

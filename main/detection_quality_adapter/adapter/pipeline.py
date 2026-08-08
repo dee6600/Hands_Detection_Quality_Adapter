@@ -1,18 +1,15 @@
 """Orchestrates the adapter stages in fixed order.
 
-Milestone 0: no-op pass-through only. Each stage is wired in as it's built
-(Milestones 2-6), in this fixed order: geometric -> association -> temporal
--> interpolation -> selection.
+Milestone 1: no-op pass-through over real `Detection` objects. Each stage is
+wired in as it's built (Milestones 2-6), in this fixed order: geometric ->
+association -> temporal -> interpolation -> selection.
 """
 
+from adapter.types import Detection, Tag
 
-def run_pipeline(detections):
-    """Pass detections through untouched, tagged 'reported'.
 
-    `detections` is a per-frame list of raw detection dicts/objects. Milestone 1
-    replaces the tagging below with the real `Detection` dataclass.
-    """
-    return [
-        {**d, "tag": "reported"} if isinstance(d, dict) else d
-        for d in detections
-    ]
+def run_pipeline(detections: list[Detection]) -> list[Detection]:
+    """Pass detections through untouched, tagged `reported`."""
+    for d in detections:
+        d.tag = Tag.REPORTED
+    return detections
