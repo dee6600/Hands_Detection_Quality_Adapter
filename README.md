@@ -1,11 +1,49 @@
 # Detection Quality Adapter
 
-Post-processing stage between a hand detector and downstream consumers.
+**`adapter`** — a post-processing stage between a hand detector and downstream consumers.
+
+![Python](https://img.shields.io/badge/python-3.x-3776AB) ![Tests](https://img.shields.io/badge/tests-pytest-0A9EDC) ![Milestone](https://img.shields.io/badge/milestone-7%20%2F%20calibration-ec3013) ![Status](https://img.shields.io/badge/status-no%20labelled%20data-lightgrey)
+
 Corrects false positives/negatives using temporal (multi-frame) logic,
 without touching or retraining the detector.
 
 See `../../planning.md` for the milestone plan and `../../hand_detection_spec.pdf`
 for the source spec. Dataset lives in `../../data/` (see its README for schema).
+
+## Contents
+
+- [Setup](#setup)
+- [Pipeline at a glance](#pipeline-at-a-glance)
+- [Visualizing stage 1 (geometric rejection)](#visualizing-stage-1-geometric-rejection)
+- [Visualizing stage 2 (the tracker)](#visualizing-stage-2-the-tracker)
+- [Visualizing stage 3 (temporal rejection)](#visualizing-stage-3-temporal-rejection)
+- [Visualizing stage 4 (interpolation + exit) and the full pipeline](#visualizing-stage-4-interpolation--exit-and-the-full-pipeline)
+- [Milestone 6: the hand-specialized pipeline](#milestone-6-the-hand-specialized-pipeline)
+- [Visualizing the hand-specialized pipeline](#visualizing-the-hand-specialized-pipeline)
+- [Milestone 7: calibration, honestly](#milestone-7-calibration-honestly)
+- [Running the final pipeline on the whole dataset](#running-the-final-pipeline-on-the-whole-dataset)
+
+## Pipeline at a glance
+
+Six stages, each documented and visualized below. Stages 1–4 are generic; 5–6 are hand-specialized (`run_hand_pipeline`) and opt-in.
+
+```mermaid
+flowchart LR
+    D[Raw detections] --> S1
+    subgraph S1[Stage 1 · geometric]
+        direction TB
+        s1a[reject implausible size/shape]
+        s1b[reject duplicates]
+    end
+    S1 --> S2["Stage 2 · tracker<br/>association across frames"]
+    S2 --> S3["Stage 3 · temporal<br/>displacement / static / unsupported"]
+    S3 --> S4["Stage 4 · interpolation + exit<br/>fill gaps, tag exits"]
+    S4 -.hand pipeline only.-> S5["Stage 5 · selection<br/>2-hand cap"]
+    S5 -.optional, needs video.-> S6["Stage 6 · stereo depth<br/>reject beyond arm's reach"]
+    S4 --> OUT[Tagged, gap-filled tracks]
+    S5 --> OUT
+    S6 --> OUT
+```
 
 ## Setup
 
@@ -64,7 +102,8 @@ displacement, purple dashed = rejected as an unsupported/flicker track,
 yellow dashed = rejected as static background. Add `--max-frames N` for a
 quick preview.
 
-### The static rule needed a sustained-run requirement, not just a threshold
+<details>
+<summary><strong>The static rule needed a sustained-run requirement, not just a threshold</strong></summary>
 
 The first version of `reject_static` flagged any single frame where a box
 moved less than `static_px_threshold` while the camera was "moving" (a very
@@ -102,7 +141,10 @@ parallax and judging staticness against the *expected* motion at a box's
 position, rather than a flat pixel threshold — deferred to Milestone 7,
 where labeled data can validate that approach instead of more eyeballing.
 
-### Speed/gate calibration: the tracker gate and the displacement check needed to split
+</details>
+
+<details>
+<summary><strong>Speed/gate calibration: the tracker gate and the displacement check needed to split</strong></summary>
 
 Both the tracker's match gate (stage 2) and the displacement-plausibility
 rule (stage 3) originally shared one `Config.max_speed_px_per_frame` value
@@ -152,6 +194,8 @@ already driving the static rule), so `ae580129_t057`-like clips don't need a
 systematically higher false-rejection rate than calmer clips. This needs
 labeled data to validate the scaling factor rather than more eyeballing.
 
+</details>
+
 ## Visualizing stage 4 (interpolation + exit) and the full pipeline
 
 `tests/test_interpolation.py` covers gap-fill/exit on synthetic tracks
@@ -185,7 +229,8 @@ detections, clip.pose)` runs all four stages in order and returns tagged,
 gap-filled tracks — matching `ClipData`'s shape directly, so it can be
 called straight off `ingest.load_clip`'s output.
 
-### A real bug found by real-data testing: exit detection used box center, not edge
+<details>
+<summary><strong>A real bug found by real-data testing: exit detection used box center, not edge</strong></summary>
 
 The exit test's first version measured distance from a box's *center* to
 the nearest frame border. On synthetic fixtures (small, fixed-size boxes)
@@ -203,7 +248,10 @@ real_exits`) locks this in, deliberately excluding `6cd0b236_t000` — a dense
 clip with only 2 tracks, both running to the clip's own last frame with no
 dropouts at all, so genuinely nothing to exit from there.
 
-### Design notes carried over from the spec cross-check
+</details>
+
+<details>
+<summary><strong>Design notes carried over from the spec cross-check</strong></summary>
 
 Two things flagged in `planning.md` before this milestone was built, both
 implemented:
@@ -227,7 +275,10 @@ implemented:
   (torso occlusion doesn't look like walking out of frame), without needing
   any changes to `interpolation.py` itself.
 
-### A real bug found while writing the tests, not the code
+</details>
+
+<details>
+<summary><strong>A real bug found while writing the tests, not the code</strong></summary>
 
 While hand-deriving the expected numbers for the "gap resumes far from
 prediction" test, the original gap-fill check turned out to be tautological:
@@ -239,6 +290,8 @@ the anchor's own *incoming* velocity (from whatever came before it in the
 track), independent of where the gap actually resumes. Caught before it
 ever ran against real data, by tracing through the synthetic test math by
 hand rather than trusting the first green test run.
+
+</details>
 
 ## Milestone 6: the hand-specialized pipeline
 
@@ -279,7 +332,8 @@ project:
   seated client, so a tighter, more "arm's-length"-sounding threshold would
   reject the wearer's own hands during completely normal reaching.
 
-### Hands crossing/overlapping vs. true duplicates: the containment-ratio fix
+<details>
+<summary><strong>Hands crossing/overlapping vs. true duplicates: the containment-ratio fix</strong></summary>
 
 The spec's edge case table is explicit: two hands crossing must be retained
 as two detections, never merged as a duplicate. But Milestone 2's
@@ -300,7 +354,10 @@ gates (IoU 0.52, containment 0.68) survives under `hand_config()` but
 would have merged under the generic `Config()` — and a true duplicate
 (containment 0.95) still correctly merges either way.
 
-### Stereo depth: migrated from `exp/scafholds/`, not a new build
+</details>
+
+<details>
+<summary><strong>Stereo depth: migrated from `exp/scafholds/`, not a new build</strong></summary>
 
 The "beyond arm's reach" rule (`stereo_depth.py`) was already built and
 validated against real `t010` data in an earlier exploratory session, but
@@ -331,7 +388,10 @@ physical camera rigs. Treat this stage as experimental outside `t010`
 specifically until that's resolved — it's why the final full-dataset run
 further down doesn't include it.
 
-### Gloved/partially-occluded hands: deliberately not implemented
+</details>
+
+<details>
+<summary><strong>Gloved/partially-occluded hands: deliberately not implemented</strong></summary>
 
 Per the spec's own instruction ("behaviour unmeasured, needs labelled
 examples — don't guess at logic here"), this edge case has a dedicated
@@ -340,6 +400,8 @@ implementation. It should keep failing until Milestone 7 provides real
 examples to design against; `strict=True` means it'll loudly break the
 suite (an "XPASS" failure) if something accidentally makes it pass first,
 which would mean untested behavior slipped in silently.
+
+</details>
 
 ## Visualizing the hand-specialized pipeline
 
@@ -427,7 +489,8 @@ python calibration/sweep_thresholds.py
   hand is outranked by a spurious box"). No way to know which candidate was
   "true" without labels.
 
-### Two accounting bugs found building the calibration tool itself
+<details>
+<summary><strong>Two accounting bugs found building the calibration tool itself</strong></summary>
 
 `rejection_reason_frequency`'s first version only walked `tracks`, which
 silently dropped every stage-1 casualty from the count: `reject_duplicates`
@@ -446,7 +509,10 @@ correctness on its own — the first buggy version's total looked internally
 consistent too, right up until it was checked against an independently
 computed number.
 
-### Parameters retuned from this data
+</details>
+
+<details>
+<summary><strong>Parameters retuned from this data</strong></summary>
 
 Both in `hand_config()`, both still informal/distribution-based (not
 precision/recall-optimal, since that needs labels):
@@ -471,7 +537,10 @@ precision/recall-optimal, since that needs labels):
   dropouts. 15 covers the reliable p75 mass without reaching into that
   contaminated tail.
 
-### Second calibration pass: checking everything else, not just the obvious gaps
+</details>
+
+<details>
+<summary><strong>Second calibration pass: checking everything else, not just the obvious gaps</strong></summary>
 
 Asked explicitly to calibrate whatever's findable without labels, so every
 other threshold got the same real-data check `plausible_size` got. Four came
@@ -511,6 +580,8 @@ leaves a candidate for later review). A job-aware version is a well-motivated
 future improvement but risks being circular without labels to validate it —
 deriving a job's expected reach from its own detections' observed depth is
 contaminated by exactly the bystander population the rule exists to exclude.
+
+</details>
 
 ## Running the final pipeline on the whole dataset
 
@@ -561,3 +632,4 @@ run's log (`final_all_clips_stereo_log.txt`, sitting alongside
 `final_all_clips/` in the same output directory) is kept for reference
 rather than deleted, since it's the evidence behind the calibration finding,
 not because its numbers should be trusted.
+
