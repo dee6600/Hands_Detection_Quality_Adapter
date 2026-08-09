@@ -529,6 +529,20 @@ adapter — mostly config, four behavioral changes.
     stereo depth across the *entire* ~2700-frame clip. Took over 15 minutes
     before this was caught and fixed (cap the actual pipeline input, not
     just the render) — see `detection_quality_adapter/README.md`.
+  - **⚠️ NOT VALIDATED ACROSS THE DATASET, found at the Milestone 7
+    overnight run** (see Milestone 7 below for the full account): the
+    nominal calibration was derived from and validated against exactly one
+    clip (`t010`). Running stage 6 against all 39 clips surfaced a confident
+    false rejection of the wearer's own hands on a different clip
+    (`42bba884_t012`) — and `meta.json` confirms the dataset spans multiple
+    recording batches (`"library": "v3"` vs `"legacy_v1"`, different
+    session-ID formats), so one hardcoded calibration can't be assumed to
+    hold dataset-wide. `stereo_depth.py`'s module docstring has the full
+    diagnostic trail. Treat this stage as experimental outside `t010`
+    specifically until per-clip camera calibration or labels exist to fix
+    it properly — it remains opt-in (`run_hand_pipeline` only invokes it
+    when video paths are explicitly passed), never part of the default
+    pipeline output.
 - [x] Implement the edge-case table from spec §6 as explicit test cases —
   `tests/test_hand_config.py`, one test per row: duplicate on one hand
   (merges), side exit (terminates, no interpolation), bottom exit (torso
@@ -646,25 +660,56 @@ object" since the position gate has grown too wide by then to mean anything,
 so 15 stays well clear of it. Both are still informal, distribution-based
 calibration, not precision/recall-optimal — flagged as such, not oversold.
 
-**Final run**: the tuned hand pipeline (stages 1-5) ran against all 39
-clips (`scripts/visualize_hand_pipeline.py --all`), 996.8s, one annotated
-video per clip saved to `detection_quality_adapter/scripts/output/
-final_all_clips/` (gitignored, ~8.3GB, local only). Aggregate: 148,714 final
-detections across 787 tracks, 90.5% kept, 5.5% rejected at stage 3, 2.6%
-interpolated, 1.4% rejected at stage 5, 36.1% of tracks confirmed exiting —
-matches `sweep_thresholds.py`'s independently-computed numbers exactly.
-Stage 6 (stereo depth) omitted from this run: at the per-clip rate observed
-in Milestone 6, the full dataset would take several hours rather than
-~15-20 minutes; available via `--stereo-depth` on a smaller selection. One
-limitation found reviewing the run: this script's stats/video never show a
-`rejected_geometric` case (same root cause as the `sweep_thresholds.py`
-accounting bug above — stage-1 casualties never reach `track_detections`,
-so a track-only walk never sees them) — doesn't affect the pipeline's actual
-output, only this one script's ability to show *why* a stage-1 rejection
-happened; `visualize_stage1.py` already covers that view correctly. Not
-fixed-and-re-rendered for this pass (would cost another ~17 min + 8GB for a
-visualization completeness gap, not a behavior change) — flagged here
-instead so it's a tracked, known thing rather than a silent gap.
+**Second calibration pass** (the user explicitly asked to calibrate
+everything findable without labels): checked every other threshold this
+project hadn't already real-data-checked, the same way `plausible_size` got
+checked. Four came back genuinely fine rather than silently unexamined —
+`camera_moving_speed_mps`, `camera_moving_angular_deg_per_frame`,
+`static_px_threshold`, and `duplicate_iou_threshold` all sit in reasonable,
+non-arbitrary positions relative to their real distributions (see
+`hand_config.py`'s docstring for the exact percentiles) — no change applied,
+but now verified rather than assumed. One genuine, unresolved limitation
+found: `max_reach_m` (1.8, derived from `t010` alone) doesn't generalize
+well — running stereo depth across 4 more clips spanning different jobs
+found real median own-hand depth varies sharply by task (Farmworker 0.77m
+vs. Hair stylist/Carpenter/Barber 1.5-1.8m). A single global threshold can't
+serve both ends; kept at 1.8 deliberately (favors under-rejecting close-work
+jobs over over-rejecting reach-heavy ones, consistent with this module's
+existing conservative bias) rather than guessing at a job-aware version that
+would be circular to validate without labels. Every one of the 39 clips is
+literally a different job (`meta.json`'s `job` field) — worth remembering
+for Milestone 7's reference set whenever it exists: report metrics per job,
+not only in aggregate.
+
+**Final run(s)**: the tuned hand pipeline (stages 1-5) first ran against
+all 39 clips without stage 6 (`scripts/visualize_hand_pipeline.py --all`),
+996.8s — 148,714 final detections across 787 tracks, 90.5% kept, 5.5%
+rejected at stage 3, 2.6% interpolated, 1.4% rejected at stage 5, 36.1% of
+tracks confirmed exiting, matching `sweep_thresholds.py`'s independently-
+computed numbers exactly. One limitation found reviewing that run: the
+script's stats/video never show a `rejected_geometric` case (same root
+cause as the `sweep_thresholds.py` accounting bug above — a track-only walk
+never sees stage-1 casualties) — doesn't affect the pipeline's actual
+output, only that script's ability to show *why* a stage-1 rejection
+happened; `visualize_stage1.py` already covers that view correctly.
+
+At the user's request, a second full run — `--all --stereo-depth`, no
+frame cap, overnight — ran to completion (14,319.9s, ~4 hours, all 39
+clips, no crashes). Stages 1-5's numbers matched the first run exactly, as
+expected. But reviewing stage 6's results before presenting them surfaced
+the calibration problem documented in Milestone 6's stereo-depth bullet
+above and `stereo_depth.py`'s module docstring: a confident false rejection
+of the wearer's own hands on `42bba884_t012`, traced to the nominal
+calibration only ever having been validated against `t010`, and the dataset
+provably spanning multiple recording batches. **Given the choice between
+keeping that run with heavy caveats, spending more time on an unvalidated
+fix, or reverting to the stages-1-5-only result as the reliable final
+deliverable, the user chose to revert.** `detection_quality_adapter/scripts/
+output/final_all_clips/` was regenerated without stage 6 as the last,
+authoritative pass — see the README for its numbers. The stereo-depth run's
+log (`final_all_clips_stereo_log.txt`) is kept alongside it for reference,
+labeled as superseded/unreliable rather than deleted, since it's the
+evidence behind the calibration finding.
 
 **Prompt to give Claude:** "Implement `metrics.py` for per-stage
 precision/recall and `sweep_thresholds.py` once the dataset is in `data/`.

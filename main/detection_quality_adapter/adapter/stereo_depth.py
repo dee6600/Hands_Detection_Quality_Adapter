@@ -19,6 +19,32 @@ Needs actual video frames, not just detections/pose, so it's a separate,
 optional stage rather than baked into `pipeline.run_hand_pipeline`'s default
 signature -- see `apply_stereo_depth_stage` below, which that function calls
 when video paths are supplied.
+
+**NOT VALIDATED ACROSS THE DATASET -- confirmed unreliable on at least one
+other clip, don't trust its output dataset-wide.** The nominal calibration
+this module depends on was derived from, and validated against, exactly one
+clip (`t010`). Running it across 39 clips (a full overnight batch, all
+stages, video paths supplied) surfaced a confident false rejection on
+`42bba884_t012`: the wearer's own two hands, visibly resting on a nearby
+desk, computed at 2.67-2.75m (match confidence 0.88-0.93 -- not a
+low-confidence case the existing safety net would catch) and rejected as
+beyond reach. Restricting the search to plausible near-range disparities
+found no competitive match there at all; a left/right crop comparison showed
+the hand sitting at nearly the same pixel position in both eyes, implausible
+for something that close under a 12cm-baseline assumption. `meta.json`
+confirms the dataset spans multiple recording batches (`t010` and
+`42bba884_t012` are both `"library": "v3"`; other clips are
+`"library": "legacy_v1"` with a different session-ID format and a real
+named worksite) -- different clips likely came from different physical
+camera rigs, and a single hardcoded calibration can't be assumed to hold
+across all of them, evidently even within the same library version. No
+per-clip camera metadata exists to correct for this, and no labels exist to
+validate a fix. Until that changes, treat `reject_beyond_reach`'s output as
+experimental outside of `t010` specifically -- `pipeline.run_hand_pipeline`
+still requires video paths to be explicitly passed to invoke this stage at
+all, so it stays opt-in rather than part of the default/recommended
+pipeline output. See `planning.md`'s Milestone 6/7 notes for the full
+account.
 """
 
 from __future__ import annotations

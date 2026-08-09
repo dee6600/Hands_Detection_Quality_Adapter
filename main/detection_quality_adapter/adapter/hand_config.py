@@ -32,6 +32,69 @@ numbers. Neither needed labels: they're unsupervised checks against what the
 detector actually emits and how tracks actually behave, not precision/recall
 against ground truth (which this dataset doesn't have -- see
 `calibration/metrics.py`'s module docstring).
+
+A second calibration pass checked every other threshold this config doesn't
+already override for evidence of being wrong, the same way `plausible_size`
+turned out to be. Four came back genuinely fine, not just unexamined --
+worth recording as real findings rather than leaving them silently
+unverified:
+
+  - `camera_moving_speed_mps` (0.05): real VIO speed distribution across all
+    39 clips has p10=0.034, p25=0.054 m/s -- 0.05 sits right in that
+    transition zone, a reasonable "bottom quartile counts as still" cut,
+    not a no-op and not absurdly tight.
+  - `camera_moving_angular_deg_per_frame` (1.0): real angular-delta
+    distribution has p75=0.77, p90=1.4 deg/frame -- similarly sits in a
+    reasonable middle zone. Deliberately not loosened despite the median
+    being lower (0.38): loosening it would make "camera moving" easier to
+    satisfy, which would make the static rule fire MORE, working against
+    the whole point of Milestone 4's sustained-run fix.
+  - `static_px_threshold` (4.0): real adjacent-frame displacement within
+    long (>=50 detections), clearly-genuine tracks has p25=3.68px -- 4.0px
+    sits at almost exactly the same relative position (~bottom quartile) as
+    the speed threshold above, not an arbitrary pick.
+  - `duplicate_iou_threshold` (0.5, shared with the generic pipeline): the
+    real distribution of same-frame box-pair IoUs is strongly bimodal --
+    82.4% of all pairs sit below IoU 0.05 (clearly distinct objects), then
+    a real, separate cluster from 0.5-0.7 (6.4% of all pairs) with a
+    near-empty gap at 0.7-0.9 before a small near-duplicate spike at
+    0.9-1.0. 0.5 sits right at the start of that second cluster, not
+    arbitrarily splitting a smooth distribution.
+  - The generic `exit_border_margin_px` (20px), still used by hands for the
+    side/top borders (only bottom gets an override): real confirmed exits
+    across all 39 clips sit at p90 <= 3.3px for every side/top border
+    checked, max 16px -- comfortably inside the current margin, no evidence
+    it needs to be larger there.
+
+One threshold was checked and found to have a real, unresolved limitation
+rather than a fixable number: `max_reach_m` (1.8, derived from `t010`
+alone). Running stereo depth across 4 more clips spanning different jobs
+found real median own-hand depth varies sharply by task -- Farmworker
+0.77m vs. Hair stylist/Carpenter/Barber 1.5-1.8m. A single global threshold
+can't be optimal for both ends: tight enough to matter for close-work jobs
+would falsely reject genuine far-reaching own-hands on extended-reach jobs.
+Kept at 1.8 deliberately, consistent with this module's existing
+conservative bias (a false reject discards a real hand permanently; a
+missed reject just leaves one more candidate for review) -- under-firing on
+close-work jobs is the safer failure mode than over-firing on reach-heavy
+ones. A job-aware version (using `meta.json`'s `job` field, which IS
+available per clip) is a well-motivated future improvement, but risks being
+circular without labels to validate it: deriving a job's expected reach
+from its OWN detections' observed depth is contaminated by exactly the
+bystander population the rule exists to exclude.
+
+That job-variance finding turned out to be the smaller problem. A full
+overnight run of stage 6 across all 39 clips (with video, at the user's
+request) surfaced something more fundamental: the underlying stereo
+calibration itself isn't validated beyond `t010`, and confidently
+misfires on at least one other clip (a wearer's own hands on
+`42bba884_t012`, computed at 2.7m and rejected, at 0.88-0.93 match
+confidence). `meta.json` confirms the dataset spans multiple recording
+batches that likely used different physical camera rigs. See
+`stereo_depth.py`'s module docstring for the full diagnostic trail. Given
+this, `run_hand_pipeline`'s stage 6 should still be treated as experimental
+outside `t010` -- the final full-dataset run (`planning.md`'s Milestone 7
+notes) was deliberately regenerated WITHOUT it after this was found.
 """
 
 from __future__ import annotations

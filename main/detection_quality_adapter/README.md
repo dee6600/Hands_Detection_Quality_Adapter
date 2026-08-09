@@ -10,7 +10,7 @@ for the source spec. Dataset lives in `../../data/` (see its README for schema).
 ## Setup
 
 ```
-conda activate koshalabs
+conda activate yourenv
 pip install -r requirements.txt
 pytest
 ```
@@ -322,6 +322,15 @@ Only runs when both video paths are given to `run_hand_pipeline` (or
 else in this pipeline touches, so it's opt-in rather than baked into the
 default 5-stage flow.
 
+**⚠️ Not validated across the dataset — see the Milestone 7 section below.**
+The calibration above was derived from and checked against exactly one clip
+(`t010`). Running it against all 39 clips found a confident false rejection
+of the wearer's own hands on a different clip, and `meta.json` confirms the
+dataset spans multiple recording batches that likely used different
+physical camera rigs. Treat this stage as experimental outside `t010`
+specifically until that's resolved — it's why the final full-dataset run
+further down doesn't include it.
+
 ### Gloved/partially-occluded hands: deliberately not implemented
 
 Per the spec's own instruction ("behaviour unmeasured, needs labelled
@@ -462,6 +471,47 @@ precision/recall-optimal, since that needs labels):
   dropouts. 15 covers the reliable p75 mass without reaching into that
   contaminated tail.
 
+### Second calibration pass: checking everything else, not just the obvious gaps
+
+Asked explicitly to calibrate whatever's findable without labels, so every
+other threshold got the same real-data check `plausible_size` got. Four came
+back genuinely fine — worth recording as verified, not just unexamined:
+
+- `camera_moving_speed_mps` (0.05): real VIO speed p10=0.034, p25=0.054 m/s
+  — sits right in that transition zone.
+- `camera_moving_angular_deg_per_frame` (1.0): real angular-delta p75=0.77,
+  p90=1.4 deg/frame — reasonable middle zone. Deliberately not loosened
+  despite the median (0.38) being lower: loosening it would make "camera
+  moving" easier to satisfy, working against Milestone 4's sustained-run fix.
+- `static_px_threshold` (4.0): real adjacent-frame displacement within long,
+  clearly-genuine tracks has p25=3.68px — almost exactly the same relative
+  position as the speed threshold above.
+- `duplicate_iou_threshold` (0.5): the real same-frame box-pair IoU
+  distribution is strongly bimodal — 82.4% of pairs sit below IoU 0.05
+  (clearly distinct objects), then a real separate cluster from 0.5-0.7
+  (6.4% of all pairs). 0.5 sits right at the start of that cluster, not
+  arbitrarily splitting a smooth distribution.
+- The generic `exit_border_margin_px` (20px, still used by hands for
+  side/top borders): real confirmed exits across all 39 clips sit at
+  p90 ≤ 3.3px, max 16px, for every side/top border — comfortably inside.
+
+**One real, unresolved limitation found, not a fixable number**:
+`max_reach_m` (1.8, derived from `t010` alone) doesn't generalize across
+jobs. Every one of the 39 clips is a *different* job (`meta.json`'s `job`
+field — Hair stylist, Carpenter, Farmworker, Jeweler, Mason, ... no two the
+same). Running stereo depth across 4 more clips found real median own-hand
+depth varies sharply: Farmworker 0.77m vs. Hair stylist/Carpenter/Barber
+1.5-1.8m. A single global threshold can't be optimal for both — tight
+enough to matter for close-work jobs would falsely reject genuine
+far-reaching own-hands on extended-reach ones. Kept at 1.8 deliberately:
+under-firing on close-work jobs is the safer failure mode than over-firing
+on reach-heavy ones, consistent with this rule's existing conservative bias
+(a false reject discards a real hand permanently; a missed reject just
+leaves a candidate for later review). A job-aware version is a well-motivated
+future improvement but risks being circular without labels to validate it —
+deriving a job's expected reach from its own detections' observed depth is
+contaminated by exactly the bystander population the rule exists to exclude.
+
 ## Running the final pipeline on the whole dataset
 
 ```
@@ -490,6 +540,24 @@ both its stats and its rendering. The pipeline's actual output is unaffected
 (those detections are correctly absent from the final result either way) —
 this only means this particular video can't show *why* a stage-1 rejection
 happened. `scripts/visualize_stage1.py` already covers that view correctly
-frame-by-frame. Left as-is for this run rather than fixing and re-rendering
-all 39 clips (another ~17 min + 8GB) for a stats/visualization completeness
-gap that doesn't change any actual pipeline behavior.
+frame-by-frame.
+
+**A second run, with stereo depth, was tried and reverted.** At the user's
+request, an overnight run (`--all --stereo-depth`, no frame cap) completed
+successfully — 14,319.9s (~4 hours), all 39 clips, no crashes. Stages 1-5's
+numbers matched the run above exactly, as expected. But reviewing stage 6's
+results before presenting them surfaced the calibration problem documented
+above: a confident false rejection of the wearer's own hands on
+`42bba884_t012` (computed at 2.67-2.75m, match confidence 0.88-0.93 — not a
+low-confidence case the existing safety net would catch), traced to the
+nominal calibration only ever having been validated against `t010`, plus
+confirmation from `meta.json` that the dataset spans multiple recording
+batches (`"library": "v3"` vs `"legacy_v1"`) likely using different physical
+camera rigs. Given the choice between keeping that run with heavy caveats,
+sinking more time into an unvalidated fix, or reverting to the stages-1-5
+result as the reliable deliverable, **the user chose to revert** — the
+numbers above are that reverted, regenerated final run. The stereo-depth
+run's log (`final_all_clips_stereo_log.txt`, sitting alongside
+`final_all_clips/` in the same output directory) is kept for reference
+rather than deleted, since it's the evidence behind the calibration finding,
+not because its numbers should be trusted.
