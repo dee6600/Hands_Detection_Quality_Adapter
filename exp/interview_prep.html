@@ -1,0 +1,937 @@
+<title>Detection Quality Adapter — Interview Reference</title>
+<style>
+  :root {
+    --bg: #f6f8fa;
+    --surface: #ffffff;
+    --surface-2: #eef1f4;
+    --ink: #1b2430;
+    --ink-soft: #57626f;
+    --ink-faint: #8794a1;
+    --accent: #1c6e8c;
+    --accent-ink: #0e4süc;
+    --accent-soft: #e4eef2;
+    --line: #dde3e8;
+    --line-strong: #c3ccd3;
+    --warn: #a15a1f;
+    --warn-soft: #f7ece0;
+    --code-bg: #eef1f4;
+
+    --c-kept: #1f8a4c;
+    --c-interp: #128a86;
+    --c-temporal: #c06a1f;
+    --c-selection: #7c449e;
+    --c-geometric: #c23f3f;
+    --c-depth: #a3821b;
+
+    --font-head: -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    --font-body: Georgia, "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif;
+    --font-mono: "SF Mono", SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #10151c;
+      --surface: #171e27;
+      --surface-2: #1e2731;
+      --ink: #e7ebef;
+      --ink-soft: #a6b1bd;
+      --ink-faint: #6e7a87;
+      --accent: #5fbdde;
+      --accent-ink: #cdeaf5;
+      --accent-soft: #1b3540;
+      --line: #29323c;
+      --line-strong: #384250;
+      --warn: #e0a35c;
+      --warn-soft: #3a2d1c;
+      --code-bg: #1e2731;
+
+      --c-kept: #4cbd7d;
+      --c-interp: #4cc9c5;
+      --c-temporal: #e0954f;
+      --c-selection: #b083d1;
+      --c-geometric: #e07070;
+      --c-depth: #d1b04a;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #10151c;
+    --surface: #171e27;
+    --surface-2: #1e2731;
+    --ink: #e7ebef;
+    --ink-soft: #a6b1bd;
+    --ink-faint: #6e7a87;
+    --accent: #5fbdde;
+    --accent-ink: #cdeaf5;
+    --accent-soft: #1b3540;
+    --line: #29323c;
+    --line-strong: #384250;
+    --warn: #e0a35c;
+    --warn-soft: #3a2d1c;
+    --code-bg: #1e2731;
+
+    --c-kept: #4cbd7d;
+    --c-interp: #4cc9c5;
+    --c-temporal: #e0954f;
+    --c-selection: #b083d1;
+    --c-geometric: #e07070;
+    --c-depth: #d1b04a;
+  }
+
+  * { box-sizing: border-box; }
+  html { text-size-adjust: 100%; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 17px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a { color: var(--accent); }
+  a:focus-visible, button:focus-visible, summary:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  ::selection { background: var(--accent-soft); }
+
+  .page {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 56px 24px 120px;
+  }
+
+  .masthead {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  h1 {
+    font-family: var(--font-head);
+    font-weight: 800;
+    font-size: clamp(28px, 4.4vw, 40px);
+    letter-spacing: -0.015em;
+    line-height: 1.12;
+    margin: 0;
+    text-wrap: balance;
+    color: var(--ink);
+  }
+
+  .subhead {
+    font-family: var(--font-body);
+    font-style: italic;
+    color: var(--ink-soft);
+    font-size: 18px;
+    max-width: 62ch;
+    margin: 2px 0 0;
+  }
+
+  .meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 18px;
+    margin-top: 18px;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    color: var(--ink-faint);
+  }
+  .meta-row span b { color: var(--ink-soft); font-weight: 600; }
+
+  hr.rule {
+    border: none;
+    border-top: 1px solid var(--line);
+    margin: 40px 0;
+  }
+
+  /* Table of contents */
+  nav.toc {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 22px 26px;
+    margin-top: 36px;
+  }
+  nav.toc .toc-title {
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 14px;
+  }
+  nav.toc ol {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px 28px;
+    margin: 0;
+    padding: 0 0 0 1.3em;
+    font-family: var(--font-head);
+    font-size: 14.5px;
+  }
+  nav.toc a { color: var(--ink); text-decoration: none; }
+  nav.toc a:hover { color: var(--accent); text-decoration: underline; }
+  @media (max-width: 640px) {
+    nav.toc ol { grid-template-columns: 1fr; }
+  }
+
+  section { margin-top: 64px; scroll-margin-top: 20px; }
+  section > .sec-label {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  section > h2 {
+    font-family: var(--font-head);
+    font-weight: 800;
+    font-size: clamp(22px, 3vw, 27px);
+    letter-spacing: -0.01em;
+    margin: 0 0 18px;
+    text-wrap: balance;
+  }
+  h3 {
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: 18px;
+    margin: 30px 0 10px;
+    color: var(--ink);
+  }
+
+  p { margin: 0 0 16px; max-width: 68ch; }
+  ul, ol { margin: 0 0 16px; padding-left: 1.3em; max-width: 68ch; }
+  li { margin-bottom: 6px; }
+  strong { color: var(--ink); }
+
+  code, .mono {
+    font-family: var(--font-mono);
+    font-size: 0.88em;
+    background: var(--code-bg);
+    padding: 0.12em 0.4em;
+    border-radius: 4px;
+    color: var(--accent-ink, var(--accent));
+    white-space: nowrap;
+  }
+
+  .callout {
+    background: var(--accent-soft);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 8px 8px 0;
+    padding: 16px 20px;
+    margin: 18px 0;
+    max-width: 68ch;
+  }
+  .callout p:last-child { margin-bottom: 0; }
+  .callout .callout-label {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 6px;
+    display: block;
+  }
+
+  .callout.warn {
+    background: var(--warn-soft);
+    border-left-color: var(--warn);
+  }
+  .callout.warn .callout-label { color: var(--warn); }
+
+  /* Tables */
+  .table-wrap { overflow-x: auto; margin: 18px 0 24px; }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 480px;
+    font-size: 15px;
+  }
+  th, td {
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+  }
+  thead th {
+    font-family: var(--font-head);
+    font-size: 12.5px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    font-weight: 700;
+    border-bottom: 2px solid var(--line-strong);
+  }
+  td.num, th.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+  tbody tr:hover { background: var(--surface-2); }
+
+  /* Pipeline diagram */
+  .pipeline {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    overflow-x: auto;
+    padding: 8px 2px 18px;
+    margin: 22px 0 8px;
+  }
+  .stage {
+    flex: 0 0 168px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-top: 3px solid var(--stage-c, var(--accent));
+    border-radius: 8px;
+    padding: 14px 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .stage .stage-no {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--ink-faint);
+    letter-spacing: 0.06em;
+  }
+  .stage .stage-name {
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: 14.5px;
+    line-height: 1.25;
+  }
+  .stage .stage-desc {
+    font-family: var(--font-body);
+    font-size: 12.8px;
+    color: var(--ink-soft);
+    line-height: 1.4;
+  }
+  .arrow {
+    flex: 0 0 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink-faint);
+    font-size: 18px;
+  }
+
+  /* Legend chips */
+  .legend { display: flex; flex-wrap: wrap; gap: 10px 18px; margin: 14px 0 22px; }
+  .chip { display: inline-flex; align-items: center; gap: 7px; font-family: var(--font-mono); font-size: 12.5px; color: var(--ink-soft); }
+  .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex: none; }
+
+  /* Decision cards */
+  .decision {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin: 0 0 18px;
+    background: var(--surface);
+  }
+  .decision h4 {
+    font-family: var(--font-head);
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0 0 4px;
+  }
+  .decision .decision-tag {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--accent);
+    font-weight: 700;
+  }
+  .decision p { margin: 10px 0 0; max-width: 66ch; }
+  .decision .why { color: var(--ink-soft); font-style: italic; }
+
+  /* Q&A */
+  .qa {
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--accent);
+    border-radius: 0 10px 10px 0;
+    padding: 18px 24px;
+    margin: 0 0 18px;
+    background: var(--surface);
+  }
+  .qa.tricky { border-left-color: var(--warn); }
+  .qa .q-tag {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .qa.tricky .q-tag { color: var(--warn); }
+  .qa .q {
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: 16.5px;
+    margin: 4px 0 10px;
+    text-wrap: balance;
+  }
+  .qa .a { margin: 0; max-width: 66ch; }
+  .qa .a p { margin: 0 0 10px; }
+  .qa .a p:last-child { margin-bottom: 0; }
+
+  /* Limitations / strengths list */
+  .lx-grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
+  .lx {
+    display: flex;
+    gap: 14px;
+    padding: 16px 18px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--surface);
+  }
+  .lx .lx-mark {
+    flex: none;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-head);
+    font-weight: 800;
+    font-size: 13px;
+  }
+  .lx.good .lx-mark { background: color-mix(in srgb, var(--c-kept) 18%, transparent); color: var(--c-kept); }
+  .lx.bad .lx-mark { background: color-mix(in srgb, var(--c-geometric) 16%, transparent); color: var(--c-geometric); }
+  .lx-body h4 { margin: 0 0 4px; font-family: var(--font-head); font-size: 15.5px; }
+  .lx-body p { margin: 0; font-size: 15.5px; }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--ink-faint);
+  }
+
+  @media (max-width: 560px) {
+    .page { padding: 36px 16px 90px; }
+  }
+</style>
+
+<div class="page">
+
+  <div class="masthead">
+    <span class="eyebrow">Interview reference &middot; take-home / systems project</span>
+    <h1>Detection Quality Adapter</h1>
+    <p class="subhead">A post-processing layer that turns a noisy hand detector into a trustworthy signal — without ever touching the detector itself.</p>
+    <div class="meta-row">
+      <span><b>Dataset</b> 39 egocentric work clips, 85,786 frames, 153,876 raw detections</span>
+      <span><b>Stack</b> Python, OpenCV, NumPy</span>
+      <span><b>Tests</b> 160 passing, 1 deliberate xfail</span>
+    </div>
+  </div>
+
+  <nav class="toc">
+    <div class="toc-title">Contents</div>
+    <ol>
+      <li><a href="#problem">1. The problem, plainly</a></li>
+      <li><a href="#architecture">2. Architecture: the six stages</a></li>
+      <li><a href="#decisions">3. Key design decisions</a></li>
+      <li><a href="#data">4. The data</a></li>
+      <li><a href="#results">5. Results &amp; metrics</a></li>
+      <li><a href="#limitations">6. Limitations</a></li>
+      <li><a href="#strengths">7. What went well</a></li>
+      <li><a href="#core-qa">8. Core interview questions</a></li>
+      <li><a href="#tricky-qa">9. Tricky questions</a></li>
+      <li><a href="#glossary">10. Glossary</a></li>
+    </ol>
+  </nav>
+
+  <!-- ============================================================ -->
+  <section id="problem">
+    <div class="sec-label">01</div>
+    <h2>The problem, plainly</h2>
+
+    <p>A hand detector looking at video makes two kinds of mistakes. It reports a hand where there isn't one — a <strong>false positive</strong> (a duplicate box, a bystander's hand, a shadow it mistook for skin). Or it misses a hand that's clearly there — a <strong>false negative</strong> (a frame where the hand briefly blurs, or the model just has a bad frame).</p>
+
+    <p>Neither mistake is visible from a single frame. A duplicate box looks fine in isolation. A missed hand looks like the hand simply isn't there. The only way to catch either is to look across <em>many</em> frames — a real hand moves along a continuous, physically plausible path; noise and gaps don't.</p>
+
+    <p>The obvious fix — retrain the detector — is exactly what this project <em>doesn't</em> do. Retraining is slow, expensive, and doesn't fix the structural issue: a detector scoring boxes one frame at a time has no way to know that a duplicate should lose to the real hand, because in that one frame, it doesn't know which is which. So instead: let the detector over-report (emit every plausible box, no cap, no dedup), and put a stateful, multi-frame layer <em>after</em> it that has the context a single frame never will.</p>
+
+    <div class="callout">
+      <span class="callout-label">Why this matters</span>
+      <p>This reframes the whole project as a <strong>tracking and consistency</strong> problem, not a computer-vision problem. Nothing here does object detection. Everything here asks: <em>given these noisy boxes over time, what's the most plausible explanation?</em></p>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section id="architecture">
+    <div class="sec-label">02</div>
+    <h2>Architecture: the six stages</h2>
+
+    <p>Detections flow through six stages, always in this order. Order is load-bearing: stages 3&ndash;6 need <em>tracks</em>, which don't exist until stage 2 has run, and stage 2 needs geometrically-sane boxes, which don't exist until stage 1 has run.</p>
+
+    <div class="pipeline">
+      <div class="stage" style="--stage-c: var(--c-geometric)">
+        <span class="stage-no">STAGE 1</span>
+        <span class="stage-name">Geometric rejection</span>
+        <span class="stage-desc">Per-frame only. Merge duplicates, drop implausible size/shape.</span>
+      </div>
+      <div class="arrow">&rarr;</div>
+      <div class="stage" style="--stage-c: var(--accent)">
+        <span class="stage-no">STAGE 2</span>
+        <span class="stage-name">Association</span>
+        <span class="stage-desc">The tracker. Links boxes into per-object tracks over time.</span>
+      </div>
+      <div class="arrow">&rarr;</div>
+      <div class="stage" style="--stage-c: var(--c-temporal)">
+        <span class="stage-no">STAGE 3</span>
+        <span class="stage-name">Temporal rejection</span>
+        <span class="stage-desc">Needs tracks. Drops impossible jumps, flickers, static background.</span>
+      </div>
+      <div class="arrow">&rarr;</div>
+      <div class="stage" style="--stage-c: var(--c-interp)">
+        <span class="stage-no">STAGE 4</span>
+        <span class="stage-name">Interpolation</span>
+        <span class="stage-desc">Fills genuine short gaps. Never fabricates an exit.</span>
+      </div>
+      <div class="arrow">&rarr;</div>
+      <div class="stage" style="--stage-c: var(--c-selection)">
+        <span class="stage-no">STAGE 5</span>
+        <span class="stage-name">Selection</span>
+        <span class="stage-desc">Hand-only. Enforces the 2-hand cap by track quality.</span>
+      </div>
+      <div class="arrow">&rarr;</div>
+      <div class="stage" style="--stage-c: var(--c-depth)">
+        <span class="stage-no">STAGE 6</span>
+        <span class="stage-name">Stereo depth</span>
+        <span class="stage-desc">Hand-only, opt-in. Rejects hands beyond arm's reach.</span>
+      </div>
+    </div>
+
+    <div class="legend">
+      <span class="chip"><span class="dot" style="background:var(--c-geometric)"></span>geometric</span>
+      <span class="chip"><span class="dot" style="background:var(--accent)"></span>association</span>
+      <span class="chip"><span class="dot" style="background:var(--c-temporal)"></span>temporal</span>
+      <span class="chip"><span class="dot" style="background:var(--c-interp)"></span>interpolation</span>
+      <span class="chip"><span class="dot" style="background:var(--c-selection)"></span>selection</span>
+      <span class="chip"><span class="dot" style="background:var(--c-depth)"></span>stereo depth</span>
+    </div>
+
+    <h3>What each stage actually does</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Stage</th><th>Rule</th><th>Basis</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="mono">1</td><td>Duplicate detections</td><td>Two heavily-overlapping boxes on one object &rarr; merge, keep the higher-confidence one</td></tr>
+          <tr><td class="mono">1</td><td>Implausible size</td><td>Box far larger/smaller than a hand can be at working distance</td></tr>
+          <tr><td class="mono">1</td><td>Implausible shape</td><td>Box markedly more elongated than a hand should be</td></tr>
+          <tr><td class="mono">2</td><td>Association</td><td>Greedy nearest-neighbor match against each track's velocity-predicted position</td></tr>
+          <tr><td class="mono">3</td><td>Implausible displacement</td><td>Box jumps further between frames than a hand can travel</td></tr>
+          <tr><td class="mono">3</td><td>Unsupported (flicker)</td><td>Appears for 1&ndash;2 frames with no track before or after</td></tr>
+          <tr><td class="mono">3</td><td>Static detection</td><td>Doesn't move while the camera does &rarr; probably background</td></tr>
+          <tr><td class="mono">4</td><td>Exit test, then gap-fill</td><td>Near a border with outward motion &rarr; let it end. Otherwise, resumes near prediction &rarr; interpolate</td></tr>
+          <tr><td class="mono">5</td><td>Instance-cap selection</td><td>More than 2 live candidates on a frame &rarr; keep the 2 best-supported <em>tracks</em>, not the 2 highest-confidence <em>boxes</em></td></tr>
+          <tr><td class="mono">6</td><td>Beyond arm's reach</td><td>Per-box stereo depth &rarr; reject if further than the wearer could reach</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>Every detection carries a <code>tag</code>: <code>reported</code>, <code>merged</code>, <code>rejected</code>, or <code>interpolated</code>. Nothing is ever deleted — a rejected box stays in the record, just marked untrustworthy. This matters for two reasons: it makes every stage's decision auditable after the fact, and it lets a <em>later</em> stage change its mind about an <em>earlier</em> tag (interpolation can overwrite a rejected box's position if the surrounding trajectory supports it — see the motion-blur discussion below).</p>
+  </section>
+
+  <!-- ============================================================ -->
+  <section id="decisions">
+    <div class="sec-label">03</div>
+    <h2>Key design decisions</h2>
+
+    <div class="decision">
+      <span class="decision-tag">Tracking algorithm</span>
+      <h4>Greedy nearest-neighbor, not Kalman or Hungarian</h4>
+      <p>The tracker predicts each track's next position by linear extrapolation from its last known velocity, then matches the closest detection within a distance gate. This is deliberately the simplest thing that could work, with the upgrade path (Kalman filter for noisy velocity, Hungarian algorithm for globally-optimal assignment instead of greedy) flagged in code comments but not built, because the simple version passed every synthetic and real-data test thrown at it.</p>
+      <p class="why">Why: premature sophistication is a cost, not a feature. A Kalman filter smooths velocity estimates under noise the greedy tracker doesn't have a problem with yet; Hungarian matching solves an assignment-ambiguity problem that greedy-by-distance already resolves correctly in every crossing/occlusion test built. Build the upgrade when a real failure demands it, not speculatively.</p>
+    </div>
+
+    <div class="decision">
+      <span class="decision-tag">Identity signal</span>
+      <h4>Position and motion only — never the detector's left/right label</h4>
+      <p>The detector guesses "left hand" / "right hand" per box, but that label is unreliable exactly when it matters most: when two hands cross. The tracker is built to ignore it completely for identity decisions, and this is explicitly tested with an adversarial case — two hands crossing with their labels swapped right at the crossing point.</p>
+      <p class="why">Why: an unreliable signal is worse than no signal if you don't know it's unreliable. Removing the temptation to use it removes an entire class of intermittent, hard-to-reproduce identity-swap bugs.</p>
+    </div>
+
+    <div class="decision">
+      <span class="decision-tag">Two gate radii, not one</span>
+      <h4>Separating "is this even a candidate match" from "is this jump plausible"</h4>
+      <p>Early on, one <code>max_speed</code> value governed both the tracker's match gate <em>and</em> stage 3's displacement-plausibility check. Real data showed why that's wrong: a genuinely fast, real hand movement (motion blur, a quick reach) needs a <em>generous</em> gate so the tracker doesn't fragment the track over it — but that same fast movement should still get flagged as visually untrustworthy once it's part of a track. One number couldn't do both jobs at once.</p>
+      <p class="why">Why: conflating "should these two things be considered the same object" with "is this specific frame trustworthy" is a common tracking-system bug. They're different questions on different timescales and should be different numbers.</p>
+    </div>
+
+    <div class="decision">
+      <span class="decision-tag">Hand specialization</span>
+      <h4>A generic pipeline plus a thin, config-only specialization layer</h4>
+      <p>Part 1 of the system (stages 1&ndash;4) knows nothing about hands specifically — it's written for a generic tracked object with configurable size/shape/speed expectations. <code>hand_config()</code> layers hand-specific numbers and two extra stages (selection, stereo depth) on top, without any stage 1&ndash;4 code needing to know a hand from any other object.</p>
+      <p class="why">Why: this is what makes the system testable in isolation (every core rule has a synthetic test with no dataset needed) and reusable (swap <code>hand_config()</code> for a different object's config and the same pipeline applies).</p>
+    </div>
+
+    <div class="decision">
+      <span class="decision-tag">Calibration philosophy</span>
+      <h4>Real-data checks over guesses, labels over both — but don't wait for labels to catch the obvious</h4>
+      <p>Every placeholder threshold got checked against the real dataset's own distributions before being trusted, using percentiles and structural invariants rather than inspection. A threshold that turned out to be a complete no-op (0% of 153,876 real boxes came anywhere near the old size floor) or actively wrong (rejecting real close-up hands) got fixed immediately, without waiting for labeled ground truth. Anything that genuinely needed labels to validate — true precision/recall, candidate-pool tuning — was left alone and documented as blocked, rather than guessed at.</p>
+      <p class="why">Why: "we don't have labels" is not the same as "we can't check anything." Distributional sanity checks catch a different, cheaper class of bug than precision/recall does, and there's no reason to leave them unchecked until labels exist.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section id="data">
+    <div class="sec-label">04</div>
+    <h2>The data</h2>
+
+    <p>39 clips, each a different real work task, recorded on a head-mounted stereo camera (1920&times;1200, 30fps, both eyes). Every clip bundle carries five things: the stereo video pair, raw hand boxes from a fine-tuned detector (uncapped, no dedup, no smoothing &mdash; deliberately noisy), full-rate 6DoF camera pose from onboard visual-inertial odometry, per-frame timestamps, and task metadata.</p>
+
+    <div class="callout">
+      <span class="callout-label">A fact that shaped a lot of decisions</span>
+      <p>Every one of the 39 clips is a <em>different job</em> &mdash; hairstylist, carpenter, farmworker, jeweler, mason, mechanic, and so on, no repeats. That single fact is why several "one global number" thresholds turned out to be too simple: a farmworker's typical working distance (median 0.77m) and a hairstylist's (1.5&ndash;1.8m, arms extended toward a seated client) are genuinely different populations, not noise around one true value.</p>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Quantity</th><th class="num">Value</th></tr></thead>
+        <tbody>
+          <tr><td>Clips</td><td class="num">39</td></tr>
+          <tr><td>Total frames</td><td class="num">85,786</td></tr>
+          <tr><td>Total raw detections</td><td class="num">153,876</td></tr>
+          <tr><td>Frames with exactly 2 boxes</td><td class="num">72.3%</td></tr>
+          <tr><td>Frames with 1 box</td><td class="num">18.2%</td></tr>
+          <tr><td>Frames with 0 boxes</td><td class="num">4.3%</td></tr>
+          <tr><td>Frames with 3+ boxes (bystanders, duplicates)</td><td class="num">5.25%</td></tr>
+          <tr><td>Ground-truth labels available</td><td class="num">none</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>That last row matters more than it looks. It's the single biggest constraint on the whole project &mdash; see <a href="#results">Results</a> and <a href="#limitations">Limitations</a>.</p>
+  </section>
+
+  <!-- ============================================================ -->
+  <section id="results">
+    <div class="sec-label">05</div>
+    <h2>Results &amp; metrics</h2>
+
+    <p>The spec's own validation section asks for two things: <strong>precision and recall computed per stage</strong> (not in aggregate, because each stage should move a specific direction), and a labels-free <strong>standing check</strong> on the proportion of interpolated detections. Here's what was actually achievable, honestly, without ground truth.</p>
+
+    <h3>What real precision/recall would need</h3>
+    <p>Precision and recall are both defined against ground truth &mdash; "was this box actually a hand." This dataset has none. The matching machinery to compute them (greedy IoU matching against a reference set, flagged if any stage moves the wrong direction) is fully built and unit-tested against synthetic ground truth, ready to run the moment a labeled reference set exists. No number it could produce today would be a real precision/recall figure, and the code says so before anyone can misquote it.</p>
+
+    <h3>What was computed instead, for real, across all 39 clips</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Metric</th><th class="num">Value</th><th>What it stands in for</th></tr></thead>
+        <tbody>
+          <tr><td>Final detections (stages 1&ndash;5)</td><td class="num">148,714</td><td>&mdash;</td></tr>
+          <tr><td>Kept</td><td class="num">90.5%</td><td>Survived every rule</td></tr>
+          <tr><td>Rejected &mdash; temporal (stage 3)</td><td class="num">5.5%</td><td>Proxy for false-positive frequency</td></tr>
+          <tr><td>Interpolated (stage 4)</td><td class="num">2.6%</td><td>Recovered false negatives</td></tr>
+          <tr><td>Rejected &mdash; selection (stage 5)</td><td class="num">1.4%</td><td>Cap enforcement, ranked by track quality</td></tr>
+          <tr><td>Dropped as duplicate (stage 1)</td><td class="num">3.1%*</td><td>Proxy for one false-positive class</td></tr>
+          <tr><td>Rejected &mdash; size/shape (stage 1)</td><td class="num">2.6%*</td><td>Proxy for another false-positive class</td></tr>
+          <tr><td>Tracks confirmed exiting</td><td class="num">36.1%</td><td>Border-exit correctly not fabricated</td></tr>
+          <tr><td>Interpolated proportion, mean / max across clips</td><td class="num">3.5% / 17.2%</td><td>The spec's own labels-free standing check</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size: 14px; color: var(--ink-soft);">*measured against all 153,876 raw detections, not just the 148,714 that survive to a track</p>
+
+    <p>These are <strong>rejection-reason frequencies</strong>, not confirmed false-positive rates &mdash; they say where each rule fires, not whether firing was correct. That distinction was kept explicit everywhere it's reported, on purpose.</p>
+
+    <h3>What was tuned from this, without labels</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Parameter</th><th>Before</th><th>After</th><th>Evidence</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">plausible_size</td><td class="mono">(20, 800)px</td><td class="mono">(50, 1150)px</td><td>Real side-length p1=94px, max=1110px &mdash; old floor was a no-op, old ceiling rejected real close-up hands</td></tr>
+          <tr><td class="mono">plausible_shape</td><td class="mono">(0.3, 3.0)</td><td class="mono">(0.5, 2.0)</td><td>Real aspect-ratio p1=0.54, p99=2.10</td></tr>
+          <tr><td class="mono">max_dropout_frames</td><td class="mono">10</td><td class="mono">15</td><td>Real gap-length p75=13 frames</td></tr>
+          <tr><td class="mono">max_speed (plausibility)</td><td class="mono">150 px/frame</td><td class="mono">110 px/frame</td><td>Real adjacent-frame speed p99.5=97.7</td></tr>
+          <tr><td class="mono">track_gate_speed (matching)</td><td class="mono">shared with above</td><td class="mono">350 px/frame</td><td>Split out; above the fastest real jump ever observed (305.8)</td></tr>
+          <tr><td class="mono">duplicate_containment_threshold</td><td class="mono">n/a</td><td class="mono">0.7 (hands)</td><td>Real duplicate pairs cluster &ge;0.73; crossing hands sit &sim;0.5</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section id="limitations">
+    <div class="sec-label">06</div>
+    <h2>Limitations</h2>
+
+    <div class="lx-grid">
+      <div class="lx bad">
+        <span class="lx-mark">!</span>
+        <div class="lx-body">
+          <h4>No ground truth exists for this dataset</h4>
+          <p>The single biggest constraint. Every threshold above is evidence-based, not precision/recall-optimal &mdash; a genuinely different, weaker guarantee than what the spec's validation section asks for.</p>
+        </div>
+      </div>
+      <div class="lx bad">
+        <span class="lx-mark">!</span>
+        <div class="lx-body">
+          <h4>Stereo depth doesn't generalize past one clip</h4>
+          <p>The camera calibration behind the "beyond arm's reach" rule was derived from and validated against exactly one clip. Run across all 39, it confidently misjudged a real hand's depth by roughly 4&times; on a different clip &mdash; traced to the dataset spanning multiple recording batches, likely different physical camera rigs, with no per-clip calibration metadata to correct for it. This stage is opt-in and excluded from the default/final output for exactly this reason.</p>
+        </div>
+      </div>
+      <div class="lx bad">
+        <span class="lx-mark">!</span>
+        <div class="lx-body">
+          <h4>Static-background detection fails on multi-second braces</h4>
+          <p>A hand deliberately held still for a few frames is correctly protected. A hand braced motionless for several <em>seconds</em> (steadying a workpiece while the other hand works) still reads as background, because the underlying signal &mdash; "did the box move less than the camera" &mdash; can't structurally tell a long real pause from true static clutter without also modeling camera rotation vs. translation.</p>
+        </div>
+      </div>
+      <div class="lx bad">
+        <span class="lx-mark">!</span>
+        <div class="lx-body">
+          <h4>Some thresholds are one global number for 39 different jobs</h4>
+          <p>Arm's reach, camera speed, and hand size all vary by task in ways confirmed in the data. A single global value is a real simplification, not an oversight &mdash; a job-aware version was considered and deliberately not built, because deriving a job's "normal" range from its own detections risks being circular without labels to check it against.</p>
+        </div>
+      </div>
+      <div class="lx bad">
+        <span class="lx-mark">!</span>
+        <div class="lx-body">
+          <h4>The tracker is greedy, not globally optimal</h4>
+          <p>Nearest-neighbor matching can mis-assign in dense, ambiguous scenes (many overlapping candidates with near-identical predicted positions). No real or synthetic test found this actually happening, but it's a known theoretical gap the code comments flag rather than hide.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section id="strengths">
+    <div class="sec-label">07</div>
+    <h2>What went well</h2>
+
+    <div class="lx-grid">
+      <div class="lx good">
+        <span class="lx-mark">&#10003;</span>
+        <div class="lx-body">
+          <h4>Testing caught real bugs before they shipped, repeatedly</h4>
+          <p>A tracker patience bug (a stale track could be resurrected via an ever-widening search gate), an exit-detection bug (measuring from box center instead of edge, which produced <em>zero</em> detected exits on real near-frame-filling boxes), and a diagnostic tool that silently mis-counted 4% of the dataset in one direction and then the other &mdash; all caught by tests or hand-verified math before being trusted, not discovered downstream.</p>
+        </div>
+      </div>
+      <div class="lx good">
+        <span class="lx-mark">&#10003;</span>
+        <div class="lx-body">
+          <h4>Nothing is ever silently discarded</h4>
+          <p>The reported/merged/rejected/interpolated tag model means every decision the pipeline makes is inspectable after the fact, and reversible in the specific case where a later stage has better information (interpolation recovering a stage-3 wobble flag).</p>
+        </div>
+      </div>
+      <div class="lx good">
+        <span class="lx-mark">&#10003;</span>
+        <div class="lx-body">
+          <h4>Every stage is independently testable</h4>
+          <p>Synthetic, hand-built fixtures cover every rule with no dataset required, plus a real-data pass on top for every stage &mdash; 160 tests total, run in about 10 seconds.</p>
+        </div>
+      </div>
+      <div class="lx good">
+        <span class="lx-mark">&#10003;</span>
+        <div class="lx-body">
+          <h4>Visual verification, not just assertions</h4>
+          <p>A family of batch visualization scripts render real clips with every box labeled by exactly what happened to it and why, specifically so a claim like "8.4% rejected" can be checked by eye against real footage before being trusted &mdash; which is precisely what caught the stereo-depth calibration problem.</p>
+        </div>
+      </div>
+      <div class="lx good">
+        <span class="lx-mark">&#10003;</span>
+        <div class="lx-body">
+          <h4>Honest about what "done" means</h4>
+          <p>Every threshold's provenance (guessed placeholder vs. real-data-checked vs. label-validated) is documented and kept current, rather than letting "it works on the one clip I checked" quietly pass as "calibrated."</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section id="core-qa">
+    <div class="sec-label">08</div>
+    <h2>Core interview questions</h2>
+
+    <div class="qa">
+      <span class="q-tag">Core</span>
+      <p class="q">Why not just improve the detector instead of building all this?</p>
+      <div class="a">
+        <p>Because the failure modes aren't fixable per-frame. A duplicate box and a real box can look identical in isolation &mdash; the only signal that tells them apart is which one belongs to a continuous trajectory over time, and a single-frame detector structurally can't see that. Retraining also can't fix "the detector correctly saw a bystander's hand" &mdash; that's not a detection error at all, it's a business-logic decision (is this hand in reach) that has nothing to do with detection quality.</p>
+      </div>
+    </div>
+
+    <div class="qa">
+      <span class="q-tag">Core</span>
+      <p class="q">Why does the stage order matter so much?</p>
+      <div class="a">
+        <p>Stages 3 onward all reason about <em>tracks</em>, which don't exist until stage 2 (association) has run. And stage 2 needs geometrically sane input &mdash; if you tried to track before removing duplicates, you'd be trying to assign two overlapping boxes on one hand to two different tracks, which is nonsensical. Each stage's precondition is the previous stage's output.</p>
+      </div>
+    </div>
+
+    <div class="qa">
+      <span class="q-tag">Core</span>
+      <p class="q">Walk me through what happens when a hand goes behind an object for a few frames.</p>
+      <div class="a">
+        <p>The detector reports nothing for those frames. The tracker (stage 2) doesn't panic &mdash; it keeps the track alive for up to <code>max_dropout_frames</code>, "coasting" on its last known velocity. When a detection resumes, stage 4 checks two things: is the resumption near where the coasting prediction said it should be, and was the last real sighting near a frame border with outward motion (meaning the hand actually left, not just got occluded)? If it resumes near the prediction and wasn't an exit, the missing frames get filled in with linearly-interpolated boxes tagged <code>interpolated</code> &mdash; a false negative recovered.</p>
+      </div>
+    </div>
+
+    <div class="qa">
+      <span class="q-tag">Core</span>
+      <p class="q">How do you stop interpolation from just inventing hands that left the frame?</p>
+      <div class="a">
+        <p>The exit test runs <em>before</em> the gap-fill decision, every time, and it's a hard veto &mdash; if the last sighting was near a border moving outward, the gap is never filled, no matter how well a later detection might line up with the prediction. This is the spec's own explicit governing constraint: an object leaving the frame is not a false negative, and filling that gap would inflate the very recovery rate the system exists to improve honestly.</p>
+      </div>
+    </div>
+
+    <div class="qa">
+      <span class="q-tag">Core</span>
+      <p class="q">Why greedy nearest-neighbor instead of a Kalman filter or Hungarian matching?</p>
+      <div class="a">
+        <p>Because it's the simplest thing that could work, and it did &mdash; every synthetic test (smooth motion, short gaps, crossing paths, new objects entering) and every real-clip check passed without needing either upgrade. A Kalman filter buys you a smoothed velocity estimate under sensor noise; this system's "sensor" is a detector with plenty of noise, but the noise shows up as missing/duplicate boxes, which stages 1 and 3 already handle, not as jittery velocity. Hungarian matching buys you globally optimal assignment instead of greedy local assignment &mdash; useful when greedy would pick a locally-good but globally-wrong pairing, which never showed up in testing. Both are flagged in the code as the natural next step if a real failure ever demands them.</p>
+      </div>
+    </div>
+
+    <div class="qa">
+      <span class="q-tag">Core</span>
+      <p class="q">The detector guesses left/right hand per box. Why doesn't the tracker use that?</p>
+      <div class="a">
+        <p>Because it's exactly unreliable when it matters most &mdash; when two hands cross, the detector's left/right guess frequently flips, since it's guessing from appearance in a single frame, not tracking identity. Using it would mean the tracker inherits that instability. Position and velocity are self-consistent signals the tracker actually controls; the label isn't. This is tested directly: two hands cross with their labels deliberately swapped exactly at the crossing frame, and the tracker still keeps both identities straight because it never looks at the label at all.</p>
+      </div>
+    </div>
+
+    <div class="qa">
+      <span class="q-tag">Core</span>
+      <p class="q">What's the difference between the generic pipeline and the hand-specialized one?</p>
+      <div class="a">
+        <p>The generic pipeline (stages 1&ndash;4) is written for any trackable object &mdash; it takes a <code>Config</code> of size/shape/speed expectations and has no hand-specific logic anywhere. <code>hand_config()</code> supplies hand-specific numbers (roughly-equant shape, a 2-hand cap, a bottom-border exit override for torso occlusion) and the pipeline adds two more stages on top: selection (enforcing the 2-hand cap by track quality) and stereo depth (rejecting bystanders by distance). Nothing in stages 1&ndash;4 changes to support this &mdash; it's pure configuration plus two additive stages.</p>
+      </div>
+    </div>
+
+    <div class="qa">
+      <span class="q-tag">Core</span>
+      <p class="q">You had no labeled data. How did you calibrate anything?</p>
+      <div class="a">
+        <p>By distinguishing what genuinely needs labels from what doesn't. True precision/recall needs ground truth, full stop &mdash; that's left honestly blocked. But whether a threshold is even in a sane range relative to what the detector actually emits doesn't need labels at all &mdash; it needs the real distribution. A size floor that 0% of 150,000+ real boxes ever get close to is a bug regardless of whether you know which boxes are "correct." That distinction did almost all of the real calibration work here.</p>
+      </div>
+    </div>
+
+    <div class="qa">
+      <span class="q-tag">Core</span>
+      <p class="q">Why is the static-detection rule unusually important for a head-mounted camera?</p>
+      <div class="a">
+        <p>Because the camera never stops moving &mdash; the wearer's head is always doing something &mdash; so anything that stays visually fixed in the frame while the camera moves is almost certainly scene structure (a doorframe edge, a mirror) rather than a hand, which makes this rule unusually discriminating <em>in principle</em>. In practice it turned out to be the trickiest rule in the whole system, precisely because "the camera is moving" is true almost continuously, and a naive version of the rule fired on real hands pausing for a single frame.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section id="tricky-qa">
+    <div class="sec-label">09</div>
+    <h2>Tricky questions</h2>
+
+    <div class="qa tricky">
+      <span class="q-tag">Tricky</span>
+      <p class="q">Your static rule still misses multi-second braces. Why not just make the "sustained run" window longer?</p>
+      <div class="a">
+        <p>Because that trades one failure for its opposite. The fix that already shipped requires many consecutive still-while-moving frames before rejecting anything &mdash; long enough to stop punishing a brief real pause, but short enough to still catch true background. Stretching the window further to catch multi-second braces would also let genuinely static clutter survive for that same multi-second window before being caught, which is a worse trade for a system whose whole job is catching background reliably. The actual fix isn't a bigger number &mdash; it's distinguishing rotation-induced apparent motion (the camera panning, which moves everything including real hands near the gaze center the least) from real parallax, which needs a geometric model this system doesn't have yet, and ideally labels to validate it against.</p>
+      </div>
+    </div>
+
+    <div class="qa tricky">
+      <span class="q-tag">Tricky</span>
+      <p class="q">You derived max_dropout_frames from a distribution with a tail out to 2,529 frames but picked 15. Isn't that arbitrary?</p>
+      <div class="a">
+        <p>The tail is the tell, not the target. At 2,529 frames of separation, the tracker's own position gate has grown so wide (it scales with elapsed time) that it's no longer meaningfully restrictive &mdash; almost anything in frame would satisfy it. That's the signature of coincidental position matches between two <em>different</em> objects, not one object's genuine dropout. The reliable part of the distribution is the front &mdash; the point (p75 &asymp; 13 frames) where three-quarters of real, short, recoverable gaps live. 15 sits just past that, deliberately not chasing the contaminated tail.</p>
+      </div>
+    </div>
+
+    <div class="qa tricky">
+      <span class="q-tag">Tricky</span>
+      <p class="q">You found a stereo-depth bug that confidently misjudged a real hand's distance. Walk me through how you actually caught it, and why testing didn't catch it first.</p>
+      <div class="a">
+        <p>The synthetic tests couldn't have caught it &mdash; they test the matching <em>mechanism</em> (does the code correctly compute disparity from a known, synthetic offset), not whether a real camera's calibration constants are right for a real clip. The single real-clip validation that existed was checked against exactly one clip. The bug surfaced when a full-dataset run was reviewed by eye before being trusted: a specific clip's rejection rate (44.6%) was implausibly high, so I pulled the actual frame, saw the wearer's own hands sitting on a nearby desk, and traced the wrong depth back to a stereo match that was confident (0.9+ correlation) but physically implausible &mdash; the same patch appeared at nearly the same pixel position in both eyes, which shouldn't happen for something that close. Cross-referencing clip metadata confirmed the dataset spans multiple recording batches, likely different physical rigs. The honest lesson: a synthetic test proves the algorithm is implemented correctly; it says nothing about whether the algorithm's real-world assumptions hold, and that gap only shows up by looking at real output.</p>
+      </div>
+    </div>
+
+    <div class="qa tricky">
+      <span class="q-tag">Tricky</span>
+      <p class="q">Selection ranks candidates by track length. Doesn't that unfairly penalize a real hand that only briefly enters frame?</p>
+      <div class="a">
+        <p>It would, if selection and flicker-rejection were the same rule &mdash; but they're deliberately not. A track has to survive stage 3's unsupported-track check first, which only removes tracks of 1&ndash;2 detections with no support before or after. Anything that clears that bar is already a real, if short, trajectory. Selection then only matters when <em>more</em> real candidates are competing for the cap than the cap allows, and in that specific contention, favoring the better-established track over a just-arrived one is the correct call per the spec &mdash; a candidate should win a slot by the trajectory behind it, not by how loud one frame's confidence score happens to be. A brief-but-real entrant only loses a slot if something even better-supported is contending for the same frame, which is a legitimate trade-off given a hard cap has to resolve <em>somehow</em>.</p>
+      </div>
+    </div>
+
+    <div class="qa tricky">
+      <span class="q-tag">Tricky</span>
+      <p class="q">If two clips were recorded on physically different cameras, how would that break your stereo math, and how would you catch it automatically instead of by hand?</p>
+      <div class="a">
+        <p>The depth formula is <code>Z = focal_length &times; baseline / disparity</code>. Both focal length and baseline are physical constants of one specific camera unit; if a different clip used a different lens or a different eye separation, plugging in the wrong constants turns a correctly-measured disparity into a wrong depth &mdash; exactly what happened here. Catching it automatically without labels is genuinely hard: the best available proxy would be a consistency check &mdash; for a handful of the wearer's own detections early in a clip, does the computed depth even fall in a physically sane band (say, under 2&ndash;3m for a hand), and if a clip's whole depth distribution reads as systematically implausible, flag that clip's calibration as suspect rather than trusting it silently. That's a per-clip anomaly detector, not a fix, and I'd rather say that plainly than claim a false confidence.</p>
+      </div>
+    </div>
+
+    <div class="qa tricky">
+      <span class="q-tag">Tricky</span>
+      <p class="q">Your calibration is drawn from 39 clips. How do you know it generalizes, and what would change your mind?</p>
+      <div class="a">
+        <p>I don't know that it fully generalizes, and I'd say so directly. What I do have is stronger than a guess: every threshold was checked against the full real distribution across all 39 clips, not fit to one or two, specifically because early on a single-clip check (the original stereo-depth calibration) turned out not to generalize even one clip over. What would change my mind on any specific number: a labeled reference set showing the threshold is systematically wrong in one direction, or a new batch of clips whose distributions don't match the ones already seen &mdash; both are explicitly anticipated in the project's own documentation as the next real test.</p>
+      </div>
+    </div>
+
+    <div class="qa tricky">
+      <span class="q-tag">Tricky</span>
+      <p class="q">Why build a custom tracker instead of using an off-the-shelf one like ByteTrack or DeepSORT?</p>
+      <div class="a">
+        <p>Those trackers are built for a different problem &mdash; many similar-looking objects across a wide frame, usually with an appearance embedding to help re-identification. This problem has at most two objects, of a known class, with position and velocity as the only signal that's actually trustworthy (confidence isn't; the handedness label isn't). A general-purpose multi-object tracker brings machinery &mdash; appearance re-identification, longer-horizon re-linking &mdash; this problem doesn't need and that would need its own tuning and failure-mode analysis. The custom tracker is roughly 150 lines and every one of its assumptions is visible and tested. That's a real trade-off, not a free win: it doesn't handle the general case, but it doesn't need to.</p>
+      </div>
+    </div>
+
+    <div class="qa tricky">
+      <span class="q-tag">Tricky</span>
+      <p class="q">How would a bystander deliberately close to the wearer break your arm's-reach rule?</p>
+      <div class="a">
+        <p>It would &mdash; the rule is purely geometric (distance), so a bystander's hand genuinely within the wearer's arm's reach is indistinguishable from the wearer's own hand by this signal alone. The spec is explicit that position and entry direction alone can't separate them either, which is exactly why depth is the discriminator used at all &mdash; but depth only encodes "how far," not "whose." A more robust version would need an orthogonal signal (hand shape/skin-tone consistency with the wearer, or motion correlated with the wearer's own arm kinematics from pose data) that this project doesn't attempt to build.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section id="glossary">
+    <div class="sec-label">10</div>
+    <h2>Glossary</h2>
+    <div class="table-wrap">
+      <table>
+        <tbody>
+          <tr><td class="mono">Detection</td><td>One raw box the detector reported on one frame, with a confidence score.</td></tr>
+          <tr><td class="mono">Track</td><td>An ordered sequence of detections believed to be the same physical object over time.</td></tr>
+          <tr><td class="mono">Tag</td><td>What happened to a detection: <code>reported</code>, <code>merged</code>, <code>rejected</code>, or <code>interpolated</code>. Never deleted, always tagged.</td></tr>
+          <tr><td class="mono">IoU</td><td>Intersection-over-Union &mdash; how much two boxes overlap, from 0 (none) to 1 (identical).</td></tr>
+          <tr><td class="mono">Disparity</td><td>How many pixels the same point shifts between the left and right stereo views &mdash; closer objects shift more.</td></tr>
+          <tr><td class="mono">VIO pose</td><td>Visual-inertial odometry &mdash; the camera's own estimated 6DoF position/orientation per frame, used as the "is the camera moving" signal.</td></tr>
+          <tr><td class="mono">Gate / gating</td><td>A maximum-distance cutoff used to decide whether a detection is even a plausible candidate match for a track.</td></tr>
+          <tr><td class="mono">Standing check</td><td>A monitor needing no ground truth &mdash; here, the proportion of interpolated detections, which rising over time would signal fabrication rather than recovery.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>
+    Prepared as an interview reference. Numbers reflect the project's real, final calibration run (stages 1&ndash;5, all 39 clips) &mdash; stage 6 is documented as opt-in and excluded from the default result for the reasons in &sect;6.
+  </footer>
+
+</div>
