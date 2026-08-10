@@ -1,0 +1,16 @@
+# Project outputs and datasets
+/data/
+/scripts/tmp/
+/scripts/output/
+
+# Python artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+
+# Editor and OS files
+.vscode/
+.claude/
+.DS_Store
