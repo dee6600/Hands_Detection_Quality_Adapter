@@ -7,6 +7,34 @@ retraining or otherwise touching the detector itself.
 
 The source spec is in [`hand_detection_spec.pdf`](hand_detection_spec.pdf).
 
+<table>
+<tr>
+<td width="50%">
+
+**Stage 2 · tracking**
+Raw detections stitched into identity-stable tracks — each color is one
+track ID, with a fading trail of recent centers.
+
+<img src="assets/tracking.gif" width="100%" alt="Tracker output: per-frame boxes color-coded by track ID with fading motion trails">
+
+</td>
+<td width="50%">
+
+**Final output · tagged data**
+Same clip after the full hand pipeline: green/cyan = kept or interpolated,
+red/orange/purple = rejected, with the reason encoded in the color.
+
+<img src="assets/tagged_pipeline.gif" width="100%" alt="Final pipeline output: boxes color-coded green for kept, cyan for interpolated, red/orange/purple for rejected by stage">
+
+</td>
+</tr>
+</table>
+
+Nothing here is hand-labeled or hand-tuned per clip — both gifs come
+straight out of `scripts/visualize_tracks.py` and
+`scripts/visualize_hand_pipeline.py` run against one of the real clips
+under `data/`.
+
 ## Why post-processing, not a better detector
 
 A single frame can't tell a duplicate box from a real one, or a bystander's
@@ -83,8 +111,10 @@ skipped automatically if it's absent.
 
 ## Visualizing a pipeline stage
 
-Each stage has a batch visualization script that renders annotated video for
-real clips, color-coding every box by what happened to it and why:
+Every stage's decision is auditable by eye, not just by assertion. Each
+stage has a batch visualization script that renders annotated video for
+real clips, color-coding every box by what happened to it and why — this is
+what produced the two gifs above:
 
 ```
 python scripts/visualize_stage1.py data/<clip_id> /tmp/out.mp4
