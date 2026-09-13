@@ -1,0 +1,3722 @@
+{
+  "per_clip": [
+    {
+      "clip_id": "0c54a47b_t010",
+      "job": "Hair stylist",
+      "association_only": {
+        "n_tracks": 38,
+        "track_length_frames": {
+          "mean": 146.23684210526315,
+          "median": 33.0
+        },
+        "detections_per_track": {
+          "mean": 127.76315789473684,
+          "median": 22.0
+        },
+        "gaps_per_track": {
+          "mean": 6.315789473684211,
+          "median": 3.5
+        },
+        "total_gap_frames": 702,
+        "n_gaps": 240,
+        "fragmentation_candidates": 14,
+        "fragmentation_rate": 0.3684210526315789,
+        "interpolated_proportion": 0.0
+      },
+      "full_pipeline": {
+        "n_tracks": 38,
+        "track_length_frames": {
+          "mean": 146.23684210526315,
+          "median": 33.0
+        },
+        "detections_per_track": {
+          "mean": 136.89473684210526,
+          "median": 29.5
+        },
+        "gaps_per_track": {
+          "mean": 2.973684210526316,
+          "median": 1.0
+        },
+        "total_gap_frames": 355,
+        "n_gaps": 113,
+        "fragmentation_candidates": 14,
+        "fragmentation_rate": 0.3684210526315789,
+        "interpolated_proportion": 0.06055363321799308
+      }
+    },
+    {
+      "clip_id": "130d64c7_t054",
+      "job": "laborer",
+      "association_only": {
+        "n_tracks": 39,
+        "track_length_frames": {
+          "mean": 75.71794871794872,
+          "median": 25.0
+        },
+        "detections_per_track": {
+          "mean": 55.58974358974359,
+          "median": 15.0
+        },
+        "gaps_per_track": {
+          "mean": 6.564102564102564,
+          "median": 4.0
+        },
+        "total_gap_frames": 785,
+        "n_gaps": 256,
+        "fragmentation_candidates": 18,
+        "fragmentation_rate": 0.46153846153846156,
+        "interpolated_proportion": 0.0
+      },
+      "full_pipeline": {
+        "n_tracks": 39,
+        "track_length_frames": {
+          "mean": 75.71794871794872,
+          "median": 25.0
+        },
+        "detections_per_track": {
+          "mean": 62.43589743589744,
+          "median": 21.0
+        },
+        "gaps_per_track": {
+          "mean": 4.410256410256411,
+          "median": 2.0
+        },
+        "total_gap_frames": 518,
+        "n_gaps": 172,
+        "fragmentation_candidates": 18,
+        "fragmentation_rate": 0.46153846153846156,
+        "interpolated_proportion": 0.11457905544147844
+      }
+    },
+    {
+      "clip_id": "1b67852b_t006",
+      "job": "Waiter / waitress",
+      "association_only": {
+        "n_tracks": 19,
+        "track_length_frames": {
+          "mean": 82.47368421052632,
+          "median": 37.0
+        },
+        "detections_per_track": {
+          "mean": 67.36842105263158,
+          "median": 18.0
+        },
+        "gaps_per_track": {
+          "mean": 2.473684210526316,
+          "median": 1.0
+        },
+        "total_gap_frames": 287,
+        "n_gaps": 47,
+        "fragmentation_candidates": 6,
+        "fragmentation_rate": 0.3157894736842105,
+        "interpolated_proportion": 0.0
+      },
+      "full_pipeline": {
+        "n_tracks": 19,
+        "track_length_frames": {
+          "mean": 82.47368421052632,
+          "median": 37.0
+        },
+        "detections_per_track": {
+          "mean": 67.78947368421052,
+          "median": 18.0
+        },
+        "gaps_per_track": {
+          "mean": 2.3157894736842106,
+          "median": 1.0
+        },
+        "total_gap_frames": 279,
+        "n_gaps": 44,
+        "fragmentation_candidates": 6,
+        "fragmentation_rate": 0.3157894736842105,
+        "interpolated_proportion": 0.006211180124223602
+      }
+    },
+    {
+      "clip_id": "1d87e32f_t010",
+      "job": "Retail salesperson",
+      "association_only": {
+        "n_tracks": 34,
+        "track_length_frames": {
+          "mean": 105.82352941176471,
+          "median": 52.5
+        },
+        "detections_per_track": {
+          "mean": 101.32352941176471,
+          "median": 43.5
+        },
+        "gaps_per_track": {
+          "mean": 1.5588235294117647,
+          "median": 1.0
+        },
+        "total_gap_frames": 153,
+        "n_gaps": 53,
+        "fragmentation_candidates": 6,
+        "fragmentation_rate": 0.17647058823529413,
+        "interpolated_proportion": 0.0
+      },
+      "full_pipeline": {
+        "n_tracks": 34,
+        "track_length_frames": {
+          "mean": 105.82352941176471,
+          "median": 52.5
+        },
+        "detections_per_track": {
+          "mean": 105.79411764705883,
+          "median": 52.5
+        },
+        "gaps_per_track": {
+          "mean": 0.029411764705882353,
+          "median": 0.0
+        },
+        "total_gap_frames": 1,
+        "n_gaps": 1,
+        "fragmentation_candidates": 6,
+        "fragmentation_rate": 0.17647058823529413,
+        "interpolated_proportion": 0.04420350291909925
+      }
+    },
+    {
+      "clip_id": "1e337713_t036",
+      "job": "Assembler",
+      "association_only": {
+        "n_tracks": 10,
+        "track_length_frames": {
+          "mean": 544.0,
+          "median": 290.0
+        },
+        "detections_per_track": {
+          "mean": 539.5,
+          "median": 284.0
+        },
+        "gaps_per_track": {
+          "mean": 1.3,
+          "median": 0.5
+        },
+        "total_gap_frames": 45,
+        "n_gaps": 13,
+        "fragmentation_candidates": 4,
+        "fragmentation_rate": 0.4,
+        "interpolated_proportion": 0.0
+      },
+      "full_pipeline": {
+        "n_tracks": 10,
+        "track_length_frames": {
+          "mean": 544.0,
+          "median": 290.0
+        },
+        "detections_per_track": {
+          "mean": 542.1,
+          "median": 284.0
+        },
+        "gaps_per_track": {
+          "mean": 0.5,
+          "median": 0.0
+        },
+        "total_gap_frames": 19,
+        "n_gaps": 5,
+        "fragmentation_candidates": 4,
+        "fragmentation_rate": 0.4,
+        "interpolated_proportion": 0.006087437742114001
+      }
+    },
+    {
+      "clip_id": "24afdf2d_t029",
+      "job": "Mechanic",
+      "association_only": {
+        "n_tracks": 28,
+        "track_length_frames": {
+          "mean": 179.64285714285714,
+          "median": 69.0
+        },
+        "detections_per_track": {
+          "mean": 173.21428571428572,
+          "median": 53.0
+        },
+        "gaps_per_track": {
+          "mean": 1.9642857142857142,
+          "median": 1.0
+        },
+        "total_gap_frames": 180,
+        "n_gaps": 55,
+        "fragmentation_candidates": 7,
+        "fragmentation_rate": 0.25,
+        "interpolated_proportion": 0.0
+      },
+      "full_pipeline": {
+        "n_tracks": 28,
+        "track_length_frames": {
+          "mean": 179.64285714285714,
+          "median": 69.0
+        },
+        "detections_per_track": {
+          "mean": 178.35714285714286,
+          "median": 68.5
+        },
+        "gaps_per_track": {
+          "mean": 0.35714285714285715,
+          "median": 0.0
+        },
+        "total_gap_frames": 36,
+        "n_gaps": 10,
+        "fragmentation_candidates": 7,
+        "fragmentation_rate": 0.25,
+        "interpolated_proportion": 0.016019223067681217
+      }
+    },
+    {
+      "clip_id": "3592c890_t007",
+      "job": "Machine operator",
+      "association_only": {
+        "n_tracks": 10,
+        "track_length_frames": {
+          "mean": 434.1,
+          "median": 156.5
+        },
+        "detections_per_track": {
+          "mean": 426.1,
+          "median": 153.5
+        },
+        "gaps_per_track": {
+          "mean": 1.9,
+          "median": 1.0
+        },
+        "total_gap_frames": 80,
+        "n_gaps": 19,
+        "fragmentation_candidates": 6,
+        "fragmentation_rate": 0.6,
+        "interpolated_proportion": 0.0
+      },
+      "full_pipeline": {
+        "n_tracks": 10,
+        "track_length_frames": {
+          "mean": 434.1,
+          "median": 156.5
+        },
+        "detections_per_track": {
+          "mean": 428.1,
+          "median": 155.5
+        },
+        "gaps_per_track": {
+          "mean": 1.0,
+          "median": 0.5
+        },
+        "total_gap_frames": 60,
+        "n_gaps": 10,
+        "fragmentation_candidates": 6,
+        "fragmentation_rate": 0.6,
+        "interpolated_proportion": 0.011679514132212099
+      }
+    },
+    {
+      "clip_id": "407258cd_t036",
+      "job": "Carpenter",
+      "association_only": {
+        "n_tracks": 20,
+        "track_length_frames": {
+          "mean": 257.95,
+          "median": 30.5
+        },
+        "detections_per_track": {
+          "mean": 251.2,
+          "median": 17.0
+        },
+        "gaps_per_track": {
+          "mean": 1.5,
+          "median": 0.0
+        },
+        "total_gap_frames": 135,
+        "n_gaps": 30,
+        "fragmentation_candidates": 4,
+        "fragmentation_rate": 0.2,
+        "interpolated_proportion": 0.0
+      },
+      "full_pipeline": {
+        "n_tracks": 20,
+        "track_length_frames": {
+          "mean": 257.95,
+          "median": 30.5
+        },
+        "detections_per_track": {
+          "mean": 256.0,
+          "median": 30.5
+        },
+        "gaps_per_track": {
+          "mean": 0.5,
+          "median": 0.0
+        },
+        "total_gap_frames": 39,
+        "n_gaps": 10,
+        "fragmentation_candidates": 4,
+        "fragmentation_rate": 0.2,
+        "interpolated_proportion": 0.014453125
+      }
+    },
+    {
+      "clip_id": "42bba884_t012",
+      "job": "Flight attendant",
+      "association_only": {
+        "n_tracks": 13,
+        "track_length_frames": {
+          "mean": 317.7692307692308,
+          "median": 102.0
+        },
+        "detections_per_track": {
+          "mean": 313.2307692307692,
+          "median": 102.0
+        },
+        "gaps_per_track": {
+          "mean": 1.8461538461538463,
+          "median": 1.0
+        },
+        "total_gap_frames": 59,
+        "n_gaps": 24,
+        "fragmentation_candidates": 3,
+        "fragmentation_rate": 0.23076923076923078,
+        "interpolated_proportion": 0.0
+      },
+      "full_pipeline": {
+        "n_tracks": 13,
+        "track_length_frames": {
+          "mean": 317.7692307692308,
+          "median": 102.0
+        },
+        "detections_per_track": {
+          "mean": 315.6923076923077,
+          "median": 102.0
+        },
+        "gaps_per_track": {
+          "mean": 0.7692307692307693,
+          "median": 0.0
+        },
+        "total_gap_frames": 27,
+        "n_gaps": 10,
+        "fragmentation_candidates": 3,
+        "fragmentation_rate": 0.23076923076923078,
+        "interpolated_proportion": 0.006578947368421052
+      }
+    },
+    {
+      "clip_id": "47f74932_t002",
+      "job": "laundry_worker",
+      "association_only": {
+        "n_tracks": 8,
+        "track_length_frames": {
+          "mean": 669.0,
+          "median": 776.0
+        },
+        "detections_per_track": {
+          "mean": 656.5,
+          "median": 761.0
+        },
+        "gaps_per_track": {
+          "mean": 3.0,
+          "median": 0.5
+        },
+        "total_gap_frames": 100,
+        "n_gaps": 24,
+        "fragmentation_candidates": 1,
+        "fragmentation_rate": 0.125,
+        "interpolated_proportion": 0.0
+      },
+      "full_pipeline": {
+        "n_tracks": 8,
+        "track_length_frames": {
+          "mean": 669.0,
+          "median": 776.0
+        },
+        "detections_per_track": {
+          "mean": 658.0,
+          "median": 761.0
+        },
+        "gaps_per_track": {
+          "mean": 2.5,
+          "median": 0.5
+        },
+        "total_gap_frames": 88,
+        "n_gaps": 20,
+        "fragmentation_candidates": 1,
+        "fragmentation_rate": 0.125,
+        "interpolated_proportion": 0.003989361702127659
+      }
+    },
+    {
+      "clip_id": "48bf4f5f_t005",
+      "job": "Maintenance technician",
+      "association_only": {
+        "n_tracks": 12,
+        "track_length_frames": {
+          "mean": 382.5,
+          "median": 1.5
+        },
+        "detections_per_track": {
+          "mean": 380.1666666666667,
+          "median": 1.5
+        },
+        "gaps_per_track": {
+          "mean": 0.9166666666666666,
+          "median": 0.0
+        },
+        "total_gap_frames": 28,
+        "n_gaps": 11,
+        "fragmentation_candidates": 0,
+        "fragmentation_rate": 0.0,
+        "interpolated_proportion": 0.0
+      },
+      "full_pipeline": {
+        "n_tracks": 12,
+        "track_length_frames": {
+          "mean": 382.5,
+          "median": 1.5
+        },
+        "detections_per_track": {
+          "mean": 381.0,
+          "median": 1.5
+        },
+        "gaps_per_track": {
+          "mean": 0.5,
+          "median": 0.0
+        },
+        "total_gap_frames": 18,
+        "n_gaps": 6,
+        "fragmentation_candidates": 0,
+        "fragmentation_rate": 0.0,
+        "interpolated_proportion": 0.002405949256342957
+      }
+    },
+    {
+      "clip_id": "557419bb_t030",
+      "job": "Dishwasher",
+      "association_only": {
+        "n_tracks": 19,
+        "track_length_frames": {
+          "mean": 239.52631578947367,
+          "median": 107.0
+        },
+        "detections_per_track": {
+          "mean": 231.1578947368421,
+          "median": 65.0
+        },
+        "gaps_per_track": {
+          "mean": 1.631578947368421,
+          "median": 1.0
+        },
+        "total_gap_frames": 159,
+        "n_gaps": 31,
+        "fragmentation_candidates": 5,
+        "fragmentation_rate": 0.2631578947368421,
+        "interpolated_proportion": 0.0
+      },
+      "full_pipeline": {
+        "n_tracks": 19,
+        "track_length_frames": {
+          "mean": 239.52631578947367,
+          "median": 107.0
+        },
+        "detections_per_track": {
+          "mean": 233.42105263157896,
+          "median": 95.0
+        },
+        "gaps_per_track": {
+          "mean": 1.1578947368421053,
+          "median": 1.0
+        },
+        "total_gap_frames": 116,
+        "n_gaps": 22,
+        "fragmentation_candidates": 5,
+        "fragmentation_rate": 0.2631578947368421,
+        "interpolated_proportion": 0.00834272829763247
+      }
+    },
+    {
+      "clip_id": "6cd0b236_t000",
+      "job": "Billing clerk",
+      "association_only": {
+        "n_tracks": 2,
+        "track_length_frames": {
+          "mean": 2619.0,
+          "median": 2619.0
+        },
+        "detections_per_track": {
+          "mean": 2619.0,
+          "median": 2619.0
+        },
+        "gaps_per_track": {
+          "mean": 0.0,
+          "median": 0.0
+        },
+        "total_gap_frames": 0,
+        "n_gaps": 0,
+        "fragmentation_candidates": 0,
+        "fragmentation_rate": 0.0,
+        "interpolated_proportion": 0.0
+      },
+      "full_pipeline": {
+        "n_tracks": 2,
+        "track_length_frames": {
+          "mean": 2619.0,
+          "median": 2619.0
+        },
+        "detections_per_track": {
+          "mean": 2619.0,
+          "median": 2619.0
+        },
+        "gaps_per_track": {
+          "mean": 0.0,
+          "median": 0.0
+        },
+        "total_gap_frames": 0,
+        "n_gaps": 0,
+        "fragmentation_candidates": 0,
+        "fragmentation_rate": 0.0,
+        "interpolated_proportion": 0.0
+      }
+    },
+    {
+      "clip_id": "7641c2af_t014",
+      "job": "inventory_clerk",
+      "association_only": {
+        "n_tracks": 12,
+        "track_length_frames": {
+          "mean": 189.16666666666666,
+          "median": 74.0
+        },
+        "detections_per_track": {
+          "mean": 180.83333333333334,
+          "median": 71.0
+        },
+        "gaps_per_track": {
+          "mean": 1.9166666666666667,
+          "median": 1.0
+        },
+        "total_gap_frames": 100,
+        "n_gaps": 23,
+        "fragmentation_candidates": 6,
+        "fragmentation_rate": 0.5,
+        "interpolated_proportion": 0.0
+      },
+      "full_pipeline": {
+        "n_tracks": 12,
+        "track_length_frames": {
+          "mean": 189.16666666666666,
+          "median": 74.0
+        },
+        "detections_per_track": {
+          "mean": 183.75,
+          "median": 71.0
+        },
+        "gaps_per_track": {
+          "mean": 0.9166666666666666,
+          "median": 1.0
+        },
+        "total_gap_frames": 65,
+        "n_gaps": 11,
+        "fragmentation_candidates": 6,
+        "fragmentation_rate": 0.5,
+        "interpolated_proportion": 0.0163265306122449
+      }
+    },
+    {
+      "clip_id": "7d9a0f24_t015",
+      "job": "server",
+      "association_only": {
+        "n_tracks": 23,
+        "track_length_frames": {
+          "mean": 251.43478260869566,
+          "median": 16.0
+        },
+        "detections_per_track": {
+          "mean": 242.0,
+          "median": 13.0
+        },
+        "gaps_per_track": {
+          "mean": 2.869565217391304,
+          "median": 1.0
+        },
+        "total_gap_frames": 217,
+        "n_gaps": 66,
+        "fragmentation_candidates": 7,
+        "fragmentation_rate": 0.30434782608695654,
+        "interpolated_proportion": 0.0
+      },
+      "full_pipeline": {
+        "n_tracks": 23,
+        "track_length_frames": {
+          "mean": 251.43478260869566,
+          "median": 16.0
+        },
+        "detections_per_track": {
+          "mean": 248.08695652173913,
+          "median": 15.0
+        },
+        "gaps_per_track": {
+          "mean": 0.8260869565217391,
+          "median": 0.0
+        },
+        "total_gap_frames": 77,
+        "n_gaps": 19,
+        "fragmentation_candidates": 7,
+        "fragmentation_rate": 0.30434782608695654,
+        "interpolated_proportion": 0.021906764808973012
+      }
+    },
+    {
+      "clip_id": "7fe10737_t009",
+      "job": "Construction laborer",
+      "association_only": {
+        "n_tracks": 27,
+        "track_length_frames": {
+          "mean": 87.18518518518519,
+          "median": 34.0
+        },
+        "detections_per_track": {
+          "mean": 79.51851851851852,
+          "median": 31.0
+        },
+        "gaps_per_track": {
+          "mean": 2.2962962962962963,
+          "median": 0.0
+        },
+        "total_gap_frames": 207,
+        "n_gaps": 62,
+        "fragmentation_candidates": 10,
+        "fragmentation_rate": 0.37037037037037035,
+        "interpolated_proportion": 0.0
+      },
+      "full_pipeline": {
+        "n_tracks": 27,
+        "track_length_frames": {
+          "mean": 87.18518518518519,
+          "median": 34.0
+        },
+        "detections_per_track": {
+          "mean": 80.66666666666667,
+          "median": 31.0
+        },
+        "gaps_per_track": {
+          "mean": 2.0,
+          "median": 0.0
+        },
+        "total_gap_frames": 176,
+        "n_gaps": 54,
+        "fragmentation_candidates": 10,
+        "fragmentation_rate": 0.37037037037037035,
+        "interpolated_proportion": 0.014233241505968778
+      }
+    },
+    {
+      "clip_id": "887c633e_t028",
+      "job": "tour_guide",
+      "association_only": {
+        "n_tracks": 12,
+        "track_length_frames": {
+          "mean": 173.83333333333334,
+          "median": 32.5
+        },
+        "detections_per_track": {
+          "mean": 160.66666666666666,
+          "median": 18.5
+        },
+        "gaps_per_track": {
+          "mean": 3.5,
+          "median": 1.0
+        },
+        "total_gap_frames": 158,
+        "n_gaps": 42,
+        "fragmentation_candidates": 5,
+        "fragmentation_rate": 0.4166666666666667,
+        "interpolated_proportion": 0.0
+      },
+      "full_pipeline": {
+        "n_tracks": 12,
+        "track_length_frames": {
+          "mean": 173.83333333333334,
+          "median": 32.5
+        },
+        "detections_per_track": {
+          "mean": 169.33333333333334,
+          "median": 26.0
+        },
+        "gaps_per_track": {
+          "mean": 1.5,
+          "median": 0.0
+        },
+        "total_gap_frames": 54,
+        "n_gaps": 18,
+        "fragmentation_candidates": 5,
+        "fragmentation_rate": 0.4166666666666667,
+        "interpolated_proportion": 0.013779527559055118
+      }
+    },
+    {
+      "clip_id": "9f6fc515_t000",
+      "job": "Packaging Worker",
+      "association_only": {
+        "n_tracks": 21,
+        "track_length_frames": {
+          "mean": 114.0952380952381,
+          "median": 15.0
+        },
+        "detections_per_track": {
+          "mean": 102.52380952380952,
+          "median": 6.0
+        },
+        "gaps_per_track": {
+          "mean": 3.380952380952381,
+          "median": 1.0
+        },
+        "total_gap_frames": 243,
+        "n_gaps": 71,
+        "fragmentation_candidates": 3,
+        "fragmentation_rate": 0.14285714285714285,
+        "interpolated_proportion": 0.0
+      },
+      "full_pipeline": {
+        "n_tracks": 21,
+        "track_length_frames": {
+          "mean": 114.0952380952381,
+          "median": 15.0
+        },
+        "detections_per_track": {
+          "mean": 106.80952380952381,
+          "median": 14.0
+        },
+        "gaps_per_track": {
+          "mean": 2.142857142857143,
+          "median": 1.0
+        },
+        "total_gap_frames": 153,
+        "n_gaps": 45,
+        "fragmentation_candidates": 3,
+        "fragmentation_rate": 0.14285714285714285,
+        "interpolated_proportion": 0.03700401248328132
+      }
+    },
+    {
+      "clip_id": "a3569273_t014",
+      "job": "mechanic",
+      "association_only": {
+        "n_tracks": 44,
+        "track_length_frames": {
+          "mean": 112.54545454545455,
+          "median": 53.0
+        },
+        "detections_per_track": {
+          "mean": 105.9090909090909,
+          "median": 38.5
+        },
+        "gaps_per_track": {
+          "mean": 1.7045454545454546,
+          "median": 1.0
+        },
+        "total_gap_frames": 292,
+        "n_gaps": 75,
+        "fragmentation_candidates": 22,
+        "fragmentation_rate": 0.5,
+        "interpolated_proportion": 0.0
+      },
+      "full_pipeline": {
+        "n_tracks": 44,
+        "track_length_frames": {
+          "mean": 112.54545454545455,
+          "median": 53.0
+        },
+        "detections_per_track": {
+          "mean": 108.31818181818181,
+          "median": 40.0
+        },
+        "gaps_per_track": {
+          "mean": 0.8409090909090909,
+          "median": 0.0
+        },
+        "total_gap_frames": 186,
+        "n_gaps": 37,
+        "fragmentation_candidates": 22,
+        "fragmentation_rate": 0.5,
+        "interpolated_proportion": 0.016995383969785983
+      }
+    },
+    {
+      "clip_id": "a59a9449_t004",
+      "job": "Jeweler",
+      "association_only": {
+        "n_tracks": 16,
+        "track_length_frames": {
+          "mean": 305.5,
+          "median": 39.5
+        },
+        "detections_per_track": {
+          "mean": 291.4375,
+          "median": 30.0
+        },
+        "gaps_per_track": {
+          "mean": 4.75,
+          "median": 2.5
+        },
+        "total_gap_frames": 225,
+        "n_gaps": 76,
+        "fragmentation_candidates": 7,
+        "fragmentation_rate": 0.4375,
+        "interpolated_proportion": 0.0
+      },
+      "full_pipeline": {
+        "n_tracks": 16,
+        "track_length_frames": {
+          "mean": 305.5,
+          "median": 39.5
+        },
+        "detections_per_track": {
+          "mean": 298.0625,
+          "median": 35.0
+        },
+        "gaps_per_track": {
+          "mean": 2.125,
+          "median": 0.0
+        },
+        "total_gap_frames": 119,
+        "n_gaps": 34,
+        "fragmentation_candidates": 7,
+        "fragmentation_rate": 0.4375,
+        "interpolated_proportion": 0.02180750681484588
+      }
+    },
+    {
+      "clip_id": "ae580129_t057",
+      "job": "Maintenance worker",
+      "association_only": {
+        "n_tracks": 23,
+        "track_length_frames": {
+          "mean": 183.43478260869566,
+          "median": 43.0
+        },
+        "detections_per_track": {
+          "mean": 164.2173913043478,
+          "median": 34.0
+        },
+        "gaps_per_track": {
+          "mean": 4.695652173913044,
+          "median": 2.0
+        },
+        "total_gap_frames": 442,
+        "n_gaps": 108,
+        "fragmentation_candidates": 13,
+        "fragmentation_rate": 0.5652173913043478,
+        "interpolated_proportion": 0.0
+      },
+      "full_pipeline": {
+        "n_tracks": 23,
+        "track_length_frames": {
+          "mean": 183.43478260869566,
+          "median": 43.0
+        },
+        "detections_per_track": {
+          "mean": 173.82608695652175,
+          "median": 39.0
+        },
+        "gaps_per_track": {
+          "mean": 2.0,
+          "median": 1.0
+        },
+        "total_gap_frames": 221,
+        "n_gaps": 46,
+        "fragmentation_candidates": 13,
+        "fragmentation_rate": 0.5652173913043478,
+        "interpolated_proportion": 0.11980990495247623
+      }
+    },
+    {
+      "clip_id": "b2a761e6_t031",
+      "job": "Barista",
+      "association_only": {
+        "n_tracks": 13,
+        "track_length_frames": {
+          "mean": 429.38461538461536,
+          "median": 125.0
+        },
+        "detections_per_track": {
+          "mean": 423.3076923076923,
+          "median": 123.0
+        },
+        "gaps_per_track": {
+          "mean": 1.8461538461538463,
+          "median": 1.0
+        },
+        "total_gap_frames": 79,
+        "n_gaps": 24,
+        "fragmentation_candidates": 3,
+        "fragmentation_rate": 0.23076923076923078,
+        "interpolated_proportion": 0.0
+      },
+      "full_pipeline": {
+        "n_tracks": 13,
+        "track_length_frames": {
+          "mean": 429.38461538461536,
+          "median": 125.0
+        },
+        "detections_per_track": {
+          "mean": 425.3076923076923,
+          "median": 123.0
+        },
+        "gaps_per_track": {
+          "mean": 0.9230769230769231,
+          "median": 1.0
+        },
+        "total_gap_frames": 53,
+        "n_gaps": 12,
+        "fragmentation_candidates": 3,
+        "fragmentation_rate": 0.23076923076923078,
+        "interpolated_proportion": 0.005245071441490324
+      }
+    },
+    {
+      "clip_id": "b8272207_t051",
+      "job": "Painter",
+      "association_only": {
+        "n_tracks": 16,
+        "track_length_frames": {
+          "mean": 99.3125,
+          "median": 38.0
+        },
+        "detections_per_track": {
+          "mean": 81.25,
+          "median": 34.5
+        },
+        "gaps_per_track": {
+          "mean": 6.125,
+          "median": 2.5
+        },
+        "total_gap_frames": 289,
+        "n_gaps": 98,
+        "fragmentation_candidates": 4,
+        "fragmentation_rate": 0.25,
+        "interpolated_proportion": 0.0
+      },
+      "full_pipeline": {
+        "n_tracks": 16,
+        "track_length_frames": {
+          "mean": 99.3125,
+          "median": 38.0
+        },
+        "detections_per_track": {
+          "mean": 95.3125,
+          "median": 37.0
+        },
+        "gaps_per_track": {
+          "mean": 1.0625,
+          "median": 1.0
+        },
+        "total_gap_frames": 64,
+        "n_gaps": 17,
+        "fragmentation_candidates": 4,
+        "fragmentation_rate": 0.25,
+        "interpolated_proportion": 0.13639344262295083
+      }
+    },
+    {
+      "clip_id": "beb348be_t000",
+      "job": "Tailor / seamstress",
+      "association_only": {
+        "n_tracks": 39,
+        "track_length_frames": {
+          "mean": 31.435897435897434,
+          "median": 9.0
+        },
+        "detections_per_track": {
+          "mean": 23.153846153846153,
+          "median": 6.0
+        },
+        "gaps_per_track": {
+          "mean": 2.8461538461538463,
+          "median": 1.0
+        },
+        "total_gap_frames": 323,
+        "n_gaps": 111,
+        "fragmentation_candidates": 13,
+        "fragmentation_rate": 0.3333333333333333,
+        "interpolated_proportion": 0.0
+      },
+      "full_pipeline": {
+        "n_tracks": 39,
+        "track_length_frames": {
+          "mean": 31.435897435897434,
+          "median": 9.0
+        },
+        "detections_per_track": {
+          "mean": 27.82051282051282,
+          "median": 9.0
+        },
+        "gaps_per_track": {
+          "mean": 1.0769230769230769,
+          "median": 0.0
+        },
+        "total_gap_frames": 141,
+        "n_gaps": 42,
+        "fragmentation_candidates": 13,
+        "fragmentation_rate": 0.3333333333333333,
+        "interpolated_proportion": 0.17235023041474654
+      }
+    },
+    {
+      "clip_id": "c2920c2d_t009",
+      "job": "Housekeeper",
+      "association_only": {
+        "n_tracks": 34,
+        "track_length_frames": {
+          "mean": 54.088235294117645,
+          "median": 17.5
+        },
+        "detections_per_track": {
+          "mean": 43.588235294117645,
+          "median": 16.5
+        },
+        "gaps_per_track": {
+          "mean": 2.8529411764705883,
+          "median": 1.0
+        },
+        "total_gap_frames": 357,
+        "n_gaps": 97,
+        "fragmentation_candidates": 14,
+        "fragmentation_rate": 0.4117647058823529,
+        "interpolated_proportion": 0.0
+      },
+      "full_pipeline": {
+        "n_tracks": 34,
+        "track_length_frames": {
+          "mean": 54.088235294117645,
+          "median": 17.5
+        },
+        "detections_per_track": {
+          "mean": 49.588235294117645,
+          "median": 17.5
+        },
+        "gaps_per_track": {
+          "mean": 0.7941176470588235,
+          "median": 0.5
+        },
+        "total_gap_frames": 153,
+        "n_gaps": 27,
+        "fragmentation_candidates": 14,
+        "fragmentation_rate": 0.4117647058823529,
+        "interpolated_proportion": 0.13048635824436536
+      }
+    },
+    {
+      "clip_id": "c440b068_t014",
+      "job": "Event staff",
+      "association_only": {
+        "n_tracks": 5,
+        "track_length_frames": {
+          "mean": 404.4,
+          "median": 182.0
+        },
+        "detections_per_track": {
+          "mean": 396.4,
+          "median": 176.0
+        },
+        "gaps_per_track": {
+          "mean": 2.0,
+          "median": 2.0
+        },
+        "total_gap_frames": 40,
+        "n_gaps": 10,
+        "fragmentation_candidates": 2,
+        "fragmentation_rate": 0.4,
+        "interpolated_proportion": 0.0
+      },
+      "full_pipeline": {
+        "n_tracks": 5,
+        "track_length_frames": {
+          "mean": 404.4,
+          "median": 182.0
+        },
+        "detections_per_track": {
+          "mean": 402.4,
+          "median": 182.0
+        },
+        "gaps_per_track": {
+          "mean": 0.4,
+          "median": 0.0
+        },
+        "total_gap_frames": 10,
+        "n_gaps": 2,
+        "fragmentation_candidates": 2,
+        "fragmentation_rate": 0.4,
+        "interpolated_proportion": 0.014910536779324055
+      }
+    },
+    {
+      "clip_id": "c6754e88_t019",
+      "job": "Security guard",
+      "association_only": {
+        "n_tracks": 33,
+        "track_length_frames": {
+          "mean": 86.72727272727273,
+          "median": 21.0
+        },
+        "detections_per_track": {
+          "mean": 74.18181818181819,
+          "median": 12.0
+        },
+        "gaps_per_track": {
+          "mean": 2.9696969696969697,
+          "median": 2.0
+        },
+        "total_gap_frames": 414,
+        "n_gaps": 98,
+        "fragmentation_candidates": 15,
+        "fragmentation_rate": 0.45454545454545453,
+        "interpolated_proportion": 0.0
+      },
+      "full_pipeline": {
+        "n_tracks": 33,
+        "track_length_frames": {
+          "mean": 86.72727272727273,
+          "median": 21.0
+        },
+        "detections_per_track": {
+          "mean": 81.36363636363636,
+          "median": 21.0
+        },
+        "gaps_per_track": {
+          "mean": 1.121212121212121,
+          "median": 0.0
+        },
+        "total_gap_frames": 177,
+        "n_gaps": 37,
+        "fragmentation_candidates": 15,
+        "fragmentation_rate": 0.45454545454545453,
+        "interpolated_proportion": 0.08379888268156424
+      }
+    },
+    {
+      "clip_id": "cb8a6019_t003",
+      "job": "Mason",
+      "association_only": {
+        "n_tracks": 13,
+        "track_length_frames": {
+          "mean": 139.3846153846154,
+          "median": 16.0
+        },
+        "detections_per_track": {
+          "mean": 126.61538461538461,
+          "median": 11.0
+        },
+        "gaps_per_track": {
+          "mean": 3.6153846153846154,
+          "median": 1.0
+        },
+        "total_gap_frames": 166,
+        "n_gaps": 47,
+        "fragmentation_candidates": 1,
+        "fragmentation_rate": 0.07692307692307693,
+        "interpolated_proportion": 0.0
+      },
+      "full_pipeline": {
+        "n_tracks": 13,
+        "track_length_frames": {
+          "mean": 139.3846153846154,
+          "median": 16.0
+        },
+        "detections_per_track": {
+          "mean": 134.76923076923077,
+          "median": 16.0
+        },
+        "gaps_per_track": {
+          "mean": 1.2307692307692308,
+          "median": 0.0
+        },
+        "total_gap_frames": 60,
+        "n_gaps": 16,
+        "fragmentation_candidates": 1,
+        "fragmentation_rate": 0.07692307692307693,
+        "interpolated_proportion": 0.05650684931506849
+      }
+    },
+    {
+      "clip_id": "cd8d7687_t011",
+      "job": "Food prep worker",
+      "association_only": {
+        "n_tracks": 6,
+        "track_length_frames": {
+          "mean": 624.6666666666666,
+          "median": 13.0
+        },
+        "detections_per_track": {
+          "mean": 612.5,
+          "median": 7.5
+        },
+        "gaps_per_track": {
+          "mean": 3.8333333333333335,
+          "median": 2.5
+        },
+        "total_gap_frames": 73,
+        "n_gaps": 23,
+        "fragmentation_candidates": 0,
+        "fragmentation_rate": 0.0,
+        "interpolated_proportion": 0.0
+      },
+      "full_pipeline": {
+        "n_tracks": 6,
+        "track_length_frames": {
+          "mean": 624.6666666666666,
+          "median": 13.0
+        },
+        "detections_per_track": {
+          "mean": 615.0,
+          "median": 12.5
+        },
+        "gaps_per_track": {
+          "mean": 2.3333333333333335,
+          "median": 0.0
+        },
+        "total_gap_frames": 58,
+        "n_gaps": 14,
+        "fragmentation_candidates": 0,
+        "fragmentation_rate": 0.0,
+        "interpolated_proportion": 0.0013550135501355014
+      }
+    },
+    {
+      "clip_id": "ce045be4_t019",
+      "job": "Picker / packer",
+      "association_only": {
+        "n_tracks": 42,
+        "track_length_frames": {
+          "mean": 122.95238095238095,
+          "median": 16.5
+        },
+        "detections_per_track": {
+          "mean": 113.47619047619048,
+          "median": 10.5
+        },
+        "gaps_per_track": {
+          "mean": 2.7857142857142856,
+          "median": 1.0
+        },
+        "total_gap_frames": 398,
+        "n_gaps": 117,
+        "fragmentation_candidates": 14,
+        "fragmentation_rate": 0.3333333333333333,
+        "interpolated_proportion": 0.0
+      },
+      "full_pipeline": {
+        "n_tracks": 42,
+        "track_length_frames": {
+          "mean": 122.95238095238095,
+          "median": 16.5
+        },
+        "detections_per_track": {
+          "mean": 117.28571428571429,
+          "median": 15.5
+        },
+        "gaps_per_track": {
+          "mean": 1.7142857142857142,
+          "median": 0.0
+        },
+        "total_gap_frames": 238,
+        "n_gaps": 72,
+        "fragmentation_candidates": 14,
+        "fragmentation_rate": 0.3333333333333333,
+        "interpolated_proportion": 0.02679658952496955
+      }
+    },
+    {
+      "clip_id": "d6dfe4bf_t023",
+      "job": "Office clerk",
+      "association_only": {
+        "n_tracks": 34,
+        "track_length_frames": {
+          "mean": 160.23529411764707,
+          "median": 34.0
+        },
+        "detections_per_track": {
+          "mean": 153.8235294117647,
+          "median": 31.5
+        },
+        "gaps_per_track": {
+          "mean": 1.5294117647058822,
+          "median": 1.0
+        },
+        "total_gap_frames": 218,
+        "n_gaps": 52,
+        "fragmentation_candidates": 12,
+        "fragmentation_rate": 0.35294117647058826,
+        "interpolated_proportion": 0.0
+      },
+      "full_pipeline": {
+        "n_tracks": 34,
+        "track_length_frames": {
+          "mean": 160.23529411764707,
+          "median": 34.0
+        },
+        "detections_per_track": {
+          "mean": 155.55882352941177,
+          "median": 32.5
+        },
+        "gaps_per_track": {
+          "mean": 1.2058823529411764,
+          "median": 0.0
+        },
+        "total_gap_frames": 159,
+        "n_gaps": 41,
+        "fragmentation_candidates": 12,
+        "fragmentation_rate": 0.35294117647058826,
+        "interpolated_proportion": 0.01115522783134808
+      }
+    },
+    {
+      "clip_id": "db6471bb_t004",
+      "job": "Farmworker",
+      "association_only": {
+        "n_tracks": 17,
+        "track_length_frames": {
+          "mean": 315.2352941176471,
+          "median": 125.0
+        },
+        "detections_per_track": {
+          "mean": 307.5882352941176,
+          "median": 125.0
+        },
+        "gaps_per_track": {
+          "mean": 2.176470588235294,
+          "median": 2.0
+        },
+        "total_gap_frames": 130,
+        "n_gaps": 37,
+        "fragmentation_candidates": 5,
+        "fragmentation_rate": 0.29411764705882354,
+        "interpolated_proportion": 0.0
+      },
+      "full_pipeline": {
+        "n_tracks": 17,
+        "track_length_frames": {
+          "mean": 315.2352941176471,
+          "median": 125.0
+        },
+        "detections_per_track": {
+          "mean": 313.0,
+          "median": 125.0
+        },
+        "gaps_per_track": {
+          "mean": 0.35294117647058826,
+          "median": 0.0
+        },
+        "total_gap_frames": 38,
+        "n_gaps": 6,
+        "fragmentation_candidates": 5,
+        "fragmentation_rate": 0.29411764705882354,
+        "interpolated_proportion": 0.012779552715654952
+      }
+    },
+    {
+      "clip_id": "e459c013_t033",
+      "job": "Forestry worker",
+      "association_only": {
+        "n_tracks": 27,
+        "track_length_frames": {
+          "mean": 107.18518518518519,
+          "median": 23.0
+        },
+        "detections_per_track": {
+          "mean": 98.25925925925925,
+          "median": 15.0
+        },
+        "gaps_per_track": {
+          "mean": 3.037037037037037,
+          "median": 2.0
+        },
+        "total_gap_frames": 241,
+        "n_gaps": 82,
+        "fragmentation_candidates": 6,
+        "fragmentation_rate": 0.2222222222222222,
+        "interpolated_proportion": 0.0
+      },
+      "full_pipeline": {
+        "n_tracks": 27,
+        "track_length_frames": {
+          "mean": 107.18518518518519,
+          "median": 23.0
+        },
+        "detections_per_track": {
+          "mean": 104.0,
+          "median": 18.0
+        },
+        "gaps_per_track": {
+          "mean": 1.0740740740740742,
+          "median": 0.0
+        },
+        "total_gap_frames": 86,
+        "n_gaps": 29,
+        "fragmentation_candidates": 6,
+        "fragmentation_rate": 0.2222222222222222,
+        "interpolated_proportion": 0.04878917378917379
+      }
+    },
+    {
+      "clip_id": "eba8442d_t005",
+      "job": "Barber",
+      "association_only": {
+        "n_tracks": 15,
+        "track_length_frames": {
+          "mean": 294.2,
+          "median": 6.0
+        },
+        "detections_per_track": {
+          "mean": 290.26666666666665,
+          "median": 2.0
+        },
+        "gaps_per_track": {
+          "mean": 0.9333333333333333,
+          "median": 0.0
+        },
+        "total_gap_frames": 59,
+        "n_gaps": 14,
+        "fragmentation_candidates": 2,
+        "fragmentation_rate": 0.13333333333333333,
+        "interpolated_proportion": 0.0
+      },
+      "full_pipeline": {
+        "n_tracks": 15,
+        "track_length_frames": {
+          "mean": 294.2,
+          "median": 6.0
+        },
+        "detections_per_track": {
+          "mean": 293.46666666666664,
+          "median": 2.0
+        },
+        "gaps_per_track": {
+          "mean": 0.13333333333333333,
+          "median": 0.0
+        },
+        "total_gap_frames": 11,
+        "n_gaps": 2,
+        "fragmentation_candidates": 2,
+        "fragmentation_rate": 0.13333333333333333,
+        "interpolated_proportion": 0.004997728305315766
+      }
+    },
+    {
+      "clip_id": "f2914cca_t014",
+      "job": "Woodworker",
+      "association_only": {
+        "n_tracks": 3,
+        "track_length_frames": {
+          "mean": 1521.3333333333333,
+          "median": 2278.0
+        },
+        "detections_per_track": {
+          "mean": 1499.0,
+          "median": 2217.0
+        },
+        "gaps_per_track": {
+          "mean": 5.333333333333333,
+          "median": 1.0
+        },
+        "total_gap_frames": 67,
+        "n_gaps": 16,
+        "fragmentation_candidates": 0,
+        "fragmentation_rate": 0.0,
+        "interpolated_proportion": 0.0
+      },
+      "full_pipeline": {
+        "n_tracks": 3,
+        "track_length_frames": {
+          "mean": 1521.3333333333333,
+          "median": 2278.0
+        },
+        "detections_per_track": {
+          "mean": 1511.0,
+          "median": 2249.0
+        },
+        "gaps_per_track": {
+          "mean": 1.3333333333333333,
+          "median": 0.0
+        },
+        "total_gap_frames": 31,
+        "n_gaps": 4,
+        "fragmentation_candidates": 0,
+        "fragmentation_rate": 0.0,
+        "interpolated_proportion": 0.008382969335980588
+      }
+    },
+    {
+      "clip_id": "f9afe024_t004",
+      "job": "Leatherworker",
+      "association_only": {
+        "n_tracks": 15,
+        "track_length_frames": {
+          "mean": 342.53333333333336,
+          "median": 28.0
+        },
+        "detections_per_track": {
+          "mean": 333.06666666666666,
+          "median": 25.0
+        },
+        "gaps_per_track": {
+          "mean": 2.1333333333333333,
+          "median": 2.0
+        },
+        "total_gap_frames": 142,
+        "n_gaps": 32,
+        "fragmentation_candidates": 4,
+        "fragmentation_rate": 0.26666666666666666,
+        "interpolated_proportion": 0.0
+      },
+      "full_pipeline": {
+        "n_tracks": 15,
+        "track_length_frames": {
+          "mean": 342.53333333333336,
+          "median": 28.0
+        },
+        "detections_per_track": {
+          "mean": 336.2,
+          "median": 25.0
+        },
+        "gaps_per_track": {
+          "mean": 1.4666666666666666,
+          "median": 0.0
+        },
+        "total_gap_frames": 95,
+        "n_gaps": 22,
+        "fragmentation_candidates": 4,
+        "fragmentation_rate": 0.26666666666666666,
+        "interpolated_proportion": 0.011302795954788817
+      }
+    },
+    {
+      "clip_id": "fcaf46ee_t001",
+      "job": "Administrative assistant",
+      "association_only": {
+        "n_tracks": 6,
+        "track_length_frames": {
+          "mean": 432.8333333333333,
+          "median": 14.0
+        },
+        "detections_per_track": {
+          "mean": 425.6666666666667,
+          "median": 14.0
+        },
+        "gaps_per_track": {
+          "mean": 1.3333333333333333,
+          "median": 0.0
+        },
+        "total_gap_frames": 43,
+        "n_gaps": 8,
+        "fragmentation_candidates": 1,
+        "fragmentation_rate": 0.16666666666666666,
+        "interpolated_proportion": 0.0
+      },
+      "full_pipeline": {
+        "n_tracks": 6,
+        "track_length_frames": {
+          "mean": 432.8333333333333,
+          "median": 14.0
+        },
+        "detections_per_track": {
+          "mean": 429.1666666666667,
+          "median": 14.0
+        },
+        "gaps_per_track": {
+          "mean": 0.5,
+          "median": 0.0
+        },
+        "total_gap_frames": 22,
+        "n_gaps": 3,
+        "fragmentation_candidates": 1,
+        "fragmentation_rate": 0.16666666666666666,
+        "interpolated_proportion": 0.008155339805825243
+      }
+    },
+    {
+      "clip_id": "ff30f5ac_t022",
+      "job": "Laundry worker",
+      "association_only": {
+        "n_tracks": 15,
+        "track_length_frames": {
+          "mean": 348.6,
+          "median": 236.0
+        },
+        "detections_per_track": {
+          "mean": 330.73333333333335,
+          "median": 221.0
+        },
+        "gaps_per_track": {
+          "mean": 3.466666666666667,
+          "median": 2.0
+        },
+        "total_gap_frames": 268,
+        "n_gaps": 52,
+        "fragmentation_candidates": 4,
+        "fragmentation_rate": 0.26666666666666666,
+        "interpolated_proportion": 0.0
+      },
+      "full_pipeline": {
+        "n_tracks": 15,
+        "track_length_frames": {
+          "mean": 348.6,
+          "median": 236.0
+        },
+        "detections_per_track": {
+          "mean": 336.53333333333336,
+          "median": 221.0
+        },
+        "gaps_per_track": {
+          "mean": 1.8,
+          "median": 1.0
+        },
+        "total_gap_frames": 181,
+        "n_gaps": 27,
+        "fragmentation_candidates": 4,
+        "fragmentation_rate": 0.26666666666666666,
+        "interpolated_proportion": 0.0223851030110935
+      }
+    },
+    {
+      "clip_id": "ff5d0d5c_t007",
+      "job": "laundry_attendant",
+      "association_only": {
+        "n_tracks": 24,
+        "track_length_frames": {
+          "mean": 213.08333333333334,
+          "median": 66.5
+        },
+        "detections_per_track": {
+          "mean": 199.08333333333334,
+          "median": 56.0
+        },
+        "gaps_per_track": {
+          "mean": 3.7916666666666665,
+          "median": 1.5
+        },
+        "total_gap_frames": 336,
+        "n_gaps": 91,
+        "fragmentation_candidates": 7,
+        "fragmentation_rate": 0.2916666666666667,
+        "interpolated_proportion": 0.0
+      },
+      "full_pipeline": {
+        "n_tracks": 24,
+        "track_length_frames": {
+          "mean": 213.08333333333334,
+          "median": 66.5
+        },
+        "detections_per_track": {
+          "mean": 206.54166666666666,
+          "median": 63.0
+        },
+        "gaps_per_track": {
+          "mean": 1.3333333333333333,
+          "median": 1.0
+        },
+        "total_gap_frames": 157,
+        "n_gaps": 32,
+        "fragmentation_candidates": 7,
+        "fragmentation_rate": 0.2916666666666667,
+        "interpolated_proportion": 0.04478515230986484
+      }
+    }
+  ],
+  "overall": {
+    "association_only": {
+      "n_tracks": 787,
+      "total_gap_frames": 8240,
+      "n_gaps": 2335,
+      "fragmentation_candidates": 254,
+      "fragmentation_rate": {
+        "mean": 0.2849501610107569,
+        "median": 0.2916666666666667
+      },
+      "interpolated_proportion": {
+        "mean": 0.0,
+        "median": 0.0
+      },
+      "track_length_frames": {
+        "mean_of_clip_means": 194.47903430749682
+      },
+      "detections_per_track": {
+        "mean_of_clip_means": 184.00889453621346
+      },
+      "gaps_per_track": {
+        "mean_of_clip_means": 2.9669631512071155
+      },
+      "n_clips": 39
+    },
+    "full_pipeline": {
+      "n_tracks": 787,
+      "total_gap_frames": 4341,
+      "n_gaps": 1092,
+      "fragmentation_candidates": 254,
+      "fragmentation_rate": {
+        "mean": 0.2849501610107569,
+        "median": 0.2916666666666667
+      },
+      "interpolated_proportion": {
+        "mean": 0.03480878329768249,
+        "median": 0.014910536779324055
+      },
+      "track_length_frames": {
+        "mean_of_clip_means": 194.47903430749682
+      },
+      "detections_per_track": {
+        "mean_of_clip_means": 188.96315120711563
+      },
+      "gaps_per_track": {
+        "mean_of_clip_means": 1.3875476493011436
+      },
+      "n_clips": 39
+    }
+  },
+  "by_job": {
+    "Administrative assistant": {
+      "association_only": {
+        "n_tracks": 6,
+        "total_gap_frames": 43,
+        "n_gaps": 8,
+        "fragmentation_candidates": 1,
+        "fragmentation_rate": {
+          "mean": 0.16666666666666666,
+          "median": 0.16666666666666666
+        },
+        "interpolated_proportion": {
+          "mean": 0.0,
+          "median": 0.0
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 432.8333333333333
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 425.6666666666667
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 1.3333333333333333
+        },
+        "n_clips": 1
+      },
+      "full_pipeline": {
+        "n_tracks": 6,
+        "total_gap_frames": 22,
+        "n_gaps": 3,
+        "fragmentation_candidates": 1,
+        "fragmentation_rate": {
+          "mean": 0.16666666666666666,
+          "median": 0.16666666666666666
+        },
+        "interpolated_proportion": {
+          "mean": 0.008155339805825243,
+          "median": 0.008155339805825243
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 432.8333333333333
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 429.1666666666667
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 0.5
+        },
+        "n_clips": 1
+      }
+    },
+    "Assembler": {
+      "association_only": {
+        "n_tracks": 10,
+        "total_gap_frames": 45,
+        "n_gaps": 13,
+        "fragmentation_candidates": 4,
+        "fragmentation_rate": {
+          "mean": 0.4,
+          "median": 0.4
+        },
+        "interpolated_proportion": {
+          "mean": 0.0,
+          "median": 0.0
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 544.0
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 539.5
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 1.3
+        },
+        "n_clips": 1
+      },
+      "full_pipeline": {
+        "n_tracks": 10,
+        "total_gap_frames": 19,
+        "n_gaps": 5,
+        "fragmentation_candidates": 4,
+        "fragmentation_rate": {
+          "mean": 0.4,
+          "median": 0.4
+        },
+        "interpolated_proportion": {
+          "mean": 0.006087437742114001,
+          "median": 0.006087437742114001
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 544.0
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 542.1
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 0.5
+        },
+        "n_clips": 1
+      }
+    },
+    "Barber": {
+      "association_only": {
+        "n_tracks": 15,
+        "total_gap_frames": 59,
+        "n_gaps": 14,
+        "fragmentation_candidates": 2,
+        "fragmentation_rate": {
+          "mean": 0.13333333333333333,
+          "median": 0.13333333333333333
+        },
+        "interpolated_proportion": {
+          "mean": 0.0,
+          "median": 0.0
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 294.2
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 290.26666666666665
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 0.9333333333333333
+        },
+        "n_clips": 1
+      },
+      "full_pipeline": {
+        "n_tracks": 15,
+        "total_gap_frames": 11,
+        "n_gaps": 2,
+        "fragmentation_candidates": 2,
+        "fragmentation_rate": {
+          "mean": 0.13333333333333333,
+          "median": 0.13333333333333333
+        },
+        "interpolated_proportion": {
+          "mean": 0.004997728305315766,
+          "median": 0.004997728305315766
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 294.2
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 293.46666666666664
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 0.13333333333333333
+        },
+        "n_clips": 1
+      }
+    },
+    "Barista": {
+      "association_only": {
+        "n_tracks": 13,
+        "total_gap_frames": 79,
+        "n_gaps": 24,
+        "fragmentation_candidates": 3,
+        "fragmentation_rate": {
+          "mean": 0.23076923076923078,
+          "median": 0.23076923076923078
+        },
+        "interpolated_proportion": {
+          "mean": 0.0,
+          "median": 0.0
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 429.38461538461536
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 423.3076923076923
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 1.8461538461538463
+        },
+        "n_clips": 1
+      },
+      "full_pipeline": {
+        "n_tracks": 13,
+        "total_gap_frames": 53,
+        "n_gaps": 12,
+        "fragmentation_candidates": 3,
+        "fragmentation_rate": {
+          "mean": 0.23076923076923078,
+          "median": 0.23076923076923078
+        },
+        "interpolated_proportion": {
+          "mean": 0.005245071441490324,
+          "median": 0.005245071441490324
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 429.38461538461536
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 425.3076923076923
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 0.9230769230769231
+        },
+        "n_clips": 1
+      }
+    },
+    "Billing clerk": {
+      "association_only": {
+        "n_tracks": 2,
+        "total_gap_frames": 0,
+        "n_gaps": 0,
+        "fragmentation_candidates": 0,
+        "fragmentation_rate": {
+          "mean": 0.0,
+          "median": 0.0
+        },
+        "interpolated_proportion": {
+          "mean": 0.0,
+          "median": 0.0
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 2619.0
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 2619.0
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 0.0
+        },
+        "n_clips": 1
+      },
+      "full_pipeline": {
+        "n_tracks": 2,
+        "total_gap_frames": 0,
+        "n_gaps": 0,
+        "fragmentation_candidates": 0,
+        "fragmentation_rate": {
+          "mean": 0.0,
+          "median": 0.0
+        },
+        "interpolated_proportion": {
+          "mean": 0.0,
+          "median": 0.0
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 2619.0
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 2619.0
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 0.0
+        },
+        "n_clips": 1
+      }
+    },
+    "Carpenter": {
+      "association_only": {
+        "n_tracks": 20,
+        "total_gap_frames": 135,
+        "n_gaps": 30,
+        "fragmentation_candidates": 4,
+        "fragmentation_rate": {
+          "mean": 0.2,
+          "median": 0.2
+        },
+        "interpolated_proportion": {
+          "mean": 0.0,
+          "median": 0.0
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 257.95
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 251.2
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 1.5
+        },
+        "n_clips": 1
+      },
+      "full_pipeline": {
+        "n_tracks": 20,
+        "total_gap_frames": 39,
+        "n_gaps": 10,
+        "fragmentation_candidates": 4,
+        "fragmentation_rate": {
+          "mean": 0.2,
+          "median": 0.2
+        },
+        "interpolated_proportion": {
+          "mean": 0.014453125,
+          "median": 0.014453125
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 257.95
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 256.0
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 0.5
+        },
+        "n_clips": 1
+      }
+    },
+    "Construction laborer": {
+      "association_only": {
+        "n_tracks": 27,
+        "total_gap_frames": 207,
+        "n_gaps": 62,
+        "fragmentation_candidates": 10,
+        "fragmentation_rate": {
+          "mean": 0.37037037037037035,
+          "median": 0.37037037037037035
+        },
+        "interpolated_proportion": {
+          "mean": 0.0,
+          "median": 0.0
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 87.18518518518519
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 79.51851851851852
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 2.2962962962962963
+        },
+        "n_clips": 1
+      },
+      "full_pipeline": {
+        "n_tracks": 27,
+        "total_gap_frames": 176,
+        "n_gaps": 54,
+        "fragmentation_candidates": 10,
+        "fragmentation_rate": {
+          "mean": 0.37037037037037035,
+          "median": 0.37037037037037035
+        },
+        "interpolated_proportion": {
+          "mean": 0.014233241505968778,
+          "median": 0.014233241505968778
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 87.18518518518519
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 80.66666666666667
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 2.0
+        },
+        "n_clips": 1
+      }
+    },
+    "Dishwasher": {
+      "association_only": {
+        "n_tracks": 19,
+        "total_gap_frames": 159,
+        "n_gaps": 31,
+        "fragmentation_candidates": 5,
+        "fragmentation_rate": {
+          "mean": 0.2631578947368421,
+          "median": 0.2631578947368421
+        },
+        "interpolated_proportion": {
+          "mean": 0.0,
+          "median": 0.0
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 239.52631578947367
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 231.1578947368421
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 1.631578947368421
+        },
+        "n_clips": 1
+      },
+      "full_pipeline": {
+        "n_tracks": 19,
+        "total_gap_frames": 116,
+        "n_gaps": 22,
+        "fragmentation_candidates": 5,
+        "fragmentation_rate": {
+          "mean": 0.2631578947368421,
+          "median": 0.2631578947368421
+        },
+        "interpolated_proportion": {
+          "mean": 0.00834272829763247,
+          "median": 0.00834272829763247
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 239.52631578947367
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 233.42105263157896
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 1.1578947368421053
+        },
+        "n_clips": 1
+      }
+    },
+    "Event staff": {
+      "association_only": {
+        "n_tracks": 5,
+        "total_gap_frames": 40,
+        "n_gaps": 10,
+        "fragmentation_candidates": 2,
+        "fragmentation_rate": {
+          "mean": 0.4,
+          "median": 0.4
+        },
+        "interpolated_proportion": {
+          "mean": 0.0,
+          "median": 0.0
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 404.4
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 396.4
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 2.0
+        },
+        "n_clips": 1
+      },
+      "full_pipeline": {
+        "n_tracks": 5,
+        "total_gap_frames": 10,
+        "n_gaps": 2,
+        "fragmentation_candidates": 2,
+        "fragmentation_rate": {
+          "mean": 0.4,
+          "median": 0.4
+        },
+        "interpolated_proportion": {
+          "mean": 0.014910536779324055,
+          "median": 0.014910536779324055
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 404.4
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 402.4
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 0.4
+        },
+        "n_clips": 1
+      }
+    },
+    "Farmworker": {
+      "association_only": {
+        "n_tracks": 17,
+        "total_gap_frames": 130,
+        "n_gaps": 37,
+        "fragmentation_candidates": 5,
+        "fragmentation_rate": {
+          "mean": 0.29411764705882354,
+          "median": 0.29411764705882354
+        },
+        "interpolated_proportion": {
+          "mean": 0.0,
+          "median": 0.0
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 315.2352941176471
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 307.5882352941176
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 2.176470588235294
+        },
+        "n_clips": 1
+      },
+      "full_pipeline": {
+        "n_tracks": 17,
+        "total_gap_frames": 38,
+        "n_gaps": 6,
+        "fragmentation_candidates": 5,
+        "fragmentation_rate": {
+          "mean": 0.29411764705882354,
+          "median": 0.29411764705882354
+        },
+        "interpolated_proportion": {
+          "mean": 0.012779552715654952,
+          "median": 0.012779552715654952
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 315.2352941176471
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 313.0
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 0.35294117647058826
+        },
+        "n_clips": 1
+      }
+    },
+    "Flight attendant": {
+      "association_only": {
+        "n_tracks": 13,
+        "total_gap_frames": 59,
+        "n_gaps": 24,
+        "fragmentation_candidates": 3,
+        "fragmentation_rate": {
+          "mean": 0.23076923076923078,
+          "median": 0.23076923076923078
+        },
+        "interpolated_proportion": {
+          "mean": 0.0,
+          "median": 0.0
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 317.7692307692308
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 313.2307692307692
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 1.8461538461538463
+        },
+        "n_clips": 1
+      },
+      "full_pipeline": {
+        "n_tracks": 13,
+        "total_gap_frames": 27,
+        "n_gaps": 10,
+        "fragmentation_candidates": 3,
+        "fragmentation_rate": {
+          "mean": 0.23076923076923078,
+          "median": 0.23076923076923078
+        },
+        "interpolated_proportion": {
+          "mean": 0.006578947368421052,
+          "median": 0.006578947368421052
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 317.7692307692308
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 315.6923076923077
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 0.7692307692307693
+        },
+        "n_clips": 1
+      }
+    },
+    "Food prep worker": {
+      "association_only": {
+        "n_tracks": 6,
+        "total_gap_frames": 73,
+        "n_gaps": 23,
+        "fragmentation_candidates": 0,
+        "fragmentation_rate": {
+          "mean": 0.0,
+          "median": 0.0
+        },
+        "interpolated_proportion": {
+          "mean": 0.0,
+          "median": 0.0
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 624.6666666666666
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 612.5
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 3.8333333333333335
+        },
+        "n_clips": 1
+      },
+      "full_pipeline": {
+        "n_tracks": 6,
+        "total_gap_frames": 58,
+        "n_gaps": 14,
+        "fragmentation_candidates": 0,
+        "fragmentation_rate": {
+          "mean": 0.0,
+          "median": 0.0
+        },
+        "interpolated_proportion": {
+          "mean": 0.0013550135501355014,
+          "median": 0.0013550135501355014
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 624.6666666666666
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 615.0
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 2.3333333333333335
+        },
+        "n_clips": 1
+      }
+    },
+    "Forestry worker": {
+      "association_only": {
+        "n_tracks": 27,
+        "total_gap_frames": 241,
+        "n_gaps": 82,
+        "fragmentation_candidates": 6,
+        "fragmentation_rate": {
+          "mean": 0.2222222222222222,
+          "median": 0.2222222222222222
+        },
+        "interpolated_proportion": {
+          "mean": 0.0,
+          "median": 0.0
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 107.18518518518519
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 98.25925925925925
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 3.037037037037037
+        },
+        "n_clips": 1
+      },
+      "full_pipeline": {
+        "n_tracks": 27,
+        "total_gap_frames": 86,
+        "n_gaps": 29,
+        "fragmentation_candidates": 6,
+        "fragmentation_rate": {
+          "mean": 0.2222222222222222,
+          "median": 0.2222222222222222
+        },
+        "interpolated_proportion": {
+          "mean": 0.04878917378917379,
+          "median": 0.04878917378917379
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 107.18518518518519
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 104.0
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 1.0740740740740742
+        },
+        "n_clips": 1
+      }
+    },
+    "Hair stylist": {
+      "association_only": {
+        "n_tracks": 38,
+        "total_gap_frames": 702,
+        "n_gaps": 240,
+        "fragmentation_candidates": 14,
+        "fragmentation_rate": {
+          "mean": 0.3684210526315789,
+          "median": 0.3684210526315789
+        },
+        "interpolated_proportion": {
+          "mean": 0.0,
+          "median": 0.0
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 146.23684210526315
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 127.76315789473684
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 6.315789473684211
+        },
+        "n_clips": 1
+      },
+      "full_pipeline": {
+        "n_tracks": 38,
+        "total_gap_frames": 355,
+        "n_gaps": 113,
+        "fragmentation_candidates": 14,
+        "fragmentation_rate": {
+          "mean": 0.3684210526315789,
+          "median": 0.3684210526315789
+        },
+        "interpolated_proportion": {
+          "mean": 0.06055363321799308,
+          "median": 0.06055363321799308
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 146.23684210526315
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 136.89473684210526
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 2.973684210526316
+        },
+        "n_clips": 1
+      }
+    },
+    "Housekeeper": {
+      "association_only": {
+        "n_tracks": 34,
+        "total_gap_frames": 357,
+        "n_gaps": 97,
+        "fragmentation_candidates": 14,
+        "fragmentation_rate": {
+          "mean": 0.4117647058823529,
+          "median": 0.4117647058823529
+        },
+        "interpolated_proportion": {
+          "mean": 0.0,
+          "median": 0.0
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 54.088235294117645
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 43.588235294117645
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 2.8529411764705883
+        },
+        "n_clips": 1
+      },
+      "full_pipeline": {
+        "n_tracks": 34,
+        "total_gap_frames": 153,
+        "n_gaps": 27,
+        "fragmentation_candidates": 14,
+        "fragmentation_rate": {
+          "mean": 0.4117647058823529,
+          "median": 0.4117647058823529
+        },
+        "interpolated_proportion": {
+          "mean": 0.13048635824436536,
+          "median": 0.13048635824436536
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 54.088235294117645
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 49.588235294117645
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 0.7941176470588235
+        },
+        "n_clips": 1
+      }
+    },
+    "Jeweler": {
+      "association_only": {
+        "n_tracks": 16,
+        "total_gap_frames": 225,
+        "n_gaps": 76,
+        "fragmentation_candidates": 7,
+        "fragmentation_rate": {
+          "mean": 0.4375,
+          "median": 0.4375
+        },
+        "interpolated_proportion": {
+          "mean": 0.0,
+          "median": 0.0
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 305.5
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 291.4375
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 4.75
+        },
+        "n_clips": 1
+      },
+      "full_pipeline": {
+        "n_tracks": 16,
+        "total_gap_frames": 119,
+        "n_gaps": 34,
+        "fragmentation_candidates": 7,
+        "fragmentation_rate": {
+          "mean": 0.4375,
+          "median": 0.4375
+        },
+        "interpolated_proportion": {
+          "mean": 0.02180750681484588,
+          "median": 0.02180750681484588
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 305.5
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 298.0625
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 2.125
+        },
+        "n_clips": 1
+      }
+    },
+    "Laundry worker": {
+      "association_only": {
+        "n_tracks": 15,
+        "total_gap_frames": 268,
+        "n_gaps": 52,
+        "fragmentation_candidates": 4,
+        "fragmentation_rate": {
+          "mean": 0.26666666666666666,
+          "median": 0.26666666666666666
+        },
+        "interpolated_proportion": {
+          "mean": 0.0,
+          "median": 0.0
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 348.6
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 330.73333333333335
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 3.466666666666667
+        },
+        "n_clips": 1
+      },
+      "full_pipeline": {
+        "n_tracks": 15,
+        "total_gap_frames": 181,
+        "n_gaps": 27,
+        "fragmentation_candidates": 4,
+        "fragmentation_rate": {
+          "mean": 0.26666666666666666,
+          "median": 0.26666666666666666
+        },
+        "interpolated_proportion": {
+          "mean": 0.0223851030110935,
+          "median": 0.0223851030110935
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 348.6
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 336.53333333333336
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 1.8
+        },
+        "n_clips": 1
+      }
+    },
+    "Leatherworker": {
+      "association_only": {
+        "n_tracks": 15,
+        "total_gap_frames": 142,
+        "n_gaps": 32,
+        "fragmentation_candidates": 4,
+        "fragmentation_rate": {
+          "mean": 0.26666666666666666,
+          "median": 0.26666666666666666
+        },
+        "interpolated_proportion": {
+          "mean": 0.0,
+          "median": 0.0
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 342.53333333333336
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 333.06666666666666
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 2.1333333333333333
+        },
+        "n_clips": 1
+      },
+      "full_pipeline": {
+        "n_tracks": 15,
+        "total_gap_frames": 95,
+        "n_gaps": 22,
+        "fragmentation_candidates": 4,
+        "fragmentation_rate": {
+          "mean": 0.26666666666666666,
+          "median": 0.26666666666666666
+        },
+        "interpolated_proportion": {
+          "mean": 0.011302795954788817,
+          "median": 0.011302795954788817
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 342.53333333333336
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 336.2
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 1.4666666666666666
+        },
+        "n_clips": 1
+      }
+    },
+    "Machine operator": {
+      "association_only": {
+        "n_tracks": 10,
+        "total_gap_frames": 80,
+        "n_gaps": 19,
+        "fragmentation_candidates": 6,
+        "fragmentation_rate": {
+          "mean": 0.6,
+          "median": 0.6
+        },
+        "interpolated_proportion": {
+          "mean": 0.0,
+          "median": 0.0
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 434.1
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 426.1
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 1.9
+        },
+        "n_clips": 1
+      },
+      "full_pipeline": {
+        "n_tracks": 10,
+        "total_gap_frames": 60,
+        "n_gaps": 10,
+        "fragmentation_candidates": 6,
+        "fragmentation_rate": {
+          "mean": 0.6,
+          "median": 0.6
+        },
+        "interpolated_proportion": {
+          "mean": 0.011679514132212099,
+          "median": 0.011679514132212099
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 434.1
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 428.1
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 1.0
+        },
+        "n_clips": 1
+      }
+    },
+    "Maintenance technician": {
+      "association_only": {
+        "n_tracks": 12,
+        "total_gap_frames": 28,
+        "n_gaps": 11,
+        "fragmentation_candidates": 0,
+        "fragmentation_rate": {
+          "mean": 0.0,
+          "median": 0.0
+        },
+        "interpolated_proportion": {
+          "mean": 0.0,
+          "median": 0.0
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 382.5
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 380.1666666666667
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 0.9166666666666666
+        },
+        "n_clips": 1
+      },
+      "full_pipeline": {
+        "n_tracks": 12,
+        "total_gap_frames": 18,
+        "n_gaps": 6,
+        "fragmentation_candidates": 0,
+        "fragmentation_rate": {
+          "mean": 0.0,
+          "median": 0.0
+        },
+        "interpolated_proportion": {
+          "mean": 0.002405949256342957,
+          "median": 0.002405949256342957
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 382.5
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 381.0
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 0.5
+        },
+        "n_clips": 1
+      }
+    },
+    "Maintenance worker": {
+      "association_only": {
+        "n_tracks": 23,
+        "total_gap_frames": 442,
+        "n_gaps": 108,
+        "fragmentation_candidates": 13,
+        "fragmentation_rate": {
+          "mean": 0.5652173913043478,
+          "median": 0.5652173913043478
+        },
+        "interpolated_proportion": {
+          "mean": 0.0,
+          "median": 0.0
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 183.43478260869566
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 164.2173913043478
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 4.695652173913044
+        },
+        "n_clips": 1
+      },
+      "full_pipeline": {
+        "n_tracks": 23,
+        "total_gap_frames": 221,
+        "n_gaps": 46,
+        "fragmentation_candidates": 13,
+        "fragmentation_rate": {
+          "mean": 0.5652173913043478,
+          "median": 0.5652173913043478
+        },
+        "interpolated_proportion": {
+          "mean": 0.11980990495247623,
+          "median": 0.11980990495247623
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 183.43478260869566
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 173.82608695652175
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 2.0
+        },
+        "n_clips": 1
+      }
+    },
+    "Mason": {
+      "association_only": {
+        "n_tracks": 13,
+        "total_gap_frames": 166,
+        "n_gaps": 47,
+        "fragmentation_candidates": 1,
+        "fragmentation_rate": {
+          "mean": 0.07692307692307693,
+          "median": 0.07692307692307693
+        },
+        "interpolated_proportion": {
+          "mean": 0.0,
+          "median": 0.0
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 139.3846153846154
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 126.61538461538461
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 3.6153846153846154
+        },
+        "n_clips": 1
+      },
+      "full_pipeline": {
+        "n_tracks": 13,
+        "total_gap_frames": 60,
+        "n_gaps": 16,
+        "fragmentation_candidates": 1,
+        "fragmentation_rate": {
+          "mean": 0.07692307692307693,
+          "median": 0.07692307692307693
+        },
+        "interpolated_proportion": {
+          "mean": 0.05650684931506849,
+          "median": 0.05650684931506849
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 139.3846153846154
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 134.76923076923077
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 1.2307692307692308
+        },
+        "n_clips": 1
+      }
+    },
+    "Mechanic": {
+      "association_only": {
+        "n_tracks": 28,
+        "total_gap_frames": 180,
+        "n_gaps": 55,
+        "fragmentation_candidates": 7,
+        "fragmentation_rate": {
+          "mean": 0.25,
+          "median": 0.25
+        },
+        "interpolated_proportion": {
+          "mean": 0.0,
+          "median": 0.0
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 179.64285714285714
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 173.21428571428572
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 1.9642857142857142
+        },
+        "n_clips": 1
+      },
+      "full_pipeline": {
+        "n_tracks": 28,
+        "total_gap_frames": 36,
+        "n_gaps": 10,
+        "fragmentation_candidates": 7,
+        "fragmentation_rate": {
+          "mean": 0.25,
+          "median": 0.25
+        },
+        "interpolated_proportion": {
+          "mean": 0.016019223067681217,
+          "median": 0.016019223067681217
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 179.64285714285714
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 178.35714285714286
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 0.35714285714285715
+        },
+        "n_clips": 1
+      }
+    },
+    "Office clerk": {
+      "association_only": {
+        "n_tracks": 34,
+        "total_gap_frames": 218,
+        "n_gaps": 52,
+        "fragmentation_candidates": 12,
+        "fragmentation_rate": {
+          "mean": 0.35294117647058826,
+          "median": 0.35294117647058826
+        },
+        "interpolated_proportion": {
+          "mean": 0.0,
+          "median": 0.0
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 160.23529411764707
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 153.8235294117647
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 1.5294117647058822
+        },
+        "n_clips": 1
+      },
+      "full_pipeline": {
+        "n_tracks": 34,
+        "total_gap_frames": 159,
+        "n_gaps": 41,
+        "fragmentation_candidates": 12,
+        "fragmentation_rate": {
+          "mean": 0.35294117647058826,
+          "median": 0.35294117647058826
+        },
+        "interpolated_proportion": {
+          "mean": 0.01115522783134808,
+          "median": 0.01115522783134808
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 160.23529411764707
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 155.55882352941177
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 1.2058823529411764
+        },
+        "n_clips": 1
+      }
+    },
+    "Packaging Worker": {
+      "association_only": {
+        "n_tracks": 21,
+        "total_gap_frames": 243,
+        "n_gaps": 71,
+        "fragmentation_candidates": 3,
+        "fragmentation_rate": {
+          "mean": 0.14285714285714285,
+          "median": 0.14285714285714285
+        },
+        "interpolated_proportion": {
+          "mean": 0.0,
+          "median": 0.0
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 114.0952380952381
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 102.52380952380952
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 3.380952380952381
+        },
+        "n_clips": 1
+      },
+      "full_pipeline": {
+        "n_tracks": 21,
+        "total_gap_frames": 153,
+        "n_gaps": 45,
+        "fragmentation_candidates": 3,
+        "fragmentation_rate": {
+          "mean": 0.14285714285714285,
+          "median": 0.14285714285714285
+        },
+        "interpolated_proportion": {
+          "mean": 0.03700401248328132,
+          "median": 0.03700401248328132
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 114.0952380952381
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 106.80952380952381
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 2.142857142857143
+        },
+        "n_clips": 1
+      }
+    },
+    "Painter": {
+      "association_only": {
+        "n_tracks": 16,
+        "total_gap_frames": 289,
+        "n_gaps": 98,
+        "fragmentation_candidates": 4,
+        "fragmentation_rate": {
+          "mean": 0.25,
+          "median": 0.25
+        },
+        "interpolated_proportion": {
+          "mean": 0.0,
+          "median": 0.0
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 99.3125
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 81.25
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 6.125
+        },
+        "n_clips": 1
+      },
+      "full_pipeline": {
+        "n_tracks": 16,
+        "total_gap_frames": 64,
+        "n_gaps": 17,
+        "fragmentation_candidates": 4,
+        "fragmentation_rate": {
+          "mean": 0.25,
+          "median": 0.25
+        },
+        "interpolated_proportion": {
+          "mean": 0.13639344262295083,
+          "median": 0.13639344262295083
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 99.3125
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 95.3125
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 1.0625
+        },
+        "n_clips": 1
+      }
+    },
+    "Picker / packer": {
+      "association_only": {
+        "n_tracks": 42,
+        "total_gap_frames": 398,
+        "n_gaps": 117,
+        "fragmentation_candidates": 14,
+        "fragmentation_rate": {
+          "mean": 0.3333333333333333,
+          "median": 0.3333333333333333
+        },
+        "interpolated_proportion": {
+          "mean": 0.0,
+          "median": 0.0
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 122.95238095238095
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 113.47619047619048
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 2.7857142857142856
+        },
+        "n_clips": 1
+      },
+      "full_pipeline": {
+        "n_tracks": 42,
+        "total_gap_frames": 238,
+        "n_gaps": 72,
+        "fragmentation_candidates": 14,
+        "fragmentation_rate": {
+          "mean": 0.3333333333333333,
+          "median": 0.3333333333333333
+        },
+        "interpolated_proportion": {
+          "mean": 0.02679658952496955,
+          "median": 0.02679658952496955
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 122.95238095238095
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 117.28571428571429
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 1.7142857142857142
+        },
+        "n_clips": 1
+      }
+    },
+    "Retail salesperson": {
+      "association_only": {
+        "n_tracks": 34,
+        "total_gap_frames": 153,
+        "n_gaps": 53,
+        "fragmentation_candidates": 6,
+        "fragmentation_rate": {
+          "mean": 0.17647058823529413,
+          "median": 0.17647058823529413
+        },
+        "interpolated_proportion": {
+          "mean": 0.0,
+          "median": 0.0
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 105.82352941176471
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 101.32352941176471
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 1.5588235294117647
+        },
+        "n_clips": 1
+      },
+      "full_pipeline": {
+        "n_tracks": 34,
+        "total_gap_frames": 1,
+        "n_gaps": 1,
+        "fragmentation_candidates": 6,
+        "fragmentation_rate": {
+          "mean": 0.17647058823529413,
+          "median": 0.17647058823529413
+        },
+        "interpolated_proportion": {
+          "mean": 0.04420350291909925,
+          "median": 0.04420350291909925
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 105.82352941176471
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 105.79411764705883
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 0.029411764705882353
+        },
+        "n_clips": 1
+      }
+    },
+    "Security guard": {
+      "association_only": {
+        "n_tracks": 33,
+        "total_gap_frames": 414,
+        "n_gaps": 98,
+        "fragmentation_candidates": 15,
+        "fragmentation_rate": {
+          "mean": 0.45454545454545453,
+          "median": 0.45454545454545453
+        },
+        "interpolated_proportion": {
+          "mean": 0.0,
+          "median": 0.0
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 86.72727272727273
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 74.18181818181819
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 2.9696969696969697
+        },
+        "n_clips": 1
+      },
+      "full_pipeline": {
+        "n_tracks": 33,
+        "total_gap_frames": 177,
+        "n_gaps": 37,
+        "fragmentation_candidates": 15,
+        "fragmentation_rate": {
+          "mean": 0.45454545454545453,
+          "median": 0.45454545454545453
+        },
+        "interpolated_proportion": {
+          "mean": 0.08379888268156424,
+          "median": 0.08379888268156424
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 86.72727272727273
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 81.36363636363636
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 1.121212121212121
+        },
+        "n_clips": 1
+      }
+    },
+    "Tailor / seamstress": {
+      "association_only": {
+        "n_tracks": 39,
+        "total_gap_frames": 323,
+        "n_gaps": 111,
+        "fragmentation_candidates": 13,
+        "fragmentation_rate": {
+          "mean": 0.3333333333333333,
+          "median": 0.3333333333333333
+        },
+        "interpolated_proportion": {
+          "mean": 0.0,
+          "median": 0.0
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 31.435897435897434
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 23.153846153846153
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 2.8461538461538463
+        },
+        "n_clips": 1
+      },
+      "full_pipeline": {
+        "n_tracks": 39,
+        "total_gap_frames": 141,
+        "n_gaps": 42,
+        "fragmentation_candidates": 13,
+        "fragmentation_rate": {
+          "mean": 0.3333333333333333,
+          "median": 0.3333333333333333
+        },
+        "interpolated_proportion": {
+          "mean": 0.17235023041474654,
+          "median": 0.17235023041474654
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 31.435897435897434
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 27.82051282051282
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 1.0769230769230769
+        },
+        "n_clips": 1
+      }
+    },
+    "Waiter / waitress": {
+      "association_only": {
+        "n_tracks": 19,
+        "total_gap_frames": 287,
+        "n_gaps": 47,
+        "fragmentation_candidates": 6,
+        "fragmentation_rate": {
+          "mean": 0.3157894736842105,
+          "median": 0.3157894736842105
+        },
+        "interpolated_proportion": {
+          "mean": 0.0,
+          "median": 0.0
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 82.47368421052632
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 67.36842105263158
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 2.473684210526316
+        },
+        "n_clips": 1
+      },
+      "full_pipeline": {
+        "n_tracks": 19,
+        "total_gap_frames": 279,
+        "n_gaps": 44,
+        "fragmentation_candidates": 6,
+        "fragmentation_rate": {
+          "mean": 0.3157894736842105,
+          "median": 0.3157894736842105
+        },
+        "interpolated_proportion": {
+          "mean": 0.006211180124223602,
+          "median": 0.006211180124223602
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 82.47368421052632
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 67.78947368421052
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 2.3157894736842106
+        },
+        "n_clips": 1
+      }
+    },
+    "Woodworker": {
+      "association_only": {
+        "n_tracks": 3,
+        "total_gap_frames": 67,
+        "n_gaps": 16,
+        "fragmentation_candidates": 0,
+        "fragmentation_rate": {
+          "mean": 0.0,
+          "median": 0.0
+        },
+        "interpolated_proportion": {
+          "mean": 0.0,
+          "median": 0.0
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 1521.3333333333333
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 1499.0
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 5.333333333333333
+        },
+        "n_clips": 1
+      },
+      "full_pipeline": {
+        "n_tracks": 3,
+        "total_gap_frames": 31,
+        "n_gaps": 4,
+        "fragmentation_candidates": 0,
+        "fragmentation_rate": {
+          "mean": 0.0,
+          "median": 0.0
+        },
+        "interpolated_proportion": {
+          "mean": 0.008382969335980588,
+          "median": 0.008382969335980588
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 1521.3333333333333
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 1511.0
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 1.3333333333333333
+        },
+        "n_clips": 1
+      }
+    },
+    "inventory_clerk": {
+      "association_only": {
+        "n_tracks": 12,
+        "total_gap_frames": 100,
+        "n_gaps": 23,
+        "fragmentation_candidates": 6,
+        "fragmentation_rate": {
+          "mean": 0.5,
+          "median": 0.5
+        },
+        "interpolated_proportion": {
+          "mean": 0.0,
+          "median": 0.0
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 189.16666666666666
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 180.83333333333334
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 1.9166666666666667
+        },
+        "n_clips": 1
+      },
+      "full_pipeline": {
+        "n_tracks": 12,
+        "total_gap_frames": 65,
+        "n_gaps": 11,
+        "fragmentation_candidates": 6,
+        "fragmentation_rate": {
+          "mean": 0.5,
+          "median": 0.5
+        },
+        "interpolated_proportion": {
+          "mean": 0.0163265306122449,
+          "median": 0.0163265306122449
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 189.16666666666666
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 183.75
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 0.9166666666666666
+        },
+        "n_clips": 1
+      }
+    },
+    "laborer": {
+      "association_only": {
+        "n_tracks": 39,
+        "total_gap_frames": 785,
+        "n_gaps": 256,
+        "fragmentation_candidates": 18,
+        "fragmentation_rate": {
+          "mean": 0.46153846153846156,
+          "median": 0.46153846153846156
+        },
+        "interpolated_proportion": {
+          "mean": 0.0,
+          "median": 0.0
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 75.71794871794872
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 55.58974358974359
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 6.564102564102564
+        },
+        "n_clips": 1
+      },
+      "full_pipeline": {
+        "n_tracks": 39,
+        "total_gap_frames": 518,
+        "n_gaps": 172,
+        "fragmentation_candidates": 18,
+        "fragmentation_rate": {
+          "mean": 0.46153846153846156,
+          "median": 0.46153846153846156
+        },
+        "interpolated_proportion": {
+          "mean": 0.11457905544147844,
+          "median": 0.11457905544147844
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 75.71794871794872
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 62.43589743589744
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 4.410256410256411
+        },
+        "n_clips": 1
+      }
+    },
+    "laundry_attendant": {
+      "association_only": {
+        "n_tracks": 24,
+        "total_gap_frames": 336,
+        "n_gaps": 91,
+        "fragmentation_candidates": 7,
+        "fragmentation_rate": {
+          "mean": 0.2916666666666667,
+          "median": 0.2916666666666667
+        },
+        "interpolated_proportion": {
+          "mean": 0.0,
+          "median": 0.0
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 213.08333333333334
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 199.08333333333334
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 3.7916666666666665
+        },
+        "n_clips": 1
+      },
+      "full_pipeline": {
+        "n_tracks": 24,
+        "total_gap_frames": 157,
+        "n_gaps": 32,
+        "fragmentation_candidates": 7,
+        "fragmentation_rate": {
+          "mean": 0.2916666666666667,
+          "median": 0.2916666666666667
+        },
+        "interpolated_proportion": {
+          "mean": 0.04478515230986484,
+          "median": 0.04478515230986484
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 213.08333333333334
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 206.54166666666666
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 1.3333333333333333
+        },
+        "n_clips": 1
+      }
+    },
+    "laundry_worker": {
+      "association_only": {
+        "n_tracks": 8,
+        "total_gap_frames": 100,
+        "n_gaps": 24,
+        "fragmentation_candidates": 1,
+        "fragmentation_rate": {
+          "mean": 0.125,
+          "median": 0.125
+        },
+        "interpolated_proportion": {
+          "mean": 0.0,
+          "median": 0.0
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 669.0
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 656.5
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 3.0
+        },
+        "n_clips": 1
+      },
+      "full_pipeline": {
+        "n_tracks": 8,
+        "total_gap_frames": 88,
+        "n_gaps": 20,
+        "fragmentation_candidates": 1,
+        "fragmentation_rate": {
+          "mean": 0.125,
+          "median": 0.125
+        },
+        "interpolated_proportion": {
+          "mean": 0.003989361702127659,
+          "median": 0.003989361702127659
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 669.0
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 658.0
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 2.5
+        },
+        "n_clips": 1
+      }
+    },
+    "mechanic": {
+      "association_only": {
+        "n_tracks": 44,
+        "total_gap_frames": 292,
+        "n_gaps": 75,
+        "fragmentation_candidates": 22,
+        "fragmentation_rate": {
+          "mean": 0.5,
+          "median": 0.5
+        },
+        "interpolated_proportion": {
+          "mean": 0.0,
+          "median": 0.0
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 112.54545454545455
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 105.9090909090909
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 1.7045454545454546
+        },
+        "n_clips": 1
+      },
+      "full_pipeline": {
+        "n_tracks": 44,
+        "total_gap_frames": 186,
+        "n_gaps": 37,
+        "fragmentation_candidates": 22,
+        "fragmentation_rate": {
+          "mean": 0.5,
+          "median": 0.5
+        },
+        "interpolated_proportion": {
+          "mean": 0.016995383969785983,
+          "median": 0.016995383969785983
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 112.54545454545455
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 108.31818181818181
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 0.8409090909090909
+        },
+        "n_clips": 1
+      }
+    },
+    "server": {
+      "association_only": {
+        "n_tracks": 23,
+        "total_gap_frames": 217,
+        "n_gaps": 66,
+        "fragmentation_candidates": 7,
+        "fragmentation_rate": {
+          "mean": 0.30434782608695654,
+          "median": 0.30434782608695654
+        },
+        "interpolated_proportion": {
+          "mean": 0.0,
+          "median": 0.0
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 251.43478260869566
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 242.0
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 2.869565217391304
+        },
+        "n_clips": 1
+      },
+      "full_pipeline": {
+        "n_tracks": 23,
+        "total_gap_frames": 77,
+        "n_gaps": 19,
+        "fragmentation_candidates": 7,
+        "fragmentation_rate": {
+          "mean": 0.30434782608695654,
+          "median": 0.30434782608695654
+        },
+        "interpolated_proportion": {
+          "mean": 0.021906764808973012,
+          "median": 0.021906764808973012
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 251.43478260869566
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 248.08695652173913
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 0.8260869565217391
+        },
+        "n_clips": 1
+      }
+    },
+    "tour_guide": {
+      "association_only": {
+        "n_tracks": 12,
+        "total_gap_frames": 158,
+        "n_gaps": 42,
+        "fragmentation_candidates": 5,
+        "fragmentation_rate": {
+          "mean": 0.4166666666666667,
+          "median": 0.4166666666666667
+        },
+        "interpolated_proportion": {
+          "mean": 0.0,
+          "median": 0.0
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 173.83333333333334
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 160.66666666666666
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 3.5
+        },
+        "n_clips": 1
+      },
+      "full_pipeline": {
+        "n_tracks": 12,
+        "total_gap_frames": 54,
+        "n_gaps": 18,
+        "fragmentation_candidates": 5,
+        "fragmentation_rate": {
+          "mean": 0.4166666666666667,
+          "median": 0.4166666666666667
+        },
+        "interpolated_proportion": {
+          "mean": 0.013779527559055118,
+          "median": 0.013779527559055118
+        },
+        "track_length_frames": {
+          "mean_of_clip_means": 173.83333333333334
+        },
+        "detections_per_track": {
+          "mean_of_clip_means": 169.33333333333334
+        },
+        "gaps_per_track": {
+          "mean_of_clip_means": 1.5
+        },
+        "n_clips": 1
+      }
+    }
+  }
+}
