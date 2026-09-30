@@ -1,0 +1,37 @@
+cff-version: 1.2.0
+message: "If you use this software or the dataset, please cite the paper below."
+title: "Detection Quality Adapter: post-processing for egocentric hand detection"
+type: software
+authors:
+  - family-names: Reddiyar
+    given-names: Durgesh S.
+    email: durgeshreddiyar@gmail.com
+    affiliation: Independent Researcher, Pune, India
+license: MIT
+repository-code: "https://github.com/dee6600/Hands_Detection_Quality_Adapter"
+version: "1.0.0"
+date-released: "2026-10-01"
+keywords:
+  - hand detection
+  - multi-object tracking
+  - egocentric video
+  - temporal consistency
+  - post-processing
+preferred-citation:
+  type: article
+  title: "A Post-Processing Adapter for Correcting False Positives and False Negatives in Egocentric Hand Detection"
+  authors:
+    - family-names: Reddiyar
+      given-names: Durgesh S.
+  year: 2026
+  journal: "arXiv preprint"
+  # After arXiv announces the paper, add:  identifiers: [{type: other, value: "arXiv:XXXX.XXXXX"}]
+references:
+  - type: dataset
+    title: "Egocentric work clips with raw hand detections, camera pose and stereo video (v1)"
+    authors:
+      - family-names: Reddiyar
+        given-names: Durgesh S.
+    year: 2026
+    doi: "10.5281/zenodo.23056146"
+    license: CC-BY-4.0

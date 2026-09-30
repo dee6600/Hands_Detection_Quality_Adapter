@@ -1,0 +1,734 @@
+[
+ {
+  "where": "Table III / Sec. VI",
+  "path": "dataset.clips",
+  "value": 39,
+  "tol": 0
+ },
+ {
+  "where": "Table III / Sec. VI",
+  "path": "dataset.occupations",
+  "value": 37,
+  "tol": 0
+ },
+ {
+  "where": "Table III / Sec. VI",
+  "path": "dataset.frames",
+  "value": 85786,
+  "tol": 0
+ },
+ {
+  "where": "Table III / Sec. VI",
+  "path": "dataset.raw_detections",
+  "value": 153876,
+  "tol": 0
+ },
+ {
+  "where": "Table III / Sec. VI",
+  "path": "dataset.frames_min",
+  "value": 900,
+  "tol": 0
+ },
+ {
+  "where": "Table III / Sec. VI",
+  "path": "dataset.frames_max",
+  "value": 2820,
+  "tol": 0
+ },
+ {
+  "where": "Table III / Sec. VI",
+  "path": "dataset.max_boxes_on_frame",
+  "value": 6,
+  "tol": 0
+ },
+ {
+  "where": "Table III / Sec. VI",
+  "path": "dataset.batches.A",
+  "value": 30,
+  "tol": 0
+ },
+ {
+  "where": "Table III / Sec. VI",
+  "path": "dataset.batches.B",
+  "value": 9,
+  "tol": 0
+ },
+ {
+  "where": "Table III / Fig. 2",
+  "path": "dataset.boxes_per_frame_pct.2",
+  "value": 72.34,
+  "tol": 0.005
+ },
+ {
+  "where": "Table III / Fig. 2",
+  "path": "dataset.boxes_per_frame_pct.1",
+  "value": 18.15,
+  "tol": 0.005
+ },
+ {
+  "where": "Table III / Fig. 2",
+  "path": "dataset.boxes_per_frame_pct.3+",
+  "value": 5.25,
+  "tol": 0.005
+ },
+ {
+  "where": "Table III / Fig. 2",
+  "path": "dataset.boxes_per_frame_pct.0",
+  "value": 4.26,
+  "tol": 0.005
+ },
+ {
+  "where": "Table VI",
+  "path": "thresholds.side_px.min",
+  "value": 55,
+  "tol": 0.5
+ },
+ {
+  "where": "Table VI",
+  "path": "thresholds.side_px.p1",
+  "value": 94,
+  "tol": 0.5
+ },
+ {
+  "where": "Table VI",
+  "path": "thresholds.side_px.max",
+  "value": 1110,
+  "tol": 0.5
+ },
+ {
+  "where": "Table VI",
+  "path": "thresholds.side_px.n_over_800",
+  "value": 253,
+  "tol": 0
+ },
+ {
+  "where": "Table VI",
+  "path": "thresholds.side_px.pct_over_800",
+  "value": 0.16,
+  "tol": 0.005
+ },
+ {
+  "where": "Table VI",
+  "path": "thresholds.aspect_stage1_old_bounds.p1",
+  "value": 0.54,
+  "tol": 0.005
+ },
+ {
+  "where": "Table VI",
+  "path": "thresholds.aspect_stage1_old_bounds.median",
+  "value": 0.92,
+  "tol": 0.005
+ },
+ {
+  "where": "Table VI",
+  "path": "thresholds.aspect_stage1_old_bounds.p99",
+  "value": 2.1,
+  "tol": 0.005
+ },
+ {
+  "where": "Table VI",
+  "path": "thresholds.gap_frames.n",
+  "value": 2999,
+  "tol": 0
+ },
+ {
+  "where": "Table VI",
+  "path": "thresholds.gap_frames.p50",
+  "value": 3,
+  "tol": 0.5
+ },
+ {
+  "where": "Table VI",
+  "path": "thresholds.gap_frames.p75",
+  "value": 13,
+  "tol": 0.5
+ },
+ {
+  "where": "Table VI",
+  "path": "thresholds.gap_frames.p90",
+  "value": 53,
+  "tol": 0.5
+ },
+ {
+  "where": "Table VI",
+  "path": "thresholds.speed_px_per_frame.p99",
+  "value": 82.6,
+  "tol": 0.05
+ },
+ {
+  "where": "Table VI",
+  "path": "thresholds.speed_px_per_frame.p99_5",
+  "value": 97.7,
+  "tol": 0.05
+ },
+ {
+  "where": "Table VI",
+  "path": "thresholds.speed_px_per_frame.p99_9",
+  "value": 132.1,
+  "tol": 0.05
+ },
+ {
+  "where": "Table VI",
+  "path": "thresholds.fastest_jump_px_per_frame",
+  "value": 305.8,
+  "tol": 0.05
+ },
+ {
+  "where": "Sec. VII-A / Table VI",
+  "path": "thresholds.containment_pairs_iou_ge_0_5.n",
+  "value": 5475,
+  "tol": 0
+ },
+ {
+  "where": "Sec. VII-A / Table VI",
+  "path": "thresholds.containment_pairs_iou_ge_0_5.min",
+  "value": 0.675,
+  "tol": 0.0005
+ },
+ {
+  "where": "Sec. VII-A / Table VI",
+  "path": "thresholds.containment_pairs_iou_ge_0_5.p1",
+  "value": 0.779,
+  "tol": 0.0005
+ },
+ {
+  "where": "Sec. VII-A / Table VI",
+  "path": "thresholds.containment_pairs_iou_ge_0_5.pct_ge_0_73",
+  "value": 99.63,
+  "tol": 0.01
+ },
+ {
+  "where": "Sec. VII-A / Table VI",
+  "path": "thresholds.containment_pairs_iou_ge_0_5.n_below_0_70",
+  "value": 6,
+  "tol": 0
+ },
+ {
+  "where": "Sec. VIII-B / Fig. 3",
+  "path": "outcomes.total",
+  "value": 157775,
+  "tol": 0
+ },
+ {
+  "where": "Sec. VIII-B / Fig. 3",
+  "path": "outcomes.stage4_new_boxes",
+  "value": 3899,
+  "tol": 0
+ },
+ {
+  "where": "Sec. VIII-B / Fig. 3",
+  "path": "outcomes.counts.kept",
+  "value": 134604,
+  "tol": 0
+ },
+ {
+  "where": "Sec. VIII-B / Fig. 3",
+  "path": "outcomes.counts.dropped_duplicate",
+  "value": 4954,
+  "tol": 0
+ },
+ {
+  "where": "Sec. VIII-B / Fig. 3",
+  "path": "outcomes.counts.rejected_shape",
+  "value": 4107,
+  "tol": 0
+ },
+ {
+  "where": "Sec. VIII-B / Fig. 3",
+  "path": "outcomes.counts.rejected_size",
+  "value": 0,
+  "tol": 0
+ },
+ {
+  "where": "Sec. VIII-B / Fig. 3",
+  "path": "outcomes.counts.rejected_static",
+  "value": 7634,
+  "tol": 0
+ },
+ {
+  "where": "Sec. VIII-B / Fig. 3",
+  "path": "outcomes.counts.rejected_displacement",
+  "value": 253,
+  "tol": 0
+ },
+ {
+  "where": "Sec. VIII-B / Fig. 3",
+  "path": "outcomes.counts.rejected_unsupported",
+  "value": 225,
+  "tol": 0
+ },
+ {
+  "where": "Sec. VIII-B / Fig. 3",
+  "path": "outcomes.counts.interpolated",
+  "value": 3933,
+  "tol": 0
+ },
+ {
+  "where": "Sec. VIII-B / Fig. 3",
+  "path": "outcomes.counts.rejected_selection",
+  "value": 2065,
+  "tol": 0
+ },
+ {
+  "where": "Sec. VIII-B / Fig. 3",
+  "path": "outcomes.pct_of_total.kept",
+  "value": 85.3,
+  "tol": 0.05
+ },
+ {
+  "where": "Sec. VIII-B / Fig. 3",
+  "path": "outcomes.pct_of_total.dropped_duplicate",
+  "value": 3.1,
+  "tol": 0.05
+ },
+ {
+  "where": "Sec. VIII-B / Fig. 3",
+  "path": "outcomes.pct_of_total.interpolated",
+  "value": 2.5,
+  "tol": 0.05
+ },
+ {
+  "where": "Sec. VIII-B / Fig. 3",
+  "path": "outcomes.pct_of_total.rejected_selection",
+  "value": 1.3,
+  "tol": 0.05
+ },
+ {
+  "where": "Table VII / Sec. VIII-C",
+  "path": "final.tracks",
+  "value": 787,
+  "tol": 0
+ },
+ {
+  "where": "Table VII / Sec. VIII-C",
+  "path": "final.exits",
+  "value": 284,
+  "tol": 0
+ },
+ {
+  "where": "Table VII / Sec. VIII-C",
+  "path": "final.in_track_detections",
+  "value": 148714,
+  "tol": 0
+ },
+ {
+  "where": "Table VII / Sec. VIII-C",
+  "path": "final.interp_share_pct.mean",
+  "value": 3.5,
+  "tol": 0.05
+ },
+ {
+  "where": "Table VII / Sec. VIII-C",
+  "path": "final.interp_share_pct.median",
+  "value": 1.5,
+  "tol": 0.05
+ },
+ {
+  "where": "Table VII / Sec. VIII-C",
+  "path": "final.interp_share_pct.max",
+  "value": 17.2,
+  "tol": 0.05
+ },
+ {
+  "where": "Table VII / Sec. VIII-C",
+  "path": "final.interp_share_pct.max_clip_job",
+  "value": "Tailor / seamstress",
+  "tol": 0
+ },
+ {
+  "where": "Table VII / Sec. VIII-C",
+  "path": "table7_pct_of_tracked.kept",
+  "value": 90.5,
+  "tol": 0.05
+ },
+ {
+  "where": "Table VII / Sec. VIII-C",
+  "path": "table7_pct_of_tracked.temporal",
+  "value": 5.5,
+  "tol": 0.05
+ },
+ {
+  "where": "Table VII / Sec. VIII-C",
+  "path": "table7_pct_of_tracked.interpolated",
+  "value": 2.6,
+  "tol": 0.05
+ },
+ {
+  "where": "Table VII / Sec. VIII-C",
+  "path": "table7_pct_of_tracked.selection",
+  "value": 1.4,
+  "tol": 0.05
+ },
+ {
+  "where": "Table VII / Sec. VIII-C",
+  "path": "table7_pct_of_tracked.exits_pct_of_tracks",
+  "value": 36.1,
+  "tol": 0.05
+ },
+ {
+  "where": "Table VIII (ablation)",
+  "path": "ablation.full_pipeline.total",
+  "value": 157775,
+  "tol": 0
+ },
+ {
+  "where": "Table VIII (ablation)",
+  "path": "ablation.full_pipeline.kept",
+  "value": 85.3,
+  "tol": 0.05
+ },
+ {
+  "where": "Table VIII (ablation)",
+  "path": "ablation.full_pipeline.interpolated",
+  "value": 2.5,
+  "tol": 0.05
+ },
+ {
+  "where": "Table VIII (ablation)",
+  "path": "ablation.full_pipeline.selection",
+  "value": 1.3,
+  "tol": 0.05
+ },
+ {
+  "where": "Table VIII (ablation)",
+  "path": "ablation.no_dedup.total",
+  "value": 161475,
+  "tol": 0
+ },
+ {
+  "where": "Table VIII (ablation)",
+  "path": "ablation.no_dedup.kept",
+  "value": 83.3,
+  "tol": 0.05
+ },
+ {
+  "where": "Table VIII (ablation)",
+  "path": "ablation.no_dedup.interpolated",
+  "value": 3.7,
+  "tol": 0.05
+ },
+ {
+  "where": "Table VIII (ablation)",
+  "path": "ablation.no_dedup.selection",
+  "value": 4.5,
+  "tol": 0.05
+ },
+ {
+  "where": "Table VIII (ablation)",
+  "path": "ablation.no_shape_filter.total",
+  "value": 157500,
+  "tol": 0
+ },
+ {
+  "where": "Table VIII (ablation)",
+  "path": "ablation.no_shape_filter.kept",
+  "value": 87.8,
+  "tol": 0.05
+ },
+ {
+  "where": "Table VIII (ablation)",
+  "path": "ablation.no_shape_filter.interpolated",
+  "value": 2.2,
+  "tol": 0.05
+ },
+ {
+  "where": "Table VIII (ablation)",
+  "path": "ablation.no_shape_filter.selection",
+  "value": 1.6,
+  "tol": 0.05
+ },
+ {
+  "where": "Table VIII (ablation)",
+  "path": "ablation.no_displacement_check.total",
+  "value": 157760,
+  "tol": 0
+ },
+ {
+  "where": "Table VIII (ablation)",
+  "path": "ablation.no_displacement_check.kept",
+  "value": 85.8,
+  "tol": 0.05
+ },
+ {
+  "where": "Table VIII (ablation)",
+  "path": "ablation.no_displacement_check.interpolated",
+  "value": 2.1,
+  "tol": 0.05
+ },
+ {
+  "where": "Table VIII (ablation)",
+  "path": "ablation.no_displacement_check.selection",
+  "value": 1.3,
+  "tol": 0.05
+ },
+ {
+  "where": "Table VIII (ablation)",
+  "path": "ablation.no_flicker_check.total",
+  "value": 157851,
+  "tol": 0
+ },
+ {
+  "where": "Table VIII (ablation)",
+  "path": "ablation.no_flicker_check.kept",
+  "value": 85.3,
+  "tol": 0.05
+ },
+ {
+  "where": "Table VIII (ablation)",
+  "path": "ablation.no_flicker_check.interpolated",
+  "value": 2.5,
+  "tol": 0.05
+ },
+ {
+  "where": "Table VIII (ablation)",
+  "path": "ablation.no_flicker_check.selection",
+  "value": 1.4,
+  "tol": 0.05
+ },
+ {
+  "where": "Table VIII (ablation)",
+  "path": "ablation.no_static_check.total",
+  "value": 157776,
+  "tol": 0
+ },
+ {
+  "where": "Table VIII (ablation)",
+  "path": "ablation.no_static_check.kept",
+  "value": 90.1,
+  "tol": 0.05
+ },
+ {
+  "where": "Table VIII (ablation)",
+  "path": "ablation.no_static_check.interpolated",
+  "value": 2.5,
+  "tol": 0.05
+ },
+ {
+  "where": "Table VIII (ablation)",
+  "path": "ablation.no_static_check.selection",
+  "value": 1.4,
+  "tol": 0.05
+ },
+ {
+  "where": "Table VIII (ablation)",
+  "path": "ablation.no_selection_cap.total",
+  "value": 157775,
+  "tol": 0
+ },
+ {
+  "where": "Table VIII (ablation)",
+  "path": "ablation.no_selection_cap.kept",
+  "value": 86.2,
+  "tol": 0.05
+ },
+ {
+  "where": "Table VIII (ablation)",
+  "path": "ablation.no_selection_cap.interpolated",
+  "value": 2.9,
+  "tol": 0.05
+ },
+ {
+  "where": "Table VIII (ablation)",
+  "path": "ablation.no_selection_cap.selection",
+  "value": 0.0,
+  "tol": 0.05
+ },
+ {
+  "where": "Table VIII (ablation)",
+  "path": "ablation.no_size_filter.total",
+  "value": 157775,
+  "tol": 0
+ },
+ {
+  "where": "Table VIII (ablation)",
+  "path": "ablation.no_size_filter.kept",
+  "value": 85.3,
+  "tol": 0.05
+ },
+ {
+  "where": "Table VIII (ablation)",
+  "path": "ablation.no_size_filter.interpolated",
+  "value": 2.5,
+  "tol": 0.05
+ },
+ {
+  "where": "Table VIII (ablation)",
+  "path": "ablation.no_size_filter.selection",
+  "value": 1.3,
+  "tol": 0.05
+ },
+ {
+  "where": "Sec. VIII-D",
+  "path": "ablation.no_interpolation.unsupported",
+  "value": 94.1,
+  "tol": 0.05
+ },
+ {
+  "where": "Sec. VIII-D (sensitivity)",
+  "path": "sensitivity.max_speed_px_per_frame.50.kept",
+  "value": 81.0,
+  "tol": 0.06
+ },
+ {
+  "where": "Sec. VIII-D (sensitivity)",
+  "path": "sensitivity.max_speed_px_per_frame.90.kept",
+  "value": 84.8,
+  "tol": 0.06
+ },
+ {
+  "where": "Sec. VIII-D (sensitivity)",
+  "path": "sensitivity.max_speed_px_per_frame.110.kept",
+  "value": 85.3,
+  "tol": 0.06
+ },
+ {
+  "where": "Sec. VIII-D (sensitivity)",
+  "path": "sensitivity.max_speed_px_per_frame.500.kept",
+  "value": 85.8,
+  "tol": 0.06
+ },
+ {
+  "where": "Sec. VIII-D (sensitivity)",
+  "path": "sensitivity.track_gate_speed_px_per_frame.150.kept",
+  "value": 85.2,
+  "tol": 0.05
+ },
+ {
+  "where": "Sec. VIII-D (sensitivity)",
+  "path": "sensitivity.track_gate_speed_px_per_frame.1000.kept",
+  "value": 85.3,
+  "tol": 0.05
+ },
+ {
+  "where": "Sec. VIII-D (sensitivity)",
+  "path": "sensitivity.max_dropout_frames.10.interpolated",
+  "value": 2.0,
+  "tol": 0.05
+ },
+ {
+  "where": "Sec. VIII-D (sensitivity)",
+  "path": "sensitivity.max_dropout_frames.15.interpolated",
+  "value": 2.5,
+  "tol": 0.05
+ },
+ {
+  "where": "Sec. VIII-D (sensitivity)",
+  "path": "sensitivity.max_dropout_frames.20.interpolated",
+  "value": 3.6,
+  "tol": 0.05
+ },
+ {
+  "where": "Sec. VIII-D (sensitivity)",
+  "path": "sensitivity.max_dropout_frames.100.interpolated",
+  "value": 9.6,
+  "tol": 0.05
+ },
+ {
+  "where": "Sec. VIII-D (sensitivity)",
+  "path": "sensitivity.max_dropout_frames.15.static",
+  "value": 4.8,
+  "tol": 0.05
+ },
+ {
+  "where": "Sec. VIII-D (sensitivity)",
+  "path": "sensitivity.max_dropout_frames.100.static",
+  "value": 1.4,
+  "tol": 0.05
+ },
+ {
+  "where": "Sec. VIII-D (sensitivity)",
+  "path": "sensitivity.min_static_run_frames.1.static",
+  "value": 10.1,
+  "tol": 0.05
+ },
+ {
+  "where": "Sec. VIII-D (sensitivity)",
+  "path": "sensitivity.min_static_run_frames.1.kept",
+  "value": 69.9,
+  "tol": 0.05
+ },
+ {
+  "where": "Sec. VIII-E / Fig. 4",
+  "path": "dropout.1.recovery_pct",
+  "value": 76.1,
+  "tol": 0.05
+ },
+ {
+  "where": "Sec. VIII-E / Fig. 4",
+  "path": "dropout.2.recovery_pct",
+  "value": 76.0,
+  "tol": 0.05
+ },
+ {
+  "where": "Sec. VIII-E / Fig. 4",
+  "path": "dropout.3.recovery_pct",
+  "value": 76.6,
+  "tol": 0.05
+ },
+ {
+  "where": "Sec. VIII-E / Fig. 4",
+  "path": "dropout.5.recovery_pct",
+  "value": 78.0,
+  "tol": 0.05
+ },
+ {
+  "where": "Sec. VIII-E / Fig. 4",
+  "path": "dropout.10.recovery_pct",
+  "value": 76.8,
+  "tol": 0.05
+ },
+ {
+  "where": "Sec. VIII-E / Fig. 4",
+  "path": "dropout.15.recovery_pct",
+  "value": 9.5,
+  "tol": 0.05
+ },
+ {
+  "where": "Sec. VIII-E / Fig. 4",
+  "path": "dropout.1.false_fill_pct",
+  "value": 0.09,
+  "tol": 0.005
+ },
+ {
+  "where": "Sec. VIII-E / Fig. 4",
+  "path": "dropout.10.false_fill_pct",
+  "value": 1.17,
+  "tol": 0.005
+ },
+ {
+  "where": "Sec. VIII-E / Fig. 4",
+  "path": "dropout.1.iou_median",
+  "value": 0.94,
+  "tol": 0.005
+ },
+ {
+  "where": "Sec. VIII-E / Fig. 4",
+  "path": "dropout.10.iou_median",
+  "value": 0.76,
+  "tol": 0.005
+ },
+ {
+  "where": "Sec. VIII-E / Fig. 4",
+  "path": "dropout.1.center_err_median_px",
+  "value": 3.3,
+  "tol": 0.05
+ },
+ {
+  "where": "Sec. VIII-E / Fig. 4",
+  "path": "dropout.10.center_err_median_px",
+  "value": 20.2,
+  "tol": 0.05
+ },
+ {
+  "where": "Sec. VIII-E / Fig. 4",
+  "path": "dropout.1.placements",
+  "value": 1815,
+  "tol": 0
+ },
+ {
+  "where": "Sec. VIII-E / Fig. 4",
+  "path": "dropout.15.placements",
+  "value": 1061,
+  "tol": 0
+ }
+]

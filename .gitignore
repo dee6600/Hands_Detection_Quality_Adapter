@@ -1,0 +1,26 @@
+# Project outputs and datasets
+/data/
+/scripts/tmp
+/scripts/output
+
+# Python artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+
+# Editor and OS files
+.vscode/
+.claude/
+.DS_Store
+
+# Local release staging (never commit)
+/release/
+
+# Reproduction outputs and LaTeX build files
+/results/
+paper/*.aux
+paper/*.log
+paper/*.blg
+paper/*.out

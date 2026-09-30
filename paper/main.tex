@@ -1,0 +1,425 @@
+\documentclass[journal]{IEEEtran}
+\pdfoutput=1
+
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{xcolor}
+\usepackage{url}
+\usepackage{cite}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta}
+\usepackage[hidelinks,pdfusetitle]{hyperref}
+\hypersetup{pdfauthor={Durgesh S Reddiyar},pdfcreator={},pdfproducer={}}
+
+% Public code repository and dataset DOI.
+\newcommand{\RepoURL}{https://github.com/dee6600/Hands_Detection_Quality_Adapter}
+\newcommand{\DataDOI}{10.5281/zenodo.23056146}
+
+\newcommand{\stage}[1]{Stage~#1}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+
+\begin{document}
+
+\title{A Post-Processing Adapter for Correcting False Positives and False Negatives in Egocentric Hand Detection}
+
+\author{Durgesh~S.~Reddiyar\\
+{\normalsize Independent Researcher, Pune, India}\\
+{\normalsize\texttt{durgeshreddiyar@gmail.com}}%
+\thanks{D.~S.~Reddiyar is an independent researcher, Pune, India (e-mail: durgeshreddiyar@gmail.com).}}
+
+\markboth{Preprint}{Reddiyar: Post-Processing Adapter for Egocentric Hand Detection}
+
+\maketitle
+
+\begin{abstract}
+Object detectors applied to video make two kinds of error that cannot be seen in a single frame: reporting a hand that is not present (a false positive) and missing one that is (a false negative). Both become detectable across frames, because a real hand follows a continuous, physically plausible trajectory and detector noise does not. We describe a detection quality adapter: a stateful, six-stage post-processing layer placed between a hand detector and its downstream consumers that corrects both error types using per-frame geometry and multi-frame tracking, without retraining or modifying the detector. The adapter is organised as a class-agnostic four-stage core (geometric rejection, association, temporal rejection, interpolation with exit detection) plus two hand-specific stages (track-ranked instance-cap selection and stereo depth). It was calibrated on 39 unlabeled egocentric work clips (85,786 frames, 153,876 raw detections) recorded with a head-mounted stereo camera. Because no ground truth exists, every threshold was set from percentiles of the data's own distributions, and results are reported as rejection-reason frequencies together with a label-free self-consistency test that masks known detections and measures their reconstruction. The calibrated pipeline keeps 90.5\% of tracked detections, interpolates 2.6\%, and rejects the remainder for a recorded cause; masked gaps of 1--10 frames are refilled in 76--78\% of cases with a false-fill rate below 1.2\%. A stereo-depth rule for separating the wearer's hands from a bystander's did not generalise beyond the clip it was calibrated on and is therefore documented as opt-in rather than enabled by default.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Hand detection, multi-object tracking, false-positive rejection, temporal consistency, egocentric video, stereo depth, post-processing, label-free evaluation.
+\end{IEEEkeywords}
+
+\section{Introduction}
+\IEEEPARstart{A}{hand} detector that scores video frame by frame fails in two directions. A \emph{false positive} is a detection reported where no hand is present: a duplicate box, a bystander's hand, or a shadow mistaken for skin. A \emph{false negative} is a hand that is present but not reported, typically during motion blur or a momentarily degraded frame. False positives retain footage that should be discarded; false negatives discard footage that was sound.
+
+Neither error is visible in a single frame. A duplicate box looks like an ordinary detection in isolation, and a missed hand looks exactly like an empty frame. What separates a real detection from a spurious one, or a genuine gap from a true absence, is behaviour across frames: a real hand moves along a continuous, physically plausible path, and noise does not. Temporal linking and rescoring of per-frame detections is well established for video object detection~\cite{han2016seqnms,kang2018tcnn}, and tracking-by-detection~\cite{bewley2016sort} rests on the same observation.
+
+Retraining the detector does not remove the structural limitation. A detector that scores one frame at a time cannot know that a duplicate should lose to the real hand, because within that frame the two are indistinguishable. We therefore take the opposite approach: allow the detector to over-report (every plausible box, uncapped and undeduplicated) and place after it a stateful multi-frame adapter that has context a single frame never has. The problem becomes one of tracking and consistency rather than recognition. No stage of the adapter performs detection; each asks, given noisy boxes over time, what the most plausible explanation is.
+
+The adapter has two layers. A generic, class-agnostic core of four stages applies geometric and temporal correction and needs only per-class expectations of size, shape, and speed. A thin hand layer specialises it for a low instance cap that is almost always reached, a head-mounted camera in near-continuous motion, a characteristic downward exit path, and a second camera view that makes per-box depth available.
+
+The contributions of this paper are:
+\begin{enumerate}
+\item a six-stage, detector-agnostic post-processing adapter whose every decision is recorded as a tag on the detection rather than applied as a deletion, so that all outputs remain auditable;
+\item a calibration procedure for the fully unlabeled setting in which thresholds are set from percentiles and structural invariants of the data's own distributions;
+\item a label-free evaluation on 39 real egocentric work clips, comprising a per-rule outcome breakdown, a single-rule ablation, a threshold sensitivity sweep, and a synthetic-dropout self-consistency test of gap filling;
+\item a documented negative result: a stereo-depth rule for rejecting bystanders' hands that did not transfer across camera rigs under a single nominal calibration.
+\end{enumerate}
+
+\section{Related Work}
+\label{sec:related}
+
+\textbf{Tracking-by-detection.} Most online multi-object trackers follow the pattern established by SORT~\cite{bewley2016sort}: a per-frame detector supplies boxes, a constant-velocity Kalman filter~\cite{kalman1960} predicts each track, and an assignment step, commonly the Hungarian method~\cite{kuhn1955hungarian}, links the two. Later work added appearance embeddings and Mahalanobis gating~\cite{wojke2017deepsort}, camera-motion compensation~\cite{aharon2022botsort}, and observation-centric corrections for occlusion and non-linear motion~\cite{cao2023ocsort}. ByteTrack~\cite{zhang2022bytetrack} is the closest precedent for our input contract: instead of discarding low-confidence boxes it keeps them and lets association decide, which parallels our request that the detector over-report and defer the instance cap. StrongSORT~\cite{du2023strongsort} adds offline post-processing, including Gaussian-smoothed interpolation of missing segments, the nearest analogue of our Stage~4. Our goal differs: auditable per-detection correction of a fixed detector's output rather than identity accuracy on a benchmark, and we deliberately use a simpler greedy tracker.
+
+\textbf{Gating and data association.} Validation gating, which bounds the region in which a measurement may be associated with a track, originates in the classical target-tracking literature~\cite{barshalom2009pdaf}. We use two gates with different roles: a generous gate for association and a stricter per-frame plausibility threshold (Section~\ref{sec:gates}).
+
+\textbf{Duplicate suppression and temporal rescoring.} Per-frame duplicates are conventionally removed by non-maximum suppression. Soft-NMS~\cite{bodla2017softnms} showed that hard IoU-based suppression wrongly removes genuinely overlapping objects; we encounter the same failure for crossing hands and address it with a containment-ratio test. Seq-NMS~\cite{han2016seqnms} and T-CNN~\cite{kang2018tcnn} link detections across frames and rescore them from temporal context. These methods are typically coupled to a particular detector or rescoring model; the adapter operates only on output boxes and never modifies detector scores or weights.
+
+\textbf{Reliability of detector confidence.} Modern neural networks are often overconfident, and their raw scores are not calibrated probabilities~\cite{guo2017calibration}; for detectors, calibration error additionally depends on box position and size~\cite{kuppers2020calibration}. This motivates ranking candidates by the support of their track rather than by single-frame confidence (Section~\ref{sec:formulation}).
+
+\textbf{Egocentric vision and hands.} First-person vision is surveyed in~\cite{betancourt2015fpv}; hands are central to it because the wearer's hands are almost always in view. Early work addressed pixel-level hand detection under camera motion and illumination change~\cite{li2013pixelhand}, and EgoHands~\cite{bambach2015egohands} explicitly separated the wearer's hands from other people's, the problem our Stage~6 attempts with stereo depth. Large-scale hand-contact detection~\cite{shan2020hands} and real-time hand tracking that reuses previous-frame estimates~\cite{zhang2020mediapipe} show the value of temporal context for hands. EPIC-KITCHENS~\cite{damen2018epic} and Ego4D~\cite{grauman2022ego4d} document the head motion, occlusion, and blur typical of egocentric footage, including skilled manual work.
+
+\textbf{Stereo depth and ego-motion.} Stage~6 estimates per-box depth from disparity; standard background is given by the stereo correspondence taxonomy of~\cite{scharstein2002taxonomy} and semi-global matching~\cite{hirschmuller2008sgm}. Conventional pipelines rectify the pair so that epipolar lines are horizontal~\cite{fusiello2000rectification}, which requires accurate calibration~\cite{zhang2000calibration}. The camera-motion signal used by our static-detection rule comes from onboard visual-inertial odometry, of which VINS-Mono~\cite{qin2018vins} is a representative method.
+
+\textbf{Evaluation.} Standard tracking evaluation uses ground-truth-matched metrics: CLEAR MOT~\cite{bernardin2008clear}, IDF1~\cite{ristani2016idf1}, and HOTA~\cite{luiten2021hota}, usually under the MOTChallenge protocol~\cite{dendorfer2021motchallenge}. None can be computed without labels, which is why we report outcome frequencies and a self-consistency test instead, and why a labeled reference set is the first item of future work.
+
+\section{Problem Formulation}
+\label{sec:formulation}
+
+The adapter sits between a detector and everything downstream, and its contract is deliberately narrow (Table~\ref{tab:contract}).
+
+\begin{table}[t]
+\centering
+\caption{The adapter's contract}
+\label{tab:contract}
+\footnotesize
+\begin{tabularx}{\columnwidth}{@{}L{1.5cm}Y@{}}
+\toprule
+Aspect & Definition \\
+\midrule
+Consumes & Per frame, a candidate pool of boxes with confidences, plus frame timestamps (and, for hands, camera pose). \\
+Returns & Every input detection plus any interpolated ones, each tagged \emph{reported}, \emph{merged}, \emph{rejected}, or \emph{interpolated}. \\
+Configured by & Per-class expectations: plausible size and shape, candidate-pool size and class maximum, maximum speed, typical exit behaviour. \\
+Does not & Alter or retrain the detector. It does ask the detector to stop capping instances itself, and takes over that selection. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Nothing is deleted. A rejected box stays in the record, tagged untrustworthy, for two reasons: every decision remains auditable after the fact, and a later stage can revise an earlier tag. Interpolation, for instance, can overwrite a rejected box's position when the surrounding trajectory supports it. An interpolated detection is an assertion made by the adapter, not by the detector, and downstream consumers must be able to tell the two apart.
+
+Six classes of false positive can be separated without a learned model. They split according to whether tracks are needed (Table~\ref{tab:fpclasses}).
+
+\begin{table}[t]
+\centering
+\caption{Separable false-positive classes, in order of application}
+\label{tab:fpclasses}
+\footnotesize
+\begin{tabularx}{\columnwidth}{@{}c L{1.55cm} L{1.2cm} Y@{}}
+\toprule
+\# & Class & Basis & Rejection criterion \\
+\midrule
+1 & Duplicate & Geometric & Two heavily overlapping boxes on one object; merge and keep the stronger. \\
+2 & Implausible size & Geometric & Far larger or smaller than the object can be at working distance. \\
+3 & Implausible shape & Geometric & Markedly more elongated than the object can be. \\
+4 & Implausible displacement & Temporal & Moves further between frames than the object can travel. \\
+5 & Unsupported & Temporal & Appears for one or two frames with no track before or after it. \\
+6 & Static & Temporal & Does not move in the image while the camera does, indicating scene structure. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The split fixes the order of the pipeline. The last three rules need tracks, and tracks exist only after association, so geometric rejection precedes association, which precedes temporal rejection, which precedes interpolation. The same ordering is why the instance cap is deferred rather than applied inside the detector. A detector asked to cap itself selects by confidence within a single frame, which is precisely the unreliable comparison~\cite{guo2017calibration,kuppers2020calibration}: a duplicate or background object can outscore the real hand on a given frame, and the real hand is discarded before the adapter sees it. Instead, the detector emits a slightly wider candidate pool, and the adapter selects after association, ranking candidates by the track that supports them. This admits more false positives at the input, which the temporal rules exist to remove; the pool is nevertheless kept narrow, since a wide pool only gives association more spurious candidates.
+
+\section{Adapter Architecture}
+\label{sec:arch}
+
+Detections pass through six stages in a fixed order (Fig.~\ref{fig:pipeline}). Stages~5 and~6 are hand-specific and sit on top of the four-stage generic core. Every detection carries a tag that survives to the final output.
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[
+  node distance=1.6mm,
+  box/.style={draw, rounded corners=1pt, align=left, text width=0.86\columnwidth, inner sep=2.2pt, font=\footnotesize},
+  opt/.style={box, dashed},
+  arr/.style={-{Latex[length=1.6mm]}, semithick}]
+\node[box] (s1) {\textbf{1\quad Geometric rejection}\\ Duplicate merge $\rightarrow$ size filter $\rightarrow$ shape filter. Per frame; no tracks needed.};
+\node[box, below=of s1] (s2) {\textbf{2\quad Association}\\ Greedy nearest-neighbour matching of detections to velocity-predicted track positions.};
+\node[box, below=of s2] (s3) {\textbf{3\quad Temporal rejection}\\ Implausible displacement, unsupported flicker, and static-while-camera-moves checks.};
+\node[box, below=of s3] (s4) {\textbf{4\quad Interpolation and exit detection}\\ Exit test first (border + outward motion $\rightarrow$ end track); otherwise fill the gap if the track resumes near its prediction.};
+\node[box, below=of s4] (s5) {\textbf{5\quad Instance-cap selection} \emph{(hand-specific)}\\ More than two live candidates on a frame $\rightarrow$ keep the two best-supported tracks.};
+\node[opt, below=of s5] (s6) {\textbf{6\quad Stereo depth} \emph{(hand-specific, opt-in)}\\ Per-box depth from the second view $\rightarrow$ reject boxes beyond arm's reach. Off by default.};
+\foreach \a/\b in {s1/s2,s2/s3,s3/s4,s4/s5,s5/s6} \draw[arr] (\a.south) -- (\b.north);
+\end{tikzpicture}
+\caption{The six-stage adapter. The order matters: Stages~3--6 all require tracks, which exist only after Stage~2. Stages~1--4 form the class-agnostic core; the dashed Stage~6 is excluded from the default configuration (Section~\ref{sec:stereo}).}
+\label{fig:pipeline}
+\end{figure}
+
+\textbf{Stage 1: geometric rejection.} Two boxes $a,b$ on the same frame are merged, keeping the higher-confidence one and tagging the other \emph{merged}, when
+\begin{equation}
+\mathrm{IoU}(a,b)\ge\tau_{\mathrm{iou}}
+\quad\text{and}\quad
+\frac{|a\cap b|}{\min(|a|,|b|)}\ge\tau_{\mathrm{cont}},
+\label{eq:dup}
+\end{equation}
+with $\tau_{\mathrm{iou}}=0.5$. The containment term is disabled in the generic core ($\tau_{\mathrm{cont}}=0$) and set to $0.7$ for hands (Section~\ref{sec:crossing}). Boxes whose side length or aspect ratio falls outside per-class bounds are tagged \emph{rejected}.
+
+\textbf{Stage 2: association.} Each active track predicts its next centre by linear extrapolation from its last velocity. For a track last observed $\Delta t$ frames ago, every surviving detection within the gate radius
+\begin{equation}
+r(\Delta t)=v_{\mathrm{gate}}\cdot\max(\Delta t,1)
+\label{eq:gate}
+\end{equation}
+of the prediction becomes a candidate pair. Candidate pairs are sorted by distance and assigned greedily; unmatched detections start new tracks, and a track that has not been matched for more than $D_{\max}$ frames ends. The detector's left/right label is never used for identity.
+
+\textbf{Stage 3: temporal rejection.} Three rules run in order. (i)~A detection whose distance from the previous detection in its track, divided by the elapsed frames, exceeds $v_{\max}$ is rejected. (ii)~Every detection in a track shorter than $L_{\min}=3$ detections is rejected as unsupported. (iii)~A box that moves less than $s_{\mathrm{static}}=4$\,px per frame for at least $N_{\mathrm{static}}$ consecutive frames while the camera is moving, according to the visual-inertial pose (translation speed $\ge0.05$\,m/s or rotation $\ge1^\circ$ per frame), is rejected as scene structure.
+
+\textbf{Stage 4: interpolation and exit detection.} For each gap between two trustworthy (non-rejected) detections in a track, the exit test runs first: if the detection before the gap lies within a border margin and its motion carries it outward, the object has left the frame and the gap is never filled. Otherwise, a gap of at most $D_{\max}$ frames whose far side lies within $r(\Delta t)$ of the pre-gap prediction is filled by linear interpolation of box position and size. Rejected detections inside the gap are treated as missing and may be overwritten. The final gap of a track is classified as a confirmed exit or an unexplained drop-out.
+
+\textbf{Stage 5: instance-cap selection.} On every frame with more than $K$ live candidates ($K=2$ for hands), only the $K$ candidates whose tracks have the highest support are kept. Support is the number of non-rejected detections in the track, with mean confidence as a tie-breaker, computed once before selection begins. An isolated flicker therefore loses even when it scores well, and a long track wins even on a frame where its box was not the most confident.
+
+\textbf{Stage 6: stereo depth.} For each box, disparity against the second camera view is converted to depth with a nominal stereo model, and boxes further than $1.8$\,m (beyond arm's reach) are rejected. This stage is opt-in (Section~\ref{sec:stereo}).
+
+\section{Design Decisions}
+\label{sec:design}
+
+\subsection{Greedy Nearest-Neighbour Tracking}
+The tracker is deliberately the simplest one that could work. A Kalman filter~\cite{kalman1960} (smoothed velocity under detector noise) and Hungarian assignment~\cite{kuhn1955hungarian} (globally optimal instead of greedy matching) were identified as upgrade paths but not built, because the simple version passed every synthetic and real-data test. With at most two hands, dense ambiguous scenes are rare; we list the theoretical gap as a limitation (Section~\ref{sec:limitations}).
+
+\subsection{Identity From Position and Motion Only}
+The detector guesses left or right hand per box, but that label is least reliable exactly when it matters most, when two hands cross. The tracker ignores it for identity. This was verified with an adversarial test in which two hands cross and their labels swap at the crossing point.
+
+\subsection{Two Gate Radii, Not One}
+\label{sec:gates}
+Early versions used a single speed parameter both for the association gate and for Stage~3's displacement check. Real data showed this to be wrong. A genuinely fast hand movement needs a generous gate so that its track does not fragment, but the same movement should still be flagged as visually untrustworthy once it is part of a track. ``Is this the same object?'' and ``is this frame trustworthy?'' are different questions on different time scales. The parameters were split into $v_{\mathrm{gate}}=350$\,px/frame (association) and $v_{\max}=110$\,px/frame (plausibility).
+
+\subsection{A Generic Core Plus a Configuration-Only Hand Layer}
+Stages~1--4 contain no hand-specific logic; they operate on any tracked object with configurable size, shape, and speed expectations. A single configuration function supplies the hand values, and the two hand stages are additive. This keeps the core testable in isolation and reusable for other object classes.
+
+\subsection{Calibration Without Labels}
+Every initial threshold was checked against the data's own distributions, using percentiles and structural invariants rather than visual inspection, before it was trusted. A threshold that was a no-op or demonstrably wrong was corrected immediately. Quantities that genuinely require labels, namely true precision and recall and the width of the candidate pool, were left unchanged and documented as blocked rather than guessed.
+
+\section{Dataset}
+\label{sec:dataset}
+
+The data are 39 clips of real work, recorded with a head-mounted ZED~X stereo camera at $1920\times1200$ pixels and 30\,frames/s in both views (Table~\ref{tab:dataset}). Clips last 30--94\,s (900--2,820 frames) and cover 37 occupations, including hairstylist, carpenter, farmworker, jeweler, mason, mechanic, tailor, barista, and dishwasher; two occupations appear twice. Each clip provides the stereo video pair; raw hand boxes from a fine-tuned detector, deliberately left uncapped, undeduplicated, and unsmoothed; full-rate 6-DoF camera pose from onboard visual-inertial odometry; per-frame timestamps; and task metadata. The clips carry two recording-batch labels (30 and 9 clips). No ground-truth labels exist.
+
+\begin{table}[t]
+\centering
+\caption{Dataset composition}
+\label{tab:dataset}
+\footnotesize
+\begin{tabular}{@{}lr@{}}
+\toprule
+Quantity & Value \\
+\midrule
+Clips (occupations) & 39 (37) \\
+Frames (timestamped) & 85,786 \\
+Raw detections & 153,876 \\
+Frames with 2 / 1 / $\ge$3 / 0 boxes & 72.34 / 18.15 / 5.25 / 4.26\% \\
+Maximum boxes on one frame & 6 \\
+Ground-truth labels & none \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics{figures/fig2_boxes_per_frame.pdf}
+\caption{Raw detections per frame across all 39 clips ($n=85{,}786$ frames). Frames with three or more boxes (bystanders' hands, undeduplicated boxes) are the main target of Stage~1; frames with fewer than two are candidates for Stage~4.}
+\label{fig:boxes}
+\end{figure}
+
+The variety of occupations matters. Several quantities that one might expect to be a single global number differ systematically by task: for example, typical working distance, estimated with the nominal stereo model on a small subset of clips, had a median of about 0.77\,m for a farmworker and spanned roughly 1.5--1.8\,m across the hairstylist, carpenter, and barber clips, whose arms extend toward a client or workpiece. These are distinct populations rather than noise around one value, which recurs in Sections~\ref{sec:hands}--\ref{sec:results}.
+
+\section{Hand Specialisation}
+\label{sec:hands}
+
+Hands are one configuration of the generic adapter. Most of the specialisation consists of parameters, but four properties change behaviour materially (Table~\ref{tab:handprops}). Two further properties are easy to get wrong: hands are roughly equant, so the shape rule is informative here where it would not be for an elongated object; and handedness is unreliable exactly when hands cross, so identity uses position and motion only.
+
+\begin{table}[t]
+\centering
+\caption{Hand-specific properties and their consequences}
+\label{tab:handprops}
+\footnotesize
+\begin{tabularx}{\columnwidth}{@{}L{1.9cm}Y@{}}
+\toprule
+Property & Consequence for the adapter \\
+\midrule
+At most two instances per frame & The cap is low and almost always reached, so deferring it matters most here: a duplicate does not merely add an error, it displaces the wearer's other hand. The detector supplies up to four candidates; the adapter selects two after association. \\
+Head-mounted camera & The camera moves almost constantly, which makes the static-detection rule unusually discriminating (see Section~\ref{sec:static} for where this breaks). \\
+Characteristic exit path & Hands usually leave downward, below the camera, rather than sideways. The exit test uses a 150\,px margin at the lower border without requiring outward motion, versus 20\,px elsewhere. \\
+Second view available & The wearer's hands are within arm's reach and a bystander's are not, so per-box stereo depth could separate them directly. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Duplicate Detections Versus Crossing Hands}
+\label{sec:crossing}
+The generic duplicate rule merges on IoU alone before any tracks exist, so it cannot tell whether two overlapping boxes are one hand detected twice or two real hands that overlap. Across all 39 clips there are 5,475 same-frame pairs of raw boxes with $\mathrm{IoU}\ge0.5$. Their containment ratio (intersection over the smaller box's area, Eq.~\eqref{eq:dup}) has a minimum of 0.675 and a first percentile of 0.779; more than 99.6\% of the pairs lie at or above 0.73. The typical duplicate is one strong box largely nested inside a weaker one. By contrast, two same-size boxes crossing with 50\% area overlap have a containment of 0.5. We therefore set $\tau_{\mathrm{cont}}=0.7$ for hands, and verified the rule with a test pair placed deliberately between the two thresholds (IoU 0.52, containment 0.68), confirming that it discriminates on containment and not merely on IoU. Without labels we cannot confirm that every high-containment pair is a true duplicate.
+
+\subsection{Where the Static-Detection Assumption Breaks}
+\label{sec:static}
+The static rule assumes that a head-mounted camera moves enough that a hand is never stationary in the image for long. One carpenter clip contradicts this: a hand is braced motionless for several seconds to steady a workpiece while the camera keeps moving. Requiring $N_{\mathrm{static}}=15$ consecutive still-while-moving frames, instead of one, protects brief real pauses but not this multi-second brace. The limitation is structural. Telling a long genuine pause from background clutter requires separating rotation-induced apparent motion from real parallax, not a longer or shorter pixel window. This remains open.
+
+\subsection{Stereo Depth: Valid on One Clip, Not on the Dataset}
+\label{sec:stereo}
+Stage~6 was calibrated with a nominal stereo model of the camera (2.2\,mm lenses, 12\,cm baseline, 733\,px focal length) and cross-checked on one clip against a high-confidence box at frame~230, where a disparity of 269\,px gives a depth of 0.33\,m, consistent with the lens's minimum focus distance for a box that large. The two views were found not to be exactly vertically aligned (about 2.4\,px mean offset, up to 9\,px, from a feature-matching check), so matching uses a vertical search tolerance rather than assuming perfectly rectified epipolar lines~\cite{fusiello2000rectification}.
+
+Applying the same calibration to all 39 clips produced a confident false rejection of the wearer's own hands on another clip. There, the stereo model placed the wearer's hands at 2.67--2.75\,m, well beyond arm's reach, and Stage~6 rejected 1,831 detections, about 45\% of that clip's tracked detections. The failing clip carries the same batch label as the calibration clip, so the likely cause is variation between physical camera units even within a batch, with no per-clip calibration available to correct for it~\cite{zhang2000calibration}. Stage~6 is therefore opt-in: it runs only when both video streams are supplied explicitly, and it is excluded from the default configuration and from every result below except where stated.
+
+\subsection{Edge Cases}
+Each required edge case is implemented as one explicit test (Table~\ref{tab:edge}). The full test suite (211 tests plus one expected failure) runs on synthetic sequences and real clips.
+
+\begin{table}[t]
+\centering
+\caption{Edge-case handling and implementation status}
+\label{tab:edge}
+\footnotesize
+\begin{tabularx}{\columnwidth}{@{}L{2.0cm}Y L{1.5cm}@{}}
+\toprule
+Case & Required handling & Status \\
+\midrule
+Duplicate boxes on one hand & Merge before selecting two & Implemented \\
+Hand exits at a side border & End the track; do not interpolate & Implemented \\
+Hand passes below the camera & End via the lower-border rule & Implemented \\
+Brief occlusion & Interpolate the gap & Implemented \\
+Hands cross or overlap & Keep both; not a duplicate & Implemented (Sec.~\ref{sec:crossing}) \\
+Re-entry after long absence & Start a new track & Implemented \\
+Motion blur & Interpolate where the trajectory is continuous & Implemented \\
+Another person's hands & Reject beyond arm's reach by depth & Opt-in, unreliable (Sec.~\ref{sec:stereo}) \\
+Gloved or partly occluded hand & Unmeasured; needs labeled examples & Expected failure \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Calibration and Label-Free Results}
+\label{sec:results}
+
+Per-stage precision and recall would be the natural measures, since each stage should move one of them in a known direction, but both require ground truth, and this dataset has none. The matching machinery for computing them is implemented and tested against synthetic ground truth, ready for a labeled reference set. This section reports what can be measured without labels: threshold evidence, outcome frequencies, an ablation and sensitivity analysis, and a self-consistency test of gap filling. Unless stated otherwise, results are for Stages~1--5 on all 39 clips.
+
+\subsection{Thresholds From Real Distributions}
+Six thresholds were changed on the basis of percentiles of the real data (Table~\ref{tab:thresholds}). The previous size floor was a no-op and the previous ceiling rejected real close-up hands; the dropout limit was set from the observed distribution of gap lengths rather than guessed. Four further thresholds (the camera translation and rotation thresholds, $s_{\mathrm{static}}$, and $\tau_{\mathrm{iou}}$) were checked against their distributions, found to be in reasonable positions, and left unchanged.
+
+\begin{table*}[t]
+\centering
+\caption{Thresholds retuned from real, unlabeled data}
+\label{tab:thresholds}
+\footnotesize
+\begin{tabularx}{\textwidth}{@{}L{3.6cm}L{1.9cm}L{1.9cm}Y@{}}
+\toprule
+Parameter & Before & After & Evidence (all 39 clips unless noted) \\
+\midrule
+Plausible size (box side) & 20--800\,px & 50--1150\,px & Raw side length: minimum 55\,px, 1st percentile 94\,px, maximum 1110\,px; 253 raw boxes (0.16\%) exceed 800\,px. \\
+Plausible shape (w/h) & 0.3--3.0 & 0.5--2.0 & Aspect ratio of Stage-1 survivors under the previous bounds: 1st percentile 0.54, median 0.92, 99th percentile 2.10. \\
+$D_{\max}$ (dropout, frames) & 10 & 15 & Internal gap length ($n=2{,}999$ gaps): median 3, 75th percentile 13, 90th percentile 53 frames. \\
+$v_{\max}$ (plausibility) & 150\,px/frame & 110\,px/frame & Adjacent-frame speed: 99th percentile 82.6, 99.5th percentile 97.7, 99.9th percentile 132.1\,px/frame (38 clips, one fast-camera clip excluded; measured with the previous size/shape bounds and a shared 150\,px/frame gate). \\
+$v_{\mathrm{gate}}$ (association) & shared with $v_{\max}$ & 350\,px/frame & Split out; set above the fastest adjacent-frame jump observed (305.8\,px/frame). \\
+$\tau_{\mathrm{cont}}$ (hands) & not used & 0.7 & 5,475 same-frame raw pairs with $\mathrm{IoU}\ge0.5$: minimum containment 0.675, 1st percentile 0.779; crossing hands sit near 0.5. \\
+\bottomrule
+\end{tabularx}
+\end{table*}
+
+\subsection{Where Every Detection Ends Up}
+Stage~4 creates 3,899 new boxes, so the 153,876 raw detections plus these give 157,775 detections in total. Fig.~\ref{fig:outcomes} attributes each of them to exactly one outcome. This is an unsupervised proxy for how often each rule fires, not a confirmed false-positive rate. Within Stage~1, all 4,107 size/shape rejections come from the shape bound; under the retuned bounds the size rule never fires. Within Stage~3, the static rule accounts for 7,634 of the 8,112 temporal rejections, displacement for 253, and unsupported flicker for 225.
+
+\begin{figure}[t]
+\centering
+\includegraphics{figures/fig3_outcomes.pdf}
+\caption{Outcome of every detection across all 39 clips ($n=157{,}775$: 153,876 raw detections plus 3,899 boxes created by Stage~4). Dark: retained; grey: removed for a recorded cause; hatched: interpolated by Stage~4. The interpolated count (3,933) includes 622 raw boxes rejected earlier whose positions Stage~4 overwrote.}
+\label{fig:outcomes}
+\end{figure}
+
+\subsection{Final Calibrated Pipeline}
+The tuned hand pipeline (Stages~1--5) produces 148,714 detections in 787 tracks (Table~\ref{tab:final}). The interpolated share per clip, the labels-free standing check we use to detect fabrication, has a mean of 3.5\% and a median of 1.5\%. Its maximum, 17.2\%, occurs on a tailor clip. We inspected that clip by hand: its longest interpolated runs are 6--12 frames, consistent with recovery from brief occlusions rather than fabrication.
+
+\begin{table}[t]
+\centering
+\caption{Final results across all 39 clips (Stages 1--5)}
+\label{tab:final}
+\footnotesize
+\begin{tabularx}{\columnwidth}{@{}L{3.1cm}rY@{}}
+\toprule
+Metric & Value & Interpretation \\
+\midrule
+Tracked detections & 148,714 & In 787 tracks \\
+\quad Kept & 90.5\% & Survived every rule \\
+\quad Rejected, temporal (St.~3) & 5.5\% & Proxy for false-positive frequency \\
+\quad Interpolated (St.~4) & 2.6\% & Recovered false negatives \\
+\quad Rejected, selection (St.~5) & 1.4\% & Cap enforced by track support \\
+Merged as duplicate (St.~1)$^{\ast}$ & 3.1\% & Proxy for one false-positive class \\
+Rejected, size/shape (St.~1)$^{\ast}$ & 2.6\% & Proxy for another class \\
+Tracks ending in confirmed exit & 36.1\% & 284 of 787; not interpolated \\
+Interpolated share per clip, mean / max & 3.5\% / 17.2\% & Labels-free standing check \\
+\bottomrule
+\end{tabularx}\\[2pt]
+\parbox{\columnwidth}{\footnotesize $^{\ast}$Share of all 157,775 detections (raw plus Stage-4 boxes); Stage-1 outcomes never enter a track. As shares of the 153,876 raw detections they are 3.2\% and 2.7\%.}
+\end{table}
+
+A second full run with Stage~6 enabled reproduced the Stages~1--5 outcomes exactly (same 787 tracks, 284 exits, 8,112 temporal and 2,065 selection rejections), as expected; Stage~6 then re-tagged 12,500 detections across the dataset. Examining that run surfaced the calibration failure of Section~\ref{sec:stereo}, and we therefore report the Stages~1--5 configuration as the default.
+
+\subsection{Ablation and Sensitivity}
+Table~\ref{tab:ablation} disables one rule at a time, purely through configuration values that make the rule unable to fire. Removing the static rule raises the kept share by 4.8 points, the largest single effect, which is consistent with it being the dominant temporal rule. Without duplicate merging, the 4,954 boxes that Stage~1 would merge stay in play, Stage~4 creates 3,700 more boxes around them, and the instance cap has to remove more than three times as many candidates (selection rejections rise from 1.3\% to 4.5\%), showing that Stage~1 and Stage~5 overlap in function and that deferred selection alone is a poor substitute for deduplication. Removing the size rule changes nothing, because the retuned size bounds never bind on this data. Interpolation cannot be isolated by configuration: $D_{\max}$ is also the tracker's patience window, so setting it to zero fragments almost every track to one or two detections, which the flicker rule then rejects (94.1\% of raw detections). This coupling between Stages~2 and~4 through one shared parameter is itself a finding.
+
+\begin{table}[t]
+\centering
+\caption{Single-rule ablation (share of all detections, \%)}
+\label{tab:ablation}
+\footnotesize
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+Variant & Total & Kept & Interp. & Select. \\
+\midrule
+Full pipeline & 157,775 & 85.3 & 2.5 & 1.3 \\
+No duplicate merge & 161,475 & 83.3 & 3.7 & 4.5 \\
+No shape filter & 157,500 & 87.8 & 2.2 & 1.6 \\
+No displacement check & 157,760 & 85.8 & 2.1 & 1.3 \\
+No flicker check & 157,851 & 85.3 & 2.5 & 1.4 \\
+No static check & 157,776 & 90.1 & 2.5 & 1.4 \\
+No instance cap & 157,775 & 86.2 & 2.9 & 0.0 \\
+\bottomrule
+\end{tabular}\\[2pt]
+\parbox{\columnwidth}{\footnotesize ``Total'' varies because the number of boxes created by Stage~4 depends on which detections survive earlier rules. Disabling the size filter gives results identical to the full pipeline.}
+\end{table}
+
+A sensitivity sweep shows which thresholds sit on a plateau. The association gate is flat: across $v_{\mathrm{gate}}=150$--$1000$\,px/frame the kept share stays between 85.2\% and 85.4\%. The plausibility speed has a knee: the kept share rises from 81.0\% at $v_{\max}=50$ to 84.8\% at 90 and 85.3\% at the chosen 110, then changes by less than 0.6 points up to 500. The dropout limit trades interpolation for rejection: the interpolated share is 2.0\% at $D_{\max}=10$, 2.5\% at 15, and 3.6\% at 20, and reaches 9.6\% at 100, where the static rule's rejections fall from 4.8\% to 1.4\% as long gaps are bridged. The static run length is the most sensitive: with $N_{\mathrm{static}}=1$ the static rule rejects 10.1\% of detections and the kept share falls to 69.9\%.
+
+\subsection{Self-Consistency of Gap Filling}
+To test Stage~4 without labels, we remove known detections and check whether they are reconstructed. We run Stages~1--4 on each untouched clip as a reference. In every reference track, for each maximal run of consecutive untouched raw detections that leaves at least three real frames of context on both sides, we mask one centred block of $g\in\{1,2,3,5,10,15\}$ frames, reload the clip from scratch, delete exactly those raw boxes, and rerun Stages~1--4. A masked frame counts as recovered if an interpolated detection appears there in the re-located track; we then measure its IoU and centre distance to the removed box. Unmasked context frames that receive an interpolated detection count as false fills. Stage~5 is excluded to avoid confounding.
+
+\begin{figure}[t]
+\centering
+\includegraphics{figures/fig4_dropout_recovery.pdf}
+\caption{Synthetic-dropout self-consistency test on all 39 clips (1,061--1,815 placements per gap length). (a)~Share of masked frames refilled by Stage~4 and share of unmasked context frames filled in error. The open marker at 15 frames reflects a boundary effect: a 15-frame gap exceeds the tracker's patience ($D_{\max}=15$), so the track ends before Stage~4 is consulted. (b)~IoU between the interpolated and the removed box for recovered frames. The reference boxes are the pipeline's own filtered detections, not ground truth.}
+\label{fig:dropout}
+\end{figure}
+
+For gaps of 1--10 frames, 76--78\% of masked frames are refilled, with a false-fill rate between 0.09\% and 1.2\% (Fig.~\ref{fig:dropout}). The remaining frames are left unfilled, either because Stage~4 declines the gap or because the track splits on re-association; we have not attributed these cases individually. Localisation degrades gracefully with gap length: the median IoU with the removed box is 0.94 for single-frame gaps and 0.76 for 10-frame gaps, and the median centre error grows from 3.3\,px to 20.2\,px. At exactly 15 frames recovery collapses to 9.5\%. This is caused by the same shared-parameter coupling seen in the ablation: the tracker ends the track before Stage~4 can bridge the gap, an off-by-one interaction between two stages that read one configuration field. We report it rather than tune it away. This test measures whether the pipeline can reconstruct its own filtered output; a detector that is wrong in the same way at a masked frame and at its interpolation would still score well.
+
+\subsection{Runtime}
+Stages~1--5 operate only on boxes and poses, and process all 85,786 frames in about one second in a single Python process on a laptop CPU. The opt-in Stage~6 decodes and matches both video streams and took 14,319.9\,s (about four hours) for the full dataset.
+
+\section{Limitations}
+\label{sec:limitations}
+
+\textbf{No ground truth.} Every threshold is evidence-based rather than precision/recall-optimal, which is a weaker guarantee than a labeled evaluation provides. The outcome frequencies in Section~\ref{sec:results} indicate how often each rule fires, not how often it is right.
+
+\textbf{Stereo depth does not generalise.} Stage~6 was calibrated and validated on one clip and misjudged depth badly on another clip from the same recording batch. It remains opt-in and excluded from the default output.
+
+\textbf{Multi-second static braces.} A hand held still for a few frames is protected, but one held still for several seconds still reads as background, because the signal cannot yet separate camera rotation from translation.
+
+\textbf{One global value for many occupations.} Arm's reach, camera speed, and hand size vary by task in ways visible in the data. A task-aware version was considered and deliberately not built, since deriving a task's normal range from its own detections would be circular without labels.
+
+\textbf{Shared dropout parameter.} $D_{\max}$ serves both as the tracker's patience window and as Stage~4's gap limit, which couples the two stages at the boundary (Fig.~\ref{fig:dropout}) and prevents a clean ablation of interpolation.
+
+\textbf{Greedy rather than optimal association.} Nearest-neighbour matching can in principle mis-assign in dense, ambiguous scenes. No real or synthetic test showed this, but it remains a known theoretical gap.
+
+\section{Conclusion and Future Work}
+We described a six-stage post-processing adapter that corrects false positives and false negatives in hand detection through temporal consistency rather than detector retraining. It was built first as a class-agnostic core validated on synthetic sequences and then specialised for hands with two additional stages. It was calibrated on 39 real, unlabeled egocentric work clips by checking every threshold against real distributions, and evaluated with outcome frequencies, ablation, sensitivity analysis, and a synthetic-dropout self-consistency test. The result is a defensible, evidence-based configuration rather than a precision/recall-optimal one, and we have kept that distinction explicit throughout.
+
+The most important next step is a labeled reference set weighted toward difficult cases (both hands visible, one hand, no hands, detections at the frame border, and borderline scores) rather than representative footage, since an evaluation without true negatives cannot show that the system recognises ``no hand'' correctly. Such a set would allow true per-stage precision and recall and standard tracking metrics~\cite{bernardin2008clear,ristani2016idf1,luiten2021hota}, tuning of the candidate-pool width, and validation of task-aware scaling of speed and reach thresholds. Two further directions do not require labels: separating rotation-induced apparent motion from true parallax to resolve the static-brace failure, and recovering per-clip stereo calibration~\cite{zhang2000calibration} so that Stage~6 can become a validated part of the default pipeline. Decoupling the tracker's patience window from Stage~4's gap limit is a small change that the self-consistency test shows to be worthwhile.
+
+\section*{Ethics Statement}
+The clips show people performing their normal work, recorded from a camera worn by the worker, and may incidentally include other people such as customers or co-workers. The recordings were used with permission, and the author has permission to publish this work and to redistribute the data, including the unblurred video, for research. Faces visible in the videos have not been blurred. The released data are intended for research on egocentric perception only; users must not attempt to identify the people shown, and the dataset metadata contains no names, locations, or recording dates.
+
+\section*{Data and Code Availability}
+The adapter's source code, configuration, calibration and evaluation scripts, and test suite are available at \url{\RepoURL} under the MIT license. The 39 clips (stereo video, raw detections, camera pose, timestamps, and task metadata) are archived on Zenodo under CC~BY~4.0, \mbox{doi:\,\href{https://doi.org/\DataDOI}{\DataDOI}}. A single script in the repository, \texttt{paper/reproduce\_paper.py}, recomputes the dataset statistics and all Stage~1--5 results reported in Sections~\ref{sec:dataset}--\ref{sec:results} (122 values) from the released data and checks each against the value printed here.
+
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+
+\end{document}

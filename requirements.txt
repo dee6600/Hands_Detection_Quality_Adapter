@@ -1,0 +1,6 @@
+# Core adapter + tests (tested with Python 3.13, numpy 2.5.3, opencv-python 5.0.0, pytest 9.1.1)
+numpy>=1.26
+opencv-python>=4.8   # only needed for Stage 6 (stereo depth) and the visualisation scripts
+pytest>=7.4
+# Paper figures (paper/make_figures.py; tested with matplotlib 3.11)
+matplotlib>=3.8
