@@ -56,7 +56,7 @@ The adapter has two layers. A generic, class-agnostic core of four stages applie
 
 The contributions of this paper are:
 \begin{enumerate}
-\item a six-stage, detector-agnostic post-processing adapter whose every decision is recorded as a tag on the detection rather than applied as a deletion, so that all outputs remain auditable;
+\item a six-stage, detector-agnostic post-processing adapter whose decisions are recorded as tags on the detections rather than applied as deletions, so that its outputs remain auditable;
 \item a calibration procedure for the fully unlabeled setting in which thresholds are set from percentiles and structural invariants of the data's own distributions;
 \item a label-free evaluation on 39 real egocentric work clips, comprising a per-rule outcome breakdown, a single-rule ablation, a threshold sensitivity sweep, and a synthetic-dropout self-consistency test of gap filling;
 \item a documented negative result: a stereo-depth rule for rejecting bystanders' hands that did not transfer across camera rigs under a single nominal calibration.
@@ -94,14 +94,14 @@ The adapter sits between a detector and everything downstream, and its contract 
 Aspect & Definition \\
 \midrule
 Consumes & Per frame, a candidate pool of boxes with confidences, plus frame timestamps (and, for hands, camera pose). \\
-Returns & Every input detection plus any interpolated ones, each tagged \emph{reported}, \emph{merged}, \emph{rejected}, or \emph{interpolated}. \\
+Returns & Every input detection not absorbed as a duplicate, plus any interpolated ones, each tagged \emph{reported}, \emph{merged}, \emph{rejected}, or \emph{interpolated}. \\
 Configured by & Per-class expectations: plausible size and shape, candidate-pool size and class maximum, maximum speed, typical exit behaviour. \\
 Does not & Alter or retrain the detector. It does ask the detector to stop capping instances itself, and takes over that selection. \\
 \bottomrule
 \end{tabularx}
 \end{table}
 
-Nothing is deleted. A rejected box stays in the record, tagged untrustworthy, for two reasons: every decision remains auditable after the fact, and a later stage can revise an earlier tag. Interpolation, for instance, can overwrite a rejected box's position when the surrounding trajectory supports it. An interpolated detection is an assertion made by the adapter, not by the detector, and downstream consumers must be able to tell the two apart.
+Rejection never deletes. A rejected box stays in the record, tagged untrustworthy, for two reasons: every decision remains auditable after the fact, and a later stage can revise an earlier tag. Interpolation, for instance, can overwrite a rejected box's position when the surrounding trajectory supports it. An interpolated detection is an assertion made by the adapter, not by the detector, and downstream consumers must be able to tell the two apart. The one exception is duplicate merging: the weaker box of a duplicate pair is set aside without a tag of its own, and the record of the merge is the \emph{merged} tag on the box that absorbed it.
 
 Six classes of false positive can be separated without a learned model. They split according to whether tracks are needed (Table~\ref{tab:fpclasses}).
 
@@ -150,14 +150,14 @@ Detections pass through six stages in a fixed order (Fig.~\ref{fig:pipeline}). S
 \label{fig:pipeline}
 \end{figure}
 
-\textbf{Stage 1: geometric rejection.} Two boxes $a,b$ on the same frame are merged, keeping the higher-confidence one and tagging the other \emph{merged}, when
+\textbf{Stage 1: geometric rejection.} Two boxes $a,b$ on the same frame are merged when
 \begin{equation}
 \mathrm{IoU}(a,b)\ge\tau_{\mathrm{iou}}
 \quad\text{and}\quad
 \frac{|a\cap b|}{\min(|a|,|b|)}\ge\tau_{\mathrm{cont}},
 \label{eq:dup}
 \end{equation}
-with $\tau_{\mathrm{iou}}=0.5$. The containment term is disabled in the generic core ($\tau_{\mathrm{cont}}=0$) and set to $0.7$ for hands (Section~\ref{sec:crossing}). Boxes whose side length or aspect ratio falls outside per-class bounds are tagged \emph{rejected}.
+with $\tau_{\mathrm{iou}}=0.5$. The higher-confidence box survives and is tagged \emph{merged}, recording that it absorbed a duplicate; the weaker box is not passed on to association. The containment term is disabled in the generic core ($\tau_{\mathrm{cont}}=0$) and set to $0.7$ for hands (Section~\ref{sec:crossing}). Boxes whose side length or aspect ratio falls outside per-class bounds are tagged \emph{rejected}.
 
 \textbf{Stage 2: association.} Each active track predicts its next centre by linear extrapolation from its last velocity. For a track last observed $\Delta t$ frames ago, every surviving detection within the gate radius
 \begin{equation}
@@ -320,12 +320,12 @@ Stage~4 creates 3,899 new boxes, so the 153,876 raw detections plus these give 1
 \begin{figure}[t]
 \centering
 \includegraphics{figures/fig3_outcomes.pdf}
-\caption{Outcome of every detection across all 39 clips ($n=157{,}775$: 153,876 raw detections plus 3,899 boxes created by Stage~4). Dark: retained; grey: removed for a recorded cause; hatched: interpolated by Stage~4. The interpolated count (3,933) includes 622 raw boxes rejected earlier whose positions Stage~4 overwrote.}
+\caption{Outcome of every detection across all 39 clips ($n=157{,}775$: 153,876 raw detections plus 3,899 boxes created by Stage~4). Dark: retained; grey: removed for a recorded cause; hatched: interpolated by Stage~4. The interpolated count (3,933) comprises 3,311 Stage-4 boxes and 622 raw boxes rejected earlier whose positions Stage~4 overwrote; the remaining 588 Stage-4 boxes were removed by Stage~5.}
 \label{fig:outcomes}
 \end{figure}
 
 \subsection{Final Calibrated Pipeline}
-The tuned hand pipeline (Stages~1--5) produces 148,714 detections in 787 tracks (Table~\ref{tab:final}). The interpolated share per clip, the labels-free standing check we use to detect fabrication, has a mean of 3.5\% and a median of 1.5\%. Its maximum, 17.2\%, occurs on a tailor clip. We inspected that clip by hand: its longest interpolated runs are 6--12 frames, consistent with recovery from brief occlusions rather than fabrication.
+The tuned hand pipeline (Stages~1--5) produces 148,714 detections in 787 tracks (Table~\ref{tab:final}). The interpolated share per clip, the label-free standing check we use to detect fabrication, has a mean of 3.5\% and a median of 1.5\%. Its maximum, 17.2\%, occurs on a tailor clip. We inspected that clip by hand: its longest interpolated runs are 6--12 frames, consistent with recovery from brief occlusions rather than fabrication.
 
 \begin{table}[t]
 \centering
@@ -344,7 +344,7 @@ Tracked detections & 148,714 & In 787 tracks \\
 Merged as duplicate (St.~1)$^{\ast}$ & 3.1\% & Proxy for one false-positive class \\
 Rejected, size/shape (St.~1)$^{\ast}$ & 2.6\% & Proxy for another class \\
 Tracks ending in confirmed exit & 36.1\% & 284 of 787; not interpolated \\
-Interpolated share per clip, mean / max & 3.5\% / 17.2\% & Labels-free standing check \\
+Interpolated share per clip, mean / max & 3.5\% / 17.2\% & Label-free standing check \\
 \bottomrule
 \end{tabularx}\\[2pt]
 \parbox{\columnwidth}{\footnotesize $^{\ast}$Share of all 157,775 detections (raw plus Stage-4 boxes); Stage-1 outcomes never enter a track. As shares of the 153,876 raw detections they are 3.2\% and 2.7\%.}
